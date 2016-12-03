@@ -1,0 +1,14 @@
+Package: togglr
+Type: Package
+Title: Toggl Api For Rstudio
+Version: 0.1.0
+Author: Vincent Guyader
+Maintainer: Vincent Guyader <vincent@thinkr.fr>
+Description: use toggl through Rstudio.
+License: GPL-3
+LazyData: TRUE
+Imports:
+    rstudioapi,
+    lubridate,
+    httr
+RoxygenNote: 5.0.1
