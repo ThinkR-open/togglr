@@ -13,6 +13,7 @@ correct_date <- function(time){
 #' @param start time in POSIXt
 #' @param stop time in POSIXt
 #' @param duration in seconds
+#' @param description the task you did
 #' @param api_token the toggl api token
 #' @importFrom lubridate now
 #' @importFrom httr POST authenticate verbose
@@ -43,7 +44,7 @@ toggl_create <- function(
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
-       body=list(time_entry = list(description = description,
+       body=toJSON(list(time_entry = list(description = description,
                                    created_with = "togglr",
                                    duronly=FALSE,
                                    duration=duration,
@@ -51,7 +52,7 @@ toggl_create <- function(
                                    # stop = correct_date(stop),
                                    at = correct_date(now())
        )
-       )
+       ),auto_unbox = TRUE)
   )
 
 
@@ -82,11 +83,13 @@ toggl_start <- function(
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
-       body=list(time_entry = list(description = description,
+       body=toJSON(
+         list(time_entry = list(description = description,
                                    created_with = "togglr",
-                                   duronly=FALSE)
+                                   duronly=FALSE)),
+              auto_unbox = TRUE)
        )
-  )
+  
 }
 
 

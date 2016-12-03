@@ -8,6 +8,8 @@ toggl_create(description = get_context(), start = now(), stop, duration,
   api_token = getOption("toggl_api_token"))
 }
 \arguments{
+\item{description}{the task you did}
+
 \item{start}{time in POSIXt}
 
 \item{stop}{time in POSIXt}
