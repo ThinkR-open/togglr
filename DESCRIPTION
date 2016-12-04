@@ -7,8 +7,10 @@ Maintainer: Vincent Guyader <vincent@thinkr.fr>
 Description: use toggl through Rstudio.
 License: GPL-3
 LazyData: TRUE
-Imports:
+Imports: 
     rstudioapi,
     lubridate,
-    httr
+    httr,
+    jsonlite,
+    magrittr
 RoxygenNote: 5.0.1
