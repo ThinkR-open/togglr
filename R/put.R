@@ -36,7 +36,7 @@ toggl_start <- function(
 #' @description  stop the active task
 #' @param id task id
 #' @param api_token the toggl api token
-#' @importFrom httr POST authenticate content
+#' @importFrom httr PUT
 #' @importFrom magrittr %>%
 #' @examples 
 #' options(toggl_api_token = "XXXXXXXX")# set your api token here
@@ -46,7 +46,7 @@ toggl_start <- function(
 toggl_stop <- function(id=get_current(),
                        api_token=getOption("toggl_api_token")){
   
-  POST(paste0("https://www.toggl.com/api/v8/time_entries/",id,"/stop/"),
+  PUT(paste0("https://www.toggl.com/api/v8/time_entries/",id,"/stop"),
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json")
