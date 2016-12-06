@@ -78,7 +78,7 @@ toggl_stop <- function(current=get_current(),
   
   if (requireNamespace("notifier", quietly = TRUE)){
   notify(
-    title = paste(description," stoped")
+    title = paste(current$description," stoped")
     ,msg = c("duration :",
             pretty_dt(now() - ymd_hms(current$start))
             
