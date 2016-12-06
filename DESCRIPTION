@@ -12,5 +12,7 @@ Imports:
     lubridate,
     httr,
     jsonlite,
-    magrittr
+    magrittr,
+    prettyunits
 RoxygenNote: 5.0.1
+Suggests: notifier

@@ -1,0 +1,23 @@
+#' @importFrom utils packageDescription
+.onAttach <- function(libname, pkgname) {
+    # Runs when attached to search() path such as by library() or require()
+    if (interactive()) {
+
+
+        pdesc <- packageDescription(pkgname)
+        packageStartupMessage('')
+        packageStartupMessage(pdesc$Package, " ", pdesc$Version, " by Vicnent Guyader")
+        packageStartupMessage("->  For help type help('SEO')")
+        packageStartupMessage('')
+        
+        
+        if ( is.null(getOption("toggl_api_token"))){
+        packageStartupMessage("  => you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+            }
+    }
+}
+
+# enleve les faux positifs du check
+# globalVariables(c(".")) # faudra mettre les autres pour que le check ne s'enflamme pas trop a cause des NSE
+
+

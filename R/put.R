@@ -7,6 +7,7 @@
 #' @importFrom httr POST authenticate content
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON
+#' @import notifier
 #' @examples 
 #' options(toggl_api_token = "XXXXXXXX")# set your api token here
 #' toggl_start()
@@ -31,36 +32,60 @@ toggl_start <- function(
          auto_unbox = TRUE)
   ) %>% content() %>% .$data %>% .$id %>% invisible()
   
+  if (requireNamespace("notifier", quietly = TRUE)){
+  notify(
+    title = paste(description," START")
+    ,msg = c("at :",
+             as.character(start)
+             
+    )
+  )}
+  
+  
+  
 }
 
 
 
 #' @title toggl_stop
 #' @description  stop the active task
-#' @param id task id
+#' @param current list task id and start time
 #' @param api_token the toggl api token
 #' @importFrom httr PUT
 #' @importFrom magrittr %>%
+#' @importFrom lubridate ymd_hms
+#' @importFrom prettyunits pretty_dt
 #' @examples 
 #' options(toggl_api_token = "XXXXXXXX")# set your api token here
 #' toggl_start()
 #' toggl_stop()
 #' @export
-toggl_stop <- function(id=get_current(),
+toggl_stop <- function(current=get_current(),
                        api_token=getOption("toggl_api_token")){
   if (is.null(api_token)){
     stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
     
   }
-  if (is.null(id)){
+  if (is.null(current$id)){
     
     stop("i can't find any task to stop...")
     
   }
-  PUT(paste0("https://www.toggl.com/api/v8/time_entries/",id,"/stop"),
+  PUT(paste0("https://www.toggl.com/api/v8/time_entries/",current$id,"/stop"),
        # verbose(),
        authenticate(api_token,"api_token"),
        encode="json")
+  
+  if (requireNamespace("notifier", quietly = TRUE)){
+  notify(
+    title = paste(description," stoped")
+    ,msg = c("duration :",
+            pretty_dt(now() - ymd_hms(current$start))
+            
+    )
+  )}
+  
+  
   
 }
 
