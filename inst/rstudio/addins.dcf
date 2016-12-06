@@ -1,0 +1,11 @@
+
+Name: START toggl
+Description: START toggl
+Binding: toggl_start
+Interactive: false
+
+
+Name: STOP toggl
+Description: STOP toggl
+Binding: toggl_stop
+Interactive: false
