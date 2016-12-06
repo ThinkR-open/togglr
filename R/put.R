@@ -15,10 +15,13 @@ toggl_start <- function(
   description=get_context(),
   start=now(),
   api_token=getOption("toggl_api_token")){
-  
+  if (is.null(api_token)){
+    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+    
+  }
   
   POST("https://www.toggl.com/api/v8/time_entries/start",
-       verbose(),
+       # verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
        body=toJSON(
@@ -45,9 +48,17 @@ toggl_start <- function(
 #' @export
 toggl_stop <- function(id=get_current(),
                        api_token=getOption("toggl_api_token")){
-  
+  if (is.null(api_token)){
+    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+    
+  }
+  if (is.null(id)){
+    
+    stop("i can't find any task to stop...")
+    
+  }
   PUT(paste0("https://www.toggl.com/api/v8/time_entries/",id,"/stop"),
-       verbose(),
+       # verbose(),
        authenticate(api_token,"api_token"),
        encode="json")
   
@@ -77,6 +88,10 @@ toggl_create <- function(
   stop,
   duration,
   api_token=getOption("toggl_api_token")){
+  if (is.null(api_token)){
+    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+    
+  }
 
 
   if (missing(duration) & missing(stop)){
