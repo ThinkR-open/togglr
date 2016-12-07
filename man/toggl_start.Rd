@@ -18,7 +18,9 @@ toggl_start(description = get_context(), start = now(),
 start a task
 }
 \examples{
+\dontrun{
 options(toggl_api_token = "XXXXXXXX")# set your api token here
 toggl_start()
+}
 }
 

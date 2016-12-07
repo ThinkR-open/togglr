@@ -22,7 +22,9 @@ toggl_create(description = get_context(), start = now(), stop, duration,
 create a
 }
 \examples{
+\dontrun{
 options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
 toggl_create(duration=1200)
+}
 }
 

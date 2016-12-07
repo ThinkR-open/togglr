@@ -7,10 +7,11 @@
 #' @importFrom httr POST authenticate content
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON
-#' @import notifier
 #' @examples 
+#' \dontrun{
 #' options(toggl_api_token = "XXXXXXXX")# set your api token here
 #' toggl_start()
+#' }
 #' @export
 toggl_start <- function(
   description=get_context(),
@@ -33,7 +34,7 @@ toggl_start <- function(
   ) %>% content() %>% .$data %>% .$id %>% invisible()
   
   if (requireNamespace("notifier", quietly = TRUE)){
-  notify(
+    notifier::notify(
     title = paste(description," START")
     ,msg = c("at :",
              as.character(start)
@@ -56,9 +57,11 @@ toggl_start <- function(
 #' @importFrom lubridate ymd_hms
 #' @importFrom prettyunits pretty_dt
 #' @examples 
+#' \dontrun{
 #' options(toggl_api_token = "XXXXXXXX")# set your api token here
 #' toggl_start()
 #' toggl_stop()
+#' }
 #' @export
 toggl_stop <- function(current=get_current(),
                        api_token=getOption("toggl_api_token")){
@@ -77,8 +80,8 @@ toggl_stop <- function(current=get_current(),
        encode="json")
   
   if (requireNamespace("notifier", quietly = TRUE)){
-  notify(
-    title = paste(current$description," stoped")
+    notifier::notify(
+    title = paste(current$description," STOP")
     ,msg = c("duration :",
             pretty_dt(now() - ymd_hms(current$start))
             
@@ -104,8 +107,10 @@ toggl_stop <- function(current=get_current(),
 #' @importFrom httr POST authenticate verbose
 #' @importFrom jsonlite toJSON
 #' @examples 
+#' \dontrun{
 #' options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
 #' toggl_create(duration=1200)
+#' }
 #' @export
 toggl_create <- function(
   description=get_context(),

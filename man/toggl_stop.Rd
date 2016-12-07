@@ -4,10 +4,11 @@
 \alias{toggl_stop}
 \title{toggl_stop}
 \usage{
-toggl_stop(id = get_current(), api_token = getOption("toggl_api_token"))
+toggl_stop(current = get_current(),
+  api_token = getOption("toggl_api_token"))
 }
 \arguments{
-\item{id}{task id}
+\item{current}{list task id and start time}
 
 \item{api_token}{the toggl api token}
 }
@@ -15,8 +16,10 @@ toggl_stop(id = get_current(), api_token = getOption("toggl_api_token"))
 stop the active task
 }
 \examples{
+\dontrun{
 options(toggl_api_token = "XXXXXXXX")# set your api token here
 toggl_start()
 toggl_stop()
+}
 }
 

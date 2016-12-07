@@ -24,6 +24,6 @@
 }
 
 # enleve les faux positifs du check
-# globalVariables(c(".")) # faudra mettre les autres pour que le check ne s'enflamme pas trop a cause des NSE
+globalVariables(c(".","notify")) # faudra mettre les autres pour que le check ne s'enflamme pas trop a cause des NSE
 
 
