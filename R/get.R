@@ -29,6 +29,6 @@ get_current <- function(api_token=getOption("toggl_api_token")){
   content(GET("https://www.toggl.com/api/v8/time_entries/current",
               # verbose(),
               authenticate(api_token,"api_token"),
-              encode="json"))$data[c("id","start","description")]
+              encode="json"))$data
   
 }
