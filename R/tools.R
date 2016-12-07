@@ -6,3 +6,10 @@
 correct_date <- function(time){
   paste0(gsub(" ","T",as.character(time)),"+01:00")
 }
+
+#' @title get_toggl_api_token
+#' @description  return the toggle api token
+#' @export
+get_toggl_api_token <- function(){
+  getOption("toggl_api_token")
+  }

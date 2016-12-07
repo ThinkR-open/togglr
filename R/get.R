@@ -21,7 +21,7 @@ get_context <- function(){
 #' @param api_token the toggl api token
 #' @importFrom httr GET authenticate content
 #' @export
-get_current <- function(api_token=getOption("toggl_api_token")){
+get_current <- function(api_token=get_toggl_api_token()){
   if (is.null(api_token)){
     stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
     
