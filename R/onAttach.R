@@ -12,7 +12,7 @@
         
         
         if ( is.null(getOption("toggl_api_token"))){
-        packageStartupMessage("  => you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+        packageStartupMessage("  => you have to set your api token using set_toggl_api_token('XXXXXXXX')")
         }
         
         if (!requireNamespace("notifier", quietly = TRUE)){

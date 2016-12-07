@@ -25,6 +25,26 @@ get_toggl_api_token <- function(){
 }
 
 
+#' @title set_toggl_api_token
+#' @description  set the toggle api token
+#' @param token toggl api token
+#' @importFrom magrittr %>% 
+#' @import assertthat
+#' @export
+set_toggl_api_token <- function(token){
+  # getOption("toggl_api_token")
+
+  
+  if ( missing(token) ){
+    agent::agent_del("toggl_api_token")
+    token <- ask_toggl_api_token() 
+  }
+  assert_that(is.character(token))
+    token %>% agent::agent_set("toggl_api_token",.)
+  
+  token
+}
+
 #' @title update_toggl_api_token
 #' @description  update the toggle api token
 #' @importFrom magrittr %>% 

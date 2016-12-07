@@ -19,7 +19,7 @@ start a task
 }
 \examples{
 \dontrun{
-options(toggl_api_token = "XXXXXXXX")# set your api token here
+get_toggl_api_token()# set your api token here
 toggl_start()
 }
 }

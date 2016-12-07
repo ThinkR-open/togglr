@@ -9,7 +9,7 @@
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
-#' options(toggl_api_token = "XXXXXXXX")# set your api token here
+#' get_toggl_api_token()# set your api token here
 #' toggl_start()
 #' }
 #' @export
@@ -18,12 +18,12 @@ toggl_start <- function(
   start=now(),
   api_token=get_toggl_api_token()){
   if (is.null(api_token)){
-    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+    stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
   
   POST("https://www.toggl.com/api/v8/time_entries/start",
-       # verbose(),
+        # verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
        body=toJSON(
@@ -31,7 +31,10 @@ toggl_start <- function(
                                 created_with = "togglr",
                                 duronly=FALSE)),
          auto_unbox = TRUE)
-  ) %>% content() %>% .$data %>% .$id %>% invisible()
+  ) %>% content() %>% .$data %>% .$id -> id
+  
+  
+  if (!is.null(id)){
   
   if (requireNamespace("notifier", quietly = TRUE)){
     notifier::notify(
@@ -40,9 +43,17 @@ toggl_start <- function(
              as.character(start)
              
     )
-  )}
+    )}}else{
+      if (requireNamespace("notifier", quietly = TRUE)){
+        notifier::notify(
+          title = paste(description," ERROR")
+          ,msg = c("NOT STARTED"
+        ))}
+      message("Error toggl not started")
+      
+  }
   
-  
+  invisible(id)
   
 }
 
@@ -66,7 +77,7 @@ toggl_start <- function(
 toggl_stop <- function(current=get_current(),
                        api_token=get_toggl_api_token()){
   if (is.null(api_token)){
-    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+    stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
   if (is.null(current$id)){
@@ -119,7 +130,7 @@ toggl_create <- function(
   duration,
   api_token=get_toggl_api_token()){
   if (is.null(api_token)){
-    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+    stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
 
