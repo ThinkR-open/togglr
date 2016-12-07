@@ -9,7 +9,55 @@ correct_date <- function(time){
 
 #' @title get_toggl_api_token
 #' @description  return the toggle api token
+#' @importFrom magrittr %>% 
 #' @export
 get_toggl_api_token <- function(){
-  getOption("toggl_api_token")
+  # getOption("toggl_api_token")
+  token <-NULL
+  try(token<-agent::agent_get("toggl_api_token"),silent=TRUE)
+  if ( is.null(token) ){
+    agent::agent_del("toggl_api_token")
+    token <- ask_toggl_api_token() 
+    token %>% agent::agent_set("toggl_api_token",.)
+    
   }
+  token
+}
+
+
+#' @title update_toggl_api_token
+#' @description  update the toggle api token
+#' @importFrom magrittr %>% 
+#' @export
+update_toggl_api_token <- function(){
+  # getOption("toggl_api_token")
+  agent::agent_del("toggl_api_token")
+    ask_toggl_api_token() %>% agent::agent_set("toggl_api_token",.)
+    
+}
+
+#' @title delete_toggl_api_token
+#' @description  delete the toggle api token
+#' @export
+delete_toggl_api_token <- function(){
+  # getOption("toggl_api_token")
+  agent::agent_del("toggl_api_token")
+  
+}
+
+
+#' @title ask_toggl_api_token
+#' @description  ask for the toggle api token
+#' @export
+ask_toggl_api_token <- function (msg="toggl api token") 
+{
+  passwd <- tryCatch({
+    newpass <- getPass::getPass(msg)
+  }, interrupt = NULL)
+  if (!length(passwd) || !nchar(passwd)) {
+    return(NULL)
+  }
+  else {
+    return(as.character(passwd))
+  }
+}
