@@ -16,7 +16,7 @@
 toggl_start <- function(
   description=get_context(),
   start=now(),
-  api_token=getOption("toggl_api_token")){
+  api_token=get_toggl_api_token()){
   if (is.null(api_token)){
     stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
     
@@ -64,7 +64,7 @@ toggl_start <- function(
 #' }
 #' @export
 toggl_stop <- function(current=get_current(),
-                       api_token=getOption("toggl_api_token")){
+                       api_token=get_toggl_api_token()){
   if (is.null(api_token)){
     stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
     
@@ -117,7 +117,7 @@ toggl_create <- function(
   start=now(),
   stop,
   duration,
-  api_token=getOption("toggl_api_token")){
+  api_token=get_toggl_api_token()){
   if (is.null(api_token)){
     stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
     
