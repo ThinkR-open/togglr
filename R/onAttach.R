@@ -11,12 +11,16 @@
         packageStartupMessage('')
         
         
-        if ( is.null(getOption("toggl_api_token"))){
-        packageStartupMessage("  => you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+        if ( is.null(togglr::get_toggl_api_token())){
+        packageStartupMessage("  => you have to set your api token using set_toggl_api_token()")
         }
         
         if (!requireNamespace("notifier", quietly = TRUE)){
           try(source("https://install-github.me/gaborcsardi/notifier"),silent=TRUE) # crade mais bon...
+          
+        }
+        if (!requireNamespace("agent", quietly = TRUE)){
+          try(source("https://install-github.me/ropensci/agent"),silent=TRUE) # crade mais bon...
           
         }
         

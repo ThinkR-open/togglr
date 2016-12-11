@@ -9,13 +9,14 @@ correct_date <- function(time){
 
 #' @title get_toggl_api_token
 #' @description  return the toggle api token
+#' @param ask booleen do we have to ask if missing
 #' @importFrom magrittr %>% 
 #' @export
-get_toggl_api_token <- function(){
+get_toggl_api_token <- function(ask=TRUE){
   # getOption("toggl_api_token")
   token <-NULL
   try(token<-agent::agent_get("toggl_api_token"),silent=TRUE)
-  if ( is.null(token) ){
+  if ( is.null(token) & ask){
     agent::agent_del("toggl_api_token")
     token <- ask_toggl_api_token() 
     token %>% agent::agent_set("toggl_api_token",.)
