@@ -7,12 +7,12 @@
         pdesc <- packageDescription(pkgname)
         packageStartupMessage('')
         packageStartupMessage(pdesc$Package, " ", pdesc$Version, " by Vincent Guyader")
-        packageStartupMessage("->  For help type help('SEO')")
+        packageStartupMessage("->  For help type help('togglr')")
         packageStartupMessage('')
         
         
         if ( is.null(getOption("toggl_api_token"))){
-        packageStartupMessage("  => you have to set your api token using set_toggl_api_token('XXXXXXXX')")
+        packageStartupMessage("  => you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
         }
         
         if (!requireNamespace("notifier", quietly = TRUE)){
@@ -24,6 +24,6 @@
 }
 
 # enleve les faux positifs du check
-globalVariables(c(".","notify")) # faudra mettre les autres pour que le check ne s'enflamme pas trop a cause des NSE
+globalVariables(c(".","notify","notifier")) # faudra mettre les autres pour que le check ne s'enflamme pas trop a cause des NSE
 
 
