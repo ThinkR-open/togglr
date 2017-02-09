@@ -4,11 +4,14 @@
 \alias{toggl_start}
 \title{toggl_start}
 \usage{
-toggl_start(description = get_context(), start = now(),
+toggl_start(description = get_context(),
+  project_name = get_context_project(), start = now(),
   api_token = get_toggl_api_token())
 }
 \arguments{
 \item{description}{the task you are doing}
+
+\item{project_name}{nom du projet}
 
 \item{start}{start time in POSIXt}
 

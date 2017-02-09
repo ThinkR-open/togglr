@@ -32,3 +32,21 @@ get_current <- function(api_token=get_toggl_api_token()){
               encode="json"))$data
   
 }
+
+
+
+
+#' @title get_context_projet
+#' @description  retrieve Rstudio projet if possible
+#' @importFrom rstudioapi getActiveProject
+#' @export
+get_context_project <- function(){
+  projet <- NULL
+  try(projet <- getActiveProject(),silent=TRUE)
+  if (!is.null(projet)){
+    description <- basename(projet)
+  }else{
+    description <- "sans projet"
+  }
+  description
+}

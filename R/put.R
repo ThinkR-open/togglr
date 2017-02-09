@@ -1,8 +1,11 @@
 #' @title toggl_start
 #' @description  start a task
+#'
 #' @param description the task you are doing
 #' @param start start time in POSIXt 
+#' @param project_name nom du projet
 #' @param api_token the toggl api token
+#'
 #' @importFrom lubridate now
 #' @importFrom httr POST authenticate content
 #' @importFrom magrittr %>%
@@ -15,6 +18,7 @@
 #' @export
 toggl_start <- function(
   description=get_context(),
+  project_name=get_context_project(),
   start=now(),
   api_token=get_toggl_api_token()){
   if (is.null(api_token)){
@@ -29,6 +33,7 @@ toggl_start <- function(
        body=toJSON(
          list(time_entry = list(description = description,
                                 created_with = "togglr",
+                                pid = get_project_id(project_name = project_name,create=TRUE),
                                 duronly=FALSE)),
          auto_unbox = TRUE)
   ) %>% content() %>% .$data %>% .$id -> id
