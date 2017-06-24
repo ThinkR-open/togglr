@@ -18,3 +18,4 @@ Imports:
     dplyr,
     assertthat
 RoxygenNote: 5.0.1
+Remotes: gaborcsardi/notifier
