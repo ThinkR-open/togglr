@@ -26,4 +26,3 @@ get_toggl_api_token()# set your api token here
 toggl_start()
 }
 }
-

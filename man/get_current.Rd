@@ -12,4 +12,3 @@ get_current(api_token = get_toggl_api_token())
 \description{
 retrieve current projet id
 }
-

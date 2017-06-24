@@ -14,8 +14,6 @@ Imports:
     jsonlite,
     magrittr,
     prettyunits,
-    notifier,
     dplyr,
     assertthat
-RoxygenNote: 5.0.1
-Remotes: gaborcsardi/notifier
+RoxygenNote: 6.0.1

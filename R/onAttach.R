@@ -12,7 +12,7 @@
         
         
         
-        if (!requireNamespace("notifier", quietly = TRUE)){
+        if (FALSE & !requireNamespace("notifier", quietly = TRUE)){
           try(source("https://install-github.me/gaborcsardi/notifier"),silent=TRUE) # crade mais bon...
           
         }

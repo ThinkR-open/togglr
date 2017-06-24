@@ -21,4 +21,3 @@ toggl_start()
 toggl_stop()
 }
 }
-

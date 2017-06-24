@@ -12,4 +12,3 @@ get_toggl_api_token(ask = TRUE)
 \description{
 return the toggle api token
 }
-

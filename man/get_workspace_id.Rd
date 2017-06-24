@@ -9,4 +9,3 @@ get_workspace_id(api_token = get_toggl_api_token())
 \arguments{
 \item{api_token}{the toggl api token}
 }
-

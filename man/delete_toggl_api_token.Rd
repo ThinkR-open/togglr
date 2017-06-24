@@ -9,4 +9,3 @@ delete_toggl_api_token()
 \description{
 delete the toggle api token
 }
-

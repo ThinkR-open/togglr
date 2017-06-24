@@ -40,22 +40,15 @@ toggl_start <- function(
   
   
   if (!is.null(id)){
-  
-  if (requireNamespace("notifier", quietly = TRUE)){
-    notifier::notify(
-    title = paste(description," START")
-    ,msg = c("at :",
-             as.character(start)
-             
-    )
-    )}}else{
-      if (requireNamespace("notifier", quietly = TRUE)){
-        notifier::notify(
+    notification(paste(description," START"),c("at :",
+                                               as.character(start)
+                                               
+    ))
+  }else{
+    notification(
           title = paste(description," ERROR")
           ,msg = c("NOT STARTED"
-        ))}
-      message("Error toggl not started")
-      
+        ))
   }
   
   invisible(id)
@@ -95,14 +88,13 @@ toggl_stop <- function(current=get_current(),
        authenticate(api_token,"api_token"),
        encode="json")
   
-  if (requireNamespace("notifier", quietly = TRUE)){
-    notifier::notify(
+  notification(
     title = paste(current$description," STOP")
     ,msg = c("duration :",
             pretty_dt(now() - ymd_hms(current$start))
             
     )
-  )}
+  )
   
   
   

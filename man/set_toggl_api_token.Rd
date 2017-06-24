@@ -12,4 +12,3 @@ set_toggl_api_token(token)
 \description{
 set the toggle api token
 }
-
