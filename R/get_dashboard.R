@@ -121,6 +121,7 @@ get_all_client_names <- function(  api_token=get_toggl_api_token(),
 #' @param workspace_id the workspace id
 #' @param since a date
 #' @param until a date
+#' @param humain boolean humain readable time
 #'
 #' @return
 #' @export
