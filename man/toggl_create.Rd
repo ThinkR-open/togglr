@@ -27,4 +27,3 @@ options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
 toggl_create(duration=1200)
 }
 }
-

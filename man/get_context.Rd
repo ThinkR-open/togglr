@@ -9,4 +9,3 @@ get_context()
 \description{
 retrieve Rstudio projet if possible
 }
-

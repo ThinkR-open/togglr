@@ -9,4 +9,3 @@ ask_toggl_api_token(msg = "toggl api token")
 \description{
 ask for the toggle api token
 }
-

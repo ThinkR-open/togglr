@@ -12,4 +12,3 @@ correct_date(time)
 \description{
 bidouille pour avoir iso 8601, pas propre mais la tisuit, osef
 }
-

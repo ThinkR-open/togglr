@@ -9,4 +9,3 @@ update_toggl_api_token()
 \description{
 update the toggle api token
 }
-
