@@ -48,13 +48,6 @@ get_dashboard <- function(api_token=get_toggl_api_token(),
 }
 
 n_to_tps <- function(n){
-  format( as.POSIXct(Sys.Date())+n/1000
-          , "%M:%S")
-}
-
-
-
-n_to_tps <- function(n){
   
   format( 
     as.POSIXct(0,origin=Sys.Date(), tz="GMT")+n/1000
@@ -137,12 +130,17 @@ get_project_task_detail <- function(
   api_token=get_toggl_api_token(),
   workspace_id =get_workspace_id(),
   since = Sys.Date()-lubridate::years(1),
-  until = Sys.Date()
+  until = Sys.Date(),humain=TRUE
   
 ){
   dash <-  get_dashboard(api_token=api_token,workspace_id=workspace_id,since=since,until=until)
-  dash$tache[[project_name]] %>% mutate(time=n_to_tps(time))
-}
+  out<- dash$tache[[project_name]] 
+  
+  if (humain) {
+  out <- out %>% mutate(time=n_to_tps(time))
+  }
+  out
+    }
 
 
 
