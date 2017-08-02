@@ -5,7 +5,7 @@
 \title{toggl_start}
 \usage{
 toggl_start(description = get_context(), start = now(),
-  api_token = getOption("toggl_api_token"))
+  api_token = get_toggl_api_token())
 }
 \arguments{
 \item{description}{the task you are doing}
@@ -23,4 +23,3 @@ options(toggl_api_token = "XXXXXXXX")# set your api token here
 toggl_start()
 }
 }
-

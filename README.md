@@ -15,6 +15,8 @@ browseURL("https://www.toggl.com/app/timer")
 #with agent ( see <https://github.com/ropensci/agent>)
 toggl_start()
 
+
+
 ```
 
 
@@ -29,5 +31,11 @@ toggl_start()
 devtools::install_github("ThinkRstat/togglr")#without agent
 
 devtools::install_github("ThinkRstat/togglr", ref="agent")# with agent
+
+# if you can't install the notifier package
+
+devtools::install_github("ThinkRstat/togglr", ref="without_notifier_with_agent")
+
+
 
 ```

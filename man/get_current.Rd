@@ -4,7 +4,7 @@
 \alias{get_current}
 \title{get_current}
 \usage{
-get_current(api_token = getOption("toggl_api_token"))
+get_current(api_token = get_toggl_api_token())
 }
 \arguments{
 \item{api_token}{the toggl api token}
@@ -12,4 +12,3 @@ get_current(api_token = getOption("toggl_api_token"))
 \description{
 retrieve current projet id
 }
-

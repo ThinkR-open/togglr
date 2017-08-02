@@ -5,7 +5,7 @@ Binding: toggl_start
 Interactive: false
 
 
-Name: stop toggl
-Description: stop toggl
+Name: STOP toggl
+Description: STOP toggl
 Binding: toggl_stop
 Interactive: false

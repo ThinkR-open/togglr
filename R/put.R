@@ -16,7 +16,7 @@
 toggl_start <- function(
   description=get_context(),
   start=now(),
-  api_token=getOption("toggl_api_token")){
+  api_token=get_toggl_api_token()){
   if (is.null(api_token)){
     stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
     
@@ -35,12 +35,12 @@ toggl_start <- function(
   
   if (requireNamespace("notifier", quietly = TRUE)){
     notifier::notify(
-    title = paste(description," START")
-    ,msg = c("at :",
-             as.character(start)
-             
-    )
-  )}
+      title = paste(description," START")
+      ,msg = c("at :",
+               as.character(start)
+               
+      )
+    )}
   
   
   
@@ -64,7 +64,7 @@ toggl_start <- function(
 #' }
 #' @export
 toggl_stop <- function(current=get_current(),
-                       api_token=getOption("toggl_api_token")){
+                       api_token=get_toggl_api_token()){
   if (is.null(api_token)){
     stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
     
@@ -75,18 +75,18 @@ toggl_stop <- function(current=get_current(),
     
   }
   PUT(paste0("https://www.toggl.com/api/v8/time_entries/",current$id,"/stop"),
-       # verbose(),
-       authenticate(api_token,"api_token"),
-       encode="json")
+      # verbose(),
+      authenticate(api_token,"api_token"),
+      encode="json")
   
   if (requireNamespace("notifier", quietly = TRUE)){
     notifier::notify(
-    title = paste(current$description," STOP")
-    ,msg = c("duration :",
-            pretty_dt(now() - ymd_hms(current$start))
-            
-    )
-  )}
+      title = paste(current$description," STOP")
+      ,msg = c("duration :",
+               pretty_dt(now() - ymd_hms(current$start))
+               
+      )
+    )}
   
   
   
@@ -117,38 +117,35 @@ toggl_create <- function(
   start=now(),
   stop,
   duration,
-  api_token=getOption("toggl_api_token")){
+  api_token=get_toggl_api_token()){
   if (is.null(api_token)){
     stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
     
   }
-
-
+  
+  
   if (missing(duration) & missing(stop)){
     stop("You must give at least duration or stop time")
-    }
-
+  }
+  
   if (missing(duration)){
     duration <- round(as.numeric(difftime(stop,start,units = "secs")))
   }
-
-
+  
+  
   POST("https://www.toggl.com/api/v8/time_entries",
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
        body=toJSON(list(time_entry = list(description = description,
-                                   created_with = "togglr",
-                                   duronly=FALSE,
-                                   duration=duration,
-                                   start = correct_date(start),
-                                   at = correct_date(now())
+                                          created_with = "togglr",
+                                          duronly=FALSE,
+                                          duration=duration,
+                                          start = correct_date(start),
+                                          at = correct_date(now())
        )
        ),auto_unbox = TRUE)
   )
-
-
+  
+  
 }
-
-
-

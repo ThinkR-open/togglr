@@ -5,7 +5,7 @@
 \title{toggl_create}
 \usage{
 toggl_create(description = get_context(), start = now(), stop, duration,
-  api_token = getOption("toggl_api_token"))
+  api_token = get_toggl_api_token())
 }
 \arguments{
 \item{description}{the task you did}
@@ -27,4 +27,3 @@ options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
 toggl_create(duration=1200)
 }
 }
-

@@ -4,8 +4,7 @@
 \alias{toggl_stop}
 \title{toggl_stop}
 \usage{
-toggl_stop(current = get_current(),
-  api_token = getOption("toggl_api_token"))
+toggl_stop(current = get_current(), api_token = get_toggl_api_token())
 }
 \arguments{
 \item{current}{list task id and start time}
@@ -22,4 +21,3 @@ toggl_start()
 toggl_stop()
 }
 }
-
