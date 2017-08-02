@@ -64,14 +64,14 @@ n_to_tps <- function(n){
 #' @export
 #'
 get_project_total <- function(project_name = get_context_project(),
-                  api_token=get_toggl_api_token(),
-                      workspace_id =get_workspace_id(),
-                      since = Sys.Date()-lubridate::years(1),
-                      until = Sys.Date()){
+                              api_token=get_toggl_api_token(),
+                              workspace_id =get_workspace_id(),
+                              since = Sys.Date()-lubridate::years(1),
+                              until = Sys.Date()){
   
   
- dash <-  get_dashboard(api_token=api_token,workspace_id=workspace_id,since=since,until=until)
-dash$synthese  %>% filter(project == project_name) %>% pull(time) %>% n_to_tps
+  dash <-  get_dashboard(api_token=api_token,workspace_id=workspace_id,since=since,until=until)
+  dash$synthese  %>% filter(project == project_name) %>% pull(time) %>% n_to_tps
 }
 
 #' Get all project's names
@@ -105,9 +105,9 @@ get_all_project_names <- function(  api_token=get_toggl_api_token(),
 #' @export
 #'
 get_all_client_names <- function(  api_token=get_toggl_api_token(),
-                                    workspace_id =get_workspace_id(),
-                                    since = Sys.Date()-lubridate::years(1),
-                                    until = Sys.Date()){
+                                   workspace_id =get_workspace_id(),
+                                   since = Sys.Date()-lubridate::years(1),
+                                   until = Sys.Date()){
   
   
   dash <-  get_dashboard(api_token=api_token,workspace_id=workspace_id,since=since,until=until)
@@ -121,6 +121,7 @@ get_all_client_names <- function(  api_token=get_toggl_api_token(),
 #' @param workspace_id the workspace id
 #' @param since a date
 #' @param until a date
+#' @param humain boolean humain readable time
 #'
 #' @return
 #' @export
@@ -137,10 +138,10 @@ get_project_task_detail <- function(
   out<- dash$tache[[project_name]] 
   
   if (humain) {
-  out <- out %>% mutate(time=n_to_tps(time))
+    out <- out %>% mutate(time=n_to_tps(time))
   }
   out
-    }
+}
 
 
 
