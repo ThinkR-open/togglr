@@ -28,13 +28,13 @@ toggl_start()
 
 ```R
 # install.packages("devtools")
-devtools::install_github("ThinkRstat/togglr")#without agent
+devtools::install_github("ThinkR-open/togglr")#without agent
 
-devtools::install_github("ThinkRstat/togglr", ref="agent")# with agent
+devtools::install_github("ThinkR-open/togglr", ref="agent")# with agent
 
 # if you can't install the notifier package
 
-devtools::install_github("ThinkRstat/togglr", ref="without_notifier_with_agent")
+devtools::install_github("ThinkR-open/togglr", ref="without_notifier_with_agent")
 
 
 
