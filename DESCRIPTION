@@ -7,12 +7,14 @@ Maintainer: Vincent Guyader <vincent@thinkr.fr>
 Description: Use toggl through Rstudio.
 License: GPL-3
 LazyData: TRUE
-Imports: 
+Imports:
     rstudioapi,
     lubridate,
     httr,
     jsonlite,
     magrittr,
     prettyunits,
-    assertthat,
+    assertthat,,
+    purrr,
+    dplyr
 RoxygenNote: 6.0.1
