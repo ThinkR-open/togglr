@@ -15,6 +15,7 @@ Imports:
     magrittr,
     prettyunits,
     dplyr,
-    assertthat
+    assertthat,
+    purrr
 Remotes: gaborcsardi/notifier
-
+RoxygenNote: 6.0.1
