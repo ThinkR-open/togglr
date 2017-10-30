@@ -125,6 +125,7 @@ get_all_client_names <- function(  api_token=get_toggl_api_token(),
 #'
 #' @return
 #' @export
+#' @importFrom dplyr mutate
 #'
 get_project_task_detail <- function(
   project_name = get_context_project(),

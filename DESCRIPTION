@@ -15,5 +15,6 @@ Imports:
     magrittr,
     prettyunits,
     dplyr,
-    assertthat
+    assertthat,
+    purrr
 RoxygenNote: 6.0.1
