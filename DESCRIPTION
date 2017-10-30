@@ -14,7 +14,7 @@ Imports:
     jsonlite,
     magrittr,
     prettyunits,
-    assertthat,,
+    assertthat,
     purrr,
     dplyr
 RoxygenNote: 6.0.1

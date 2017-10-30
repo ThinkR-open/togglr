@@ -6,7 +6,8 @@
 \usage{
 get_project_task_detail(project_name = get_context_project(),
   api_token = get_toggl_api_token(), workspace_id = get_workspace_id(),
-  since = Sys.Date() - lubridate::years(1), until = Sys.Date())
+  since = Sys.Date() - lubridate::years(1), until = Sys.Date(),
+  humain = TRUE)
 }
 \arguments{
 \item{project_name}{project name}
@@ -18,6 +19,8 @@ get_project_task_detail(project_name = get_context_project(),
 \item{since}{a date}
 
 \item{until}{a date}
+
+\item{humain}{boolean humain readable time}
 }
 \description{
 get all task from a project
