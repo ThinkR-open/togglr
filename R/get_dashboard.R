@@ -10,7 +10,7 @@
 #' @importFrom lubridate years
 #' @importFrom  dplyr select
 #' @importFrom stats setNames
-#' 
+#' @importFrom purrr map 
 get_dashboard <- function(api_token=get_toggl_api_token(),
                           workspace_id =get_workspace_id(),
                           since = Sys.Date()-lubridate::years(1),
