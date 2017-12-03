@@ -1,48 +1,77 @@
 #' @title toggl_start
 #' @description  start a task
+
+#'
 #' @param description the task you are doing
 #' @param start start time in POSIXt 
+#' @param project_name nom du projet
 #' @param api_token the toggl api token
+#' @param client client name
+#' @param wid workspace id
+#'
+
 #' @importFrom lubridate now
 #' @importFrom httr POST authenticate content
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
-#' options(toggl_api_token = "XXXXXXXX")# set your api token here
+
+#' get_toggl_api_token()# set your api token here
 #' toggl_start()
 #' }
 #' @export
-toggl_start <- function(
-  description=get_context(),
-  start=now(),
-  api_token=get_toggl_api_token()){
-  if (is.null(api_token)){
-    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+toggl_start <- function(client = "without client",
+                        description = get_context(),
+                        project_name = get_context_project(),
+                        start = now(),
+                        api_token = get_toggl_api_token(),
+                        wid = get_workspace_id(api_token)) {
+  if (is.null(api_token)) {
+    stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
   
-  POST("https://www.toggl.com/api/v8/time_entries/start",
-       # verbose(),
-       authenticate(api_token,"api_token"),
-       encode="json",
-       body=toJSON(
-         list(time_entry = list(description = description,
-                                created_with = "togglr",
-                                duronly=FALSE)),
-         auto_unbox = TRUE)
-  ) %>% content() %>% .$data %>% .$id %>% invisible()
+ 
+ 
   
-  if (requireNamespace("notifier", quietly = TRUE)){
-    notifier::notify(
-      title = paste(description," START")
-      ,msg = c("at :",
-               as.character(start)
-               
+  
+  POST(
+    "https://www.toggl.com/api/v8/time_entries/start",
+    # verbose(),
+    authenticate(api_token, "api_token"),
+    encode = "json",
+    body = toJSON(list(
+      time_entry = list(
+        description = description,
+        created_with = "togglr",
+        wid = wid,
+        pid = get_project_id(
+          project_name = project_name,
+          create = TRUE,
+          client = client
+        ),
+        duronly = FALSE
       )
-    )}
+    ),
+    auto_unbox = TRUE)
+  ) %>% content() %>% .$data %>% .$id -> id
   
   
+  if (!is.null(id)){
+    notification(paste(description," START"),c("at :",
+                                               as.character(start)
+                                               
+    ))
+  }else{
+    notification(
+          title = paste(description," ERROR")
+          ,msg = c("NOT STARTED"
+        ))
+  }
+  
+  invisible(id)
+
   
 }
 
@@ -66,7 +95,8 @@ toggl_start <- function(
 toggl_stop <- function(current=get_current(),
                        api_token=get_toggl_api_token()){
   if (is.null(api_token)){
-    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+
+    stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
   if (is.null(current$id)){
@@ -75,18 +105,19 @@ toggl_stop <- function(current=get_current(),
     
   }
   PUT(paste0("https://www.toggl.com/api/v8/time_entries/",current$id,"/stop"),
-      # verbose(),
-      authenticate(api_token,"api_token"),
-      encode="json")
+
+       # verbose(),
+       authenticate(api_token,"api_token"),
+       encode="json")
   
-  if (requireNamespace("notifier", quietly = TRUE)){
-    notifier::notify(
-      title = paste(current$description," STOP")
-      ,msg = c("duration :",
-               pretty_dt(now() - ymd_hms(current$start))
-               
-      )
-    )}
+  notification(
+    title = paste(current$description," STOP")
+    ,msg = c("duration :",
+            pretty_dt(now() - ymd_hms(current$start))
+            
+    )
+  )
+
   
   
   
@@ -119,33 +150,41 @@ toggl_create <- function(
   duration,
   api_token=get_toggl_api_token()){
   if (is.null(api_token)){
-    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+
+    stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
-  
-  
+
+
   if (missing(duration) & missing(stop)){
     stop("You must give at least duration or stop time")
-  }
-  
+    }
+
   if (missing(duration)){
     duration <- round(as.numeric(difftime(stop,start,units = "secs")))
   }
-  
-  
+
+
+
   POST("https://www.toggl.com/api/v8/time_entries",
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
-       body=toJSON(list(time_entry = list(description = description,
-                                          created_with = "togglr",
-                                          duronly=FALSE,
-                                          duration=duration,
-                                          start = correct_date(start),
-                                          at = correct_date(now())
+
+       body=toJSON(list(time_entry = list(
+         description = description,
+                                   created_with = "togglr",
+                                   duronly=FALSE,
+                                   duration=duration,
+                                   start = correct_date(start),
+                                   at = correct_date(now())
        )
        ),auto_unbox = TRUE)
   )
-  
-  
+
+
 }
+
+
+
+

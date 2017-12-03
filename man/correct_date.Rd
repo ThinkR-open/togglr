@@ -10,5 +10,5 @@ correct_date(time)
 \item{time}{as POSIXt}
 }
 \description{
-bidouille pour avoir iso 8601, pas propre mais la tisuit, osef
+tricks to obtain iso 8601
 }

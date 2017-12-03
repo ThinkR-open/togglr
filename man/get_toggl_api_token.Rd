@@ -4,7 +4,10 @@
 \alias{get_toggl_api_token}
 \title{get_toggl_api_token}
 \usage{
-get_toggl_api_token()
+get_toggl_api_token(ask = TRUE)
+}
+\arguments{
+\item{ask}{booleen do we have to ask if missing}
 }
 \description{
 return the toggle api token

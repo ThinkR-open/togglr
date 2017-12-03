@@ -4,7 +4,7 @@ Title: Toggl Api for Rstudio
 Version: 0.1.2
 Author: Vincent Guyader
 Maintainer: Vincent Guyader <vincent@thinkr.fr>
-Description: Use toggl through Rstudio.
+Description: Use the toggl.com timesheets api through R.
 License: GPL-3
 LazyData: TRUE
 Imports:
@@ -14,7 +14,10 @@ Imports:
     jsonlite,
     magrittr,
     prettyunits,
+    dplyr,
     assertthat,
     purrr,
-    dplyr
+    glue,
+    getPass,
+    keyring
 RoxygenNote: 6.0.1

@@ -2,10 +2,10 @@
 % Please edit documentation in R/open_toggl.R
 \name{open_toggl_website}
 \alias{open_toggl_website}
-\title{open tioggle.com website}
+\title{open toggle.com website}
 \usage{
 open_toggl_website()
 }
 \description{
-open tioggle.com website
+open toggle.com website
 }

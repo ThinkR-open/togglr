@@ -21,7 +21,8 @@ get_context <- function(){
 #' @export
 get_current <- function(api_token=get_toggl_api_token()){
   if (is.null(api_token)){
-    stop("you have to set your api token using options(toggl_api_token = 'XXXXXXXX')")
+
+    stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
   content(GET("https://www.toggl.com/api/v8/time_entries/current",
@@ -30,3 +31,22 @@ get_current <- function(api_token=get_toggl_api_token()){
               encode="json"))$data
   
 }
+
+
+
+
+#' @title get_context_projet
+#' @description  retrieve Rstudio projet if possible
+#' @importFrom rstudioapi getActiveProject
+#' @export
+get_context_project <- function(){
+  projet <- NULL
+  try(projet <- getActiveProject(),silent=TRUE)
+  if (!is.null(projet)){
+    description <- basename(projet)
+  }else{
+    description <- "sans projet"
+  }
+  description
+}
+
