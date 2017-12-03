@@ -5,6 +5,8 @@
 #' @param start start time in POSIXt 
 #' @param project_name nom du projet
 #' @param api_token the toggl api token
+#' @param client client name
+#' @param wid workspace id
 #'
 #' @importFrom lubridate now
 #' @importFrom httr POST authenticate content
@@ -16,36 +18,40 @@
 #' toggl_start()
 #' }
 #' @export
-toggl_start <- function(
-  client="sans client",
-  description=get_context(),
-  project_name=get_context_project(),
-  start=now(),
-  api_token=get_toggl_api_token(),
-  wid=get_workspace_id(api_token)){
-  if (is.null(api_token)){
+toggl_start <- function(client = "without client",
+                        description = get_context(),
+                        project_name = get_context_project(),
+                        start = now(),
+                        api_token = get_toggl_api_token(),
+                        wid = get_workspace_id(api_token)) {
+  if (is.null(api_token)) {
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
   
  
-  # gestion du client
-  create_client(name = client,api_token = api_token,wid = wid)
-  cid <- client_name_to_id(name = client,api_token = api_token)
-  # CID SEMBLE PAS PRIS EN COMPTE
+ 
   
-  POST("https://www.toggl.com/api/v8/time_entries/start",
-        # verbose(),
-       authenticate(api_token,"api_token"),
-       encode="json",
-       body=toJSON(
-         list(time_entry = list(description = description,
-                                created_with = "togglr",
-                                cid=cid,
-                                wid=wid,
-                                pid = get_project_id(project_name = project_name,create=TRUE),
-                                duronly=FALSE)),
-         auto_unbox = TRUE)
+  
+  POST(
+    "https://www.toggl.com/api/v8/time_entries/start",
+    # verbose(),
+    authenticate(api_token, "api_token"),
+    encode = "json",
+    body = toJSON(list(
+      time_entry = list(
+        description = description,
+        created_with = "togglr",
+        wid = wid,
+        pid = get_project_id(
+          project_name = project_name,
+          create = TRUE,
+          client = client
+        ),
+        duronly = FALSE
+      )
+    ),
+    auto_unbox = TRUE)
   ) %>% content() %>% .$data %>% .$id -> id
   
   
@@ -155,7 +161,8 @@ toggl_create <- function(
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
-       body=toJSON(list(time_entry = list(description = description,
+       body=toJSON(list(time_entry = list(
+         description = description,
                                    created_with = "togglr",
                                    duronly=FALSE,
                                    duration=duration,

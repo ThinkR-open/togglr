@@ -3,7 +3,7 @@
 #'
 #' @param name client name
 #' @param api_token the toggl api token
-#'
+#' @import glue
 #' @importFrom httr POST authenticate
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON
@@ -13,26 +13,22 @@
 #' create_client("new client")
 #' }
 #' @export
-create_client <- function(name = "client_demo",
+create_client <- function(name = "wihtout client",
                           api_token=get_toggl_api_token(),
                           wid=get_workspace_id()
                           ){
 
 # TEST CLIENT
 # POST https://www.toggl.com/api/v8/clients
-
+message(glue("we create the client : {name}"))
 POST("https://www.toggl.com/api/v8/clients",
-     # verbose(),
+     verbose(),
      authenticate(api_token,"api_token"),
      encode="json",
      body=toJSON(
        list(client = list(
          name = name,
          wid=wid
-         # ,
-         # created_with = "togglr",
-         # pid = get_project_id(project_name = project_name,create=TRUE),
-         # duronly=FALSE
        )
        ),
        auto_unbox = TRUE)

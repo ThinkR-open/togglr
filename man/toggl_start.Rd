@@ -4,9 +4,9 @@
 \alias{toggl_start}
 \title{toggl_start}
 \usage{
-toggl_start(description = get_context(),
+toggl_start(client = "sans client", description = get_context(),
   project_name = get_context_project(), start = now(),
-  api_token = get_toggl_api_token())
+  api_token = get_toggl_api_token(), wid = get_workspace_id(api_token))
 }
 \arguments{
 \item{description}{the task you are doing}

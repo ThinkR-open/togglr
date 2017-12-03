@@ -8,7 +8,8 @@
 get_project_id <- function(
   project_name = get_context_project(),
   api_token=get_toggl_api_token(),
-  create=FALSE
+  create=FALSE,
+  client = NULL
   ){
   if (is.null(api_token)){
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
@@ -27,7 +28,7 @@ get_project_id <- function(
   }
  if (is.null(id) & create){
    message("we create the project")
-   id <- toggl_create_project(project_name = project_name,api_token = api_token )
+   id <- toggl_create_project(project_name = project_name,api_token = api_token, client = client)
     }
   
     id
