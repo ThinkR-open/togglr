@@ -45,7 +45,7 @@ set_toggl_api_token <- function(token){
   delete_toggl_api_token()
   assert_that(is.character(token))
     # token %>% agent::agent_set("toggl_api_token",.)
-    token %>% key_set_with_value(service = "toggl_api_token",.)
+    token %>% key_set_with_value(service = "toggl_api_token",password = .)
   
   token
 }
@@ -60,7 +60,7 @@ update_toggl_api_token <- function(){
   # key_delete("toggl_api_token")
   delete_toggl_api_token()
     # ask_toggl_api_token() %>% agent::agent_set("toggl_api_token",.)
-    ask_toggl_api_token() %>% key_set_with_value(service = "toggl_api_token",.)
+    ask_toggl_api_token() %>% key_set_with_value(service = "toggl_api_token",password = .)
 }
 
 #' @title delete_toggl_api_token
