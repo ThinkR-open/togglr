@@ -10,17 +10,8 @@
         packageStartupMessage("->  For help type help('togglr')")
         packageStartupMessage('')
         
-        
-        # 
-        # if (FALSE & !requireNamespace("notifier", quietly = TRUE)){
-        #   try(source("https://install-github.me/gaborcsardi/notifier"),silent=TRUE) # crade mais bon...
-        #   
-        # }
-        # if (!requireNamespace("agent", quietly = TRUE)){
-        #   try(source("https://install-github.me/ropensci/agent"),silent=TRUE) # crade mais bon...
-        #   
-        # }
-            if ( is.null(togglr::get_toggl_api_token())){
+
+      if ( is.null(togglr::get_toggl_api_token(ask = FALSE))){
         packageStartupMessage("  => you have to set your api token using set_toggl_api_token()")
         }
         
