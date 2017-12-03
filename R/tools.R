@@ -37,11 +37,11 @@ set_toggl_api_token <- function(token){
 
   
   if ( missing(token) ){
-    # agent::agent_del("toggl_api_token")
     token <- ask_toggl_api_token() 
   }
   if (is.null(token)){return(invisible(NULL))}
   
+  agent::agent_del("toggl_api_token")
   assert_that(is.character(token))
     token %>% agent::agent_set("toggl_api_token",.)
   
