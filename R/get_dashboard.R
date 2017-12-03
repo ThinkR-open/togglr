@@ -84,8 +84,11 @@ get_project_total <- function(project_name = get_context_project(),
       since = since,
       until = until
     )
-  get_current_duration()
-  dash$synthese  %>% filter(project == project_name) %>% pull("time") %>% n_to_tps
+  dash$synthese  %>% filter(project == project_name) %>% pull("time") ->tmps
+  
+  # CA MARCHE PAS TRES BIEN ICI
+  
+  (get_current_duration() + tmps)  %>% as.numeric() %>% n_to_tps
 
 }
 
