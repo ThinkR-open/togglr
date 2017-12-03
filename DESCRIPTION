@@ -2,8 +2,7 @@ Package: togglr
 Type: Package
 Title: Toggl Api for Rstudio
 Version: 0.1.2
-Author: Vincent Guyader
-Maintainer: Vincent Guyader <vincent@thinkr.fr>
+Authors@R: person("Vincent", "Guyader", email = "vincent@thinkr.fr", role = c("aut", "cre"))
 Description: Use the toggl.com timesheets api through R.
 License: GPL-3
 LazyData: TRUE

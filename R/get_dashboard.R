@@ -54,9 +54,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
 
 
 n_to_tps <- function(n) {
-  format(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000
-         ,
-         "%H:%M:%S")
+  format(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000, "%H:%M:%S")
 }
 
 
@@ -86,6 +84,7 @@ get_project_total <- function(project_name = get_context_project(),
       since = since,
       until = until
     )
+  get_current_duration()
   dash$synthese  %>% filter(project == project_name) %>% pull("time") %>% n_to_tps
 
 }
