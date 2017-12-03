@@ -53,3 +53,4 @@ importFrom(rstudioapi,getActiveProject)
 importFrom(stats,setNames)
 importFrom(utils,browseURL)
 importFrom(utils,packageDescription)
+

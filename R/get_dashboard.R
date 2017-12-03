@@ -44,6 +44,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
       .x$title <-  .x$title$time_entry
       .x
     })
+
   
   res <- list(synthese = synthese,
               tache = tache)
@@ -51,11 +52,13 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
   res
 }
 
+
 n_to_tps <- function(n) {
   format(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000
          ,
          "%H:%M:%S")
 }
+
 
 
 
@@ -71,6 +74,7 @@ n_to_tps <- function(n) {
 #' @export
 #'
 get_project_total <- function(project_name = get_context_project(),
+
                               api_token = get_toggl_api_token(),
                               workspace_id = get_workspace_id(),
                               since = Sys.Date() - lubridate::years(1),
@@ -83,6 +87,7 @@ get_project_total <- function(project_name = get_context_project(),
       until = until
     )
   dash$synthese  %>% filter(project == project_name) %>% pull("time") %>% n_to_tps
+
 }
 
 #' Get all project's names
@@ -94,6 +99,7 @@ get_project_total <- function(project_name = get_context_project(),
 #'
 #' @export
 #'
+
 get_all_project_names <- function(api_token = get_toggl_api_token(),
                                   workspace_id = get_workspace_id(),
                                   since = Sys.Date() - lubridate::years(1),
@@ -105,6 +111,7 @@ get_all_project_names <- function(api_token = get_toggl_api_token(),
       since = since,
       until = until
     )
+
   dash$synthese$project
 }
 
@@ -116,6 +123,7 @@ get_all_project_names <- function(api_token = get_toggl_api_token(),
 #' @param since a date
 #' @param until a date
 #'
+
 #' @export
 #'
 get_all_client_names <- function(api_token = get_toggl_api_token(),
@@ -129,6 +137,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
       since = since,
       until = until
     )
+
   dash$synthese$client %>% unique()
 }
 
@@ -141,6 +150,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 #' @param until a date
 #' @param humain boolean humain readable time
 #'
+
 #' @export
 #' @importFrom dplyr mutate
 #'
@@ -165,3 +175,4 @@ get_project_task_detail <-
     }
     out
   }
+

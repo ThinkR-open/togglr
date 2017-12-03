@@ -1,5 +1,3 @@
-
-
 #' @title get_context
 #' @description  retrieve Rstudio projet if possible
 #' @importFrom rstudioapi getActiveProject
@@ -23,6 +21,7 @@ get_context <- function(){
 #' @export
 get_current <- function(api_token=get_toggl_api_token()){
   if (is.null(api_token)){
+
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
@@ -50,3 +49,4 @@ get_context_project <- function(){
   }
   description
 }
+

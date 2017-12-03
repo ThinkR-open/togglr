@@ -1,13 +1,3 @@
-
-
-
-
-
-
-
-
-
-
 #' @title get_toggl_api_token
 #' @description  return the toggle api token
 #' @param ask booleen do we have to ask if missing

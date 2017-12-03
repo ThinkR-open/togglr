@@ -4,6 +4,7 @@
 \alias{toggl_start}
 \title{toggl_start}
 \usage{
+
 toggl_start(client = "without client", description = get_context(),
   project_name = get_context_project(), start = now(),
   api_token = get_toggl_api_token(), wid = get_workspace_id(api_token))
@@ -20,12 +21,14 @@ toggl_start(client = "without client", description = get_context(),
 \item{api_token}{the toggl api token}
 
 \item{wid}{workspace id}
+
 }
 \description{
 start a task
 }
 \examples{
 \dontrun{
+
 get_toggl_api_token()# set your api token here
 toggl_start()
 }

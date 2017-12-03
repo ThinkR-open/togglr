@@ -1,5 +1,6 @@
 #' @title toggl_start
 #' @description  start a task
+
 #'
 #' @param description the task you are doing
 #' @param start start time in POSIXt 
@@ -8,12 +9,14 @@
 #' @param client client name
 #' @param wid workspace id
 #'
+
 #' @importFrom lubridate now
 #' @importFrom httr POST authenticate content
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
+
 #' get_toggl_api_token()# set your api token here
 #' toggl_start()
 #' }
@@ -68,6 +71,7 @@ toggl_start <- function(client = "without client",
   }
   
   invisible(id)
+
   
 }
 
@@ -91,6 +95,7 @@ toggl_start <- function(client = "without client",
 toggl_stop <- function(current=get_current(),
                        api_token=get_toggl_api_token()){
   if (is.null(api_token)){
+
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
@@ -100,6 +105,7 @@ toggl_stop <- function(current=get_current(),
     
   }
   PUT(paste0("https://www.toggl.com/api/v8/time_entries/",current$id,"/stop"),
+
        # verbose(),
        authenticate(api_token,"api_token"),
        encode="json")
@@ -111,6 +117,7 @@ toggl_stop <- function(current=get_current(),
             
     )
   )
+
   
   
   
@@ -143,6 +150,7 @@ toggl_create <- function(
   duration,
   api_token=get_toggl_api_token()){
   if (is.null(api_token)){
+
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
@@ -157,10 +165,12 @@ toggl_create <- function(
   }
 
 
+
   POST("https://www.toggl.com/api/v8/time_entries",
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
+
        body=toJSON(list(time_entry = list(
          description = description,
                                    created_with = "togglr",
@@ -174,6 +184,7 @@ toggl_create <- function(
 
 
 }
+
 
 
 
