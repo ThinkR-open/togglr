@@ -22,6 +22,6 @@ create a project
 }
 \examples{
 \dontrun{
-
+toggl_create_project()
 }
 }

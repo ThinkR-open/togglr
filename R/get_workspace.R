@@ -1,6 +1,5 @@
 #' @title get_workspace_id
-#' 
-#' Return the workspace id
+#' @description Return the workspace id
 #' @param api_token the toggl api token
 #'
 #' @importFrom httr GET authenticate content
@@ -17,7 +16,7 @@ get_workspace_id <- function(
               authenticate(api_token,"api_token"),
               encode="json")) %>% bind_rows() %>% 
      .$id -> id
-  id <- id[1] # si plusieur workspace , il faudra adapter
+  id <- id[1] # si plusieurs workspace , il faudra adapter
   if (length(id) == 0){
     stop(paste("cant find workspace id"))
     id <- NULL

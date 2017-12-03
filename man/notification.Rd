@@ -12,5 +12,5 @@ notification(title, msg)
 \item{msg}{content of the notification}
 }
 \description{
-use notifier is present, message instead
+show notification using message
 }

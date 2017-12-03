@@ -1,6 +1,6 @@
 #' show notification
 #'
-#' use notifier is present, message instead
+#' show notification using message
 #' @param title title of the notificatin
 #' @param msg content of the notification
 #'
@@ -8,16 +8,16 @@
 #'
 notification <- function(title,msg){
   
-  if (requireNamespace("notifier", quietly = TRUE)){
-    notifier::notify(
-      title = paste(title," START")
-      ,msg = msg
-    )}else{
+  # if (requireNamespace("notifier", quietly = TRUE)){
+  #   notifier::notify(
+  #     title = paste(title," START")
+  #     ,msg = msg
+  #   )}else{
       
       message(title," - ",msg)
       
       
-    }
+  # }
   
   
   

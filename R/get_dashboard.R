@@ -31,6 +31,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
   
   
   jsonlite:::simplify(wp$data, simplifyDataFrame = TRUE) -> out
+  # simplify(wp$data, simplifyDataFrame = TRUE) -> out
   
   
   synthese <-

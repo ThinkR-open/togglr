@@ -10,7 +10,7 @@
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
-#'
+#' toggl_create_project()
 #' }
 #' @export
 toggl_create_project <- function(
