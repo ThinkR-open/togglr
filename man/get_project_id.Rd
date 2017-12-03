@@ -5,10 +5,16 @@
 \title{get_project_id}
 \usage{
 get_project_id(project_name = get_context_project(),
-  api_token = get_toggl_api_token(), create = FALSE)
+  api_token = get_toggl_api_token(), create = FALSE, client = NULL)
 }
 \arguments{
+\item{project_name}{the project name}
+
 \item{api_token}{the toggl api token}
+
+\item{create}{boolean do you want to create the project if it doesnt exist ?}
+
+\item{client}{client name}
 }
 \description{
 retrieve projet id

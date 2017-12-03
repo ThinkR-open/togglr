@@ -4,13 +4,15 @@
 \alias{create_client}
 \title{create_client}
 \usage{
-create_client(name = "client_demo", api_token = get_toggl_api_token(),
+create_client(name = "wihtout client", api_token = get_toggl_api_token(),
   wid = get_workspace_id())
 }
 \arguments{
 \item{name}{client name}
 
 \item{api_token}{the toggl api token}
+
+\item{wid}{workspace id}
 }
 \description{
 create a client

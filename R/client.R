@@ -2,7 +2,9 @@
 #' @description  create a client
 #'
 #' @param name client name
+#' @param wid workspace id
 #' @param api_token the toggl api token
+#'
 #' @import glue
 #' @importFrom httr POST authenticate
 #' @importFrom magrittr %>%
@@ -55,6 +57,7 @@ get_all_client_info <- function(api_token=get_toggl_api_token()){
 
 #' client_name_to_id
 #'
+#' return client id from client name
 #' @param name client name
 #' @param api_token the toggl api token
 #' @import assertthat
@@ -62,13 +65,15 @@ get_all_client_info <- function(api_token=get_toggl_api_token()){
 #' @return the client id
 #' @export
 #'
-client_name_to_id <- function(name,api_token=get_toggl_api_token()){
+client_name_to_id <- function(name, api_token = get_toggl_api_token()) {
   assertthat::assert_that(is.string(name))
-  get_all_client_info(api_token = api_token) %>% 
+  get_all_client_info(api_token = api_token) %>%
     filter(name == !!name) %>%
-    pull(id)
+    pull("id")
 }
 #' client_id_to_name
+#' 
+#' return client name from client id
 #'
 #' @param id client id
 #' @param api_token the toggl api token
@@ -77,10 +82,10 @@ client_name_to_id <- function(name,api_token=get_toggl_api_token()){
 #' @return the client name
 #' @export
 #'
-client_id_to_name <- function(id,api_token=get_toggl_api_token()){
-  get_all_client_info(api_token = api_token) %>% 
+client_id_to_name <- function(id, api_token = get_toggl_api_token()) {
+  get_all_client_info(api_token = api_token) %>%
     filter(id == !!id) %>%
-    pull(name)
+    pull("name")
 }
 
 

@@ -1,11 +1,12 @@
 
-#' @title correct_date
-#' @description  bidouille pour avoir iso 8601, pas propre mais la tisuit, osef
-#' @param time as POSIXt
-#' @export
-correct_date <- function(time){
-  paste0(gsub(" ","T",as.character(time)),"+01:00")
-}
+
+
+
+
+
+
+
+
 
 #' @title get_toggl_api_token
 #' @description  return the toggle api token
@@ -69,8 +70,11 @@ delete_toggl_api_token <- function(){
 }
 
 
+#'
 #' @title ask_toggl_api_token
+#' @param msg the message
 #' @description  ask for the toggle api token
+#' @import getPass
 #' @export
 ask_toggl_api_token <- function (msg="toggl api token") 
 {
@@ -83,4 +87,14 @@ ask_toggl_api_token <- function (msg="toggl api token")
   else {
     return(as.character(passwd))
   }
+}
+
+
+
+#' @title correct_date
+#' @description  tricks to obtain iso 8601
+#'
+#' @param time as POSIXt
+correct_date <- function(time){
+  paste0(gsub(" ","T",as.character(time)),"+01:00")
 }

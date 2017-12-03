@@ -2,7 +2,9 @@
 % Please edit documentation in R/get_workspace.R
 \name{get_workspace_id}
 \alias{get_workspace_id}
-\title{get_workspace_id}
+\title{get_workspace_id
+
+Return the workspace id}
 \usage{
 get_workspace_id(api_token = get_toggl_api_token())
 }

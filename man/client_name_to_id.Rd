@@ -15,5 +15,5 @@ client_name_to_id(name, api_token = get_toggl_api_token())
 the client id
 }
 \description{
-client_name_to_id
+return client id from client name
 }

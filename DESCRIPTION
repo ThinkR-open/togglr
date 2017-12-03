@@ -16,5 +16,7 @@ Imports:
     prettyunits,
     dplyr,
     assertthat,
-    purrr
+    purrr,
+    glue,
+    getPass
 RoxygenNote: 6.0.1

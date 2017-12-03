@@ -2,15 +2,15 @@
 % Please edit documentation in R/notification.R
 \name{notification}
 \alias{notification}
-\title{Title}
+\title{show notification}
 \usage{
 notification(title, msg)
 }
 \arguments{
-\item{title}{}
+\item{title}{title of the notificatin}
 
-\item{msg}{}
+\item{msg}{content of the notification}
 }
 \description{
-Title
+use notifier is present, message instead
 }

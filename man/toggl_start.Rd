@@ -4,11 +4,13 @@
 \alias{toggl_start}
 \title{toggl_start}
 \usage{
-toggl_start(client = "sans client", description = get_context(),
+toggl_start(client = "without client", description = get_context(),
   project_name = get_context_project(), start = now(),
   api_token = get_toggl_api_token(), wid = get_workspace_id(api_token))
 }
 \arguments{
+\item{client}{client name}
+
 \item{description}{the task you are doing}
 
 \item{project_name}{nom du projet}
@@ -16,6 +18,8 @@ toggl_start(client = "sans client", description = get_context(),
 \item{start}{start time in POSIXt}
 
 \item{api_token}{the toggl api token}
+
+\item{wid}{workspace id}
 }
 \description{
 start a task

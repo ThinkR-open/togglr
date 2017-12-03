@@ -1,6 +1,5 @@
-#' open tioggle.com website
+#' open toggle.com website
 #'
-#' @return
 #' @export
 #' @importFrom utils browseURL
 #'

@@ -6,6 +6,9 @@
 \usage{
 ask_toggl_api_token(msg = "toggl api token")
 }
+\arguments{
+\item{msg}{the message}
+}
 \description{
 ask for the toggle api token
 }
