@@ -12,15 +12,23 @@
 #' @description  return the toggle api token
 #' @param ask booleen do we have to ask if missing
 #' @importFrom magrittr %>% 
+#' @import keyring
 #' @export
 get_toggl_api_token <- function(ask=TRUE){
   # getOption("toggl_api_token")
   token <-NULL
-  try(token<-agent::agent_get("toggl_api_token"),silent=TRUE)
+  
+  # try(token<-agent::agent_get("toggl_api_token"),silent=TRUE)
+  try(token<-key_get(service = "toggl_api_token"),silent=TRUE)
+  
+  
   if ( is.null(token) & ask){
-    agent::agent_del("toggl_api_token")
+    # agent::agent_del("toggl_api_token")
+    # key_delete("toggl_api_token")
+    delete_toggl_api_token()
     token <- ask_toggl_api_token() 
-    token %>% agent::agent_set("toggl_api_token",.)
+    # token %>% agent::agent_set("toggl_api_token",.)
+    token %>% key_set_with_value(service = "toggl_api_token",password = .)
     
   }
   token
@@ -42,9 +50,12 @@ set_toggl_api_token <- function(token){
   }
   if (is.null(token)){return(invisible(NULL))}
   
-  agent::agent_del("toggl_api_token")
+  # agent::agent_del("toggl_api_token")
+  # key_delete("toggl_api_token")
+  delete_toggl_api_token()
   assert_that(is.character(token))
-    token %>% agent::agent_set("toggl_api_token",.)
+    # token %>% agent::agent_set("toggl_api_token",.)
+    token %>% key_set_with_value(service = "toggl_api_token",.)
   
   token
 }
@@ -55,9 +66,11 @@ set_toggl_api_token <- function(token){
 #' @export
 update_toggl_api_token <- function(){
   # getOption("toggl_api_token")
-  agent::agent_del("toggl_api_token")
-    ask_toggl_api_token() %>% agent::agent_set("toggl_api_token",.)
-    
+  # agent::agent_del("toggl_api_token")
+  # key_delete("toggl_api_token")
+  delete_toggl_api_token()
+    # ask_toggl_api_token() %>% agent::agent_set("toggl_api_token",.)
+    ask_toggl_api_token() %>% key_set_with_value(service = "toggl_api_token",.)
 }
 
 #' @title delete_toggl_api_token
@@ -65,8 +78,8 @@ update_toggl_api_token <- function(){
 #' @export
 delete_toggl_api_token <- function(){
   # getOption("toggl_api_token")
-  agent::agent_del("toggl_api_token")
-  
+  # agent::agent_del("toggl_api_token")
+  try(key_delete("toggl_api_token"),silent=TRUE)
 }
 
 

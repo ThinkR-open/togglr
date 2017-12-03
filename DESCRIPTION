@@ -18,5 +18,6 @@ Imports:
     assertthat,
     purrr,
     glue,
-    getPass
+    getPass,
+    keyring
 RoxygenNote: 6.0.1

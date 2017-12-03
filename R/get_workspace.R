@@ -18,7 +18,7 @@ get_workspace_id <- function(
      .$id -> id
   id <- id[1] # si plusieurs workspace , il faudra adapter
   if (length(id) == 0){
-    stop(paste("cant find workspace id"))
+    stop(paste("cant find workspace id - is your api token ok ?"))
     id <- NULL
   }
   id
