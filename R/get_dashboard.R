@@ -60,6 +60,7 @@ n_to_tps <- function(n){
 #' @param workspace_id the workspace id
 #' @param since a date
 #' @param until a date
+#' @importFrom dplyr pull
 #'
 #' @export
 #'

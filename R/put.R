@@ -32,7 +32,7 @@ toggl_start <- function(
   # gestion du client
   create_client(name = client,api_token = api_token,wid = wid)
   cid <- client_name_to_id(name = client,api_token = api_token)
-  
+  # CID SEMBLE PAS PRIS EN COMPTE
   
   POST("https://www.toggl.com/api/v8/time_entries/start",
         # verbose(),
