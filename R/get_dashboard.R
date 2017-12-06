@@ -168,6 +168,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 #' @importFrom dplyr mutate
 #' @importFrom lubridate years
 #'
+#'
 get_project_task_detail <-
   function(project_name = get_context_project(),
            api_token = get_toggl_api_token(),
@@ -175,14 +176,13 @@ get_project_task_detail <-
            since = Sys.Date() - lubridate::years(1),
            until = Sys.Date(),
            humain = TRUE) {
-    dash <-
+    out <-
       get_dashboard(
         api_token = api_token,
         workspace_id = workspace_id,
         since = since,
         until = until
-      )
-    out <- dash$tache[[project_name]]
+      )$tache[[project_name]]
     
     # sur out on va regarder pour rajouter le temps en cours pour la tache en question
     get_current(api_token = api_token)$description
@@ -204,11 +204,11 @@ get_project_task_detail <-
       )
     }
      
-faut gerer le cas ou le truc qui tourne existe deja, c'est fait. 
-et le cas ou le truc qui tourn n'existe pas pas encore fait.
-
-quand rien ne tourne, dans ce cas c 'est ok
-    
+# faut gerer le cas ou le truc qui tourne existe deja, c'est fait. 
+# et le cas ou le truc qui tourn n'existe pas pas encore fait.
+# 
+# quand rien ne tourne, dans ce cas c 'est ok
+  #TODOB  
       
       
       

@@ -9,6 +9,9 @@ knitr::opts_chunk$set(
 #  install.packages("togglr")
 
 ## ------------------------------------------------------------------------
+#  togglr::open_toggl_website()
+
+## ------------------------------------------------------------------------
 #  set_toggl_api_token("your_token_api")
 
 ## ------------------------------------------------------------------------
@@ -26,8 +29,9 @@ knitr::opts_chunk$set(
 #  toggl_stop()
 
 ## ------------------------------------------------------------------------
-#  get_project_task_detail()
-#  get_current_duration()
+#  get_current_duration()# the current track
+#  get_project_task_detail()# all the project (including the current track)
+#  
 
 ## ------------------------------------------------------------------------
 #  get_dashboard()

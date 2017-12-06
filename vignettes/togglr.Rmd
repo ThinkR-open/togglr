@@ -37,7 +37,13 @@ devtools::install_github("ThinkR-open/togglr")
 
 ## Set toggl Api token
 
-Go on toogl.com website : `https://toggl.com/app/profile` then select and copy your token api at the bottom of the page.
+Go on toogl.com website : `https://toggl.com/app/profile` 
+
+```{r}
+togglr::open_toggl_website()
+```
+
+then select and copy your token api at the bottom of the page.
 
 ```{r}
 set_toggl_api_token("your_token_api")
@@ -83,7 +89,7 @@ get_project_task_detail()# all the project (including the current track)
 
 ```
 
-## get all your dashboard
+## Get all your dashboard
 
 ```{r}
 get_dashboard()
@@ -91,7 +97,7 @@ get_dashboard()
 
 
 
-## Some other uselfull function are in this package
+## Some other uselfull functions are in this package
 
 ```{r}
 ls(package:togglr)

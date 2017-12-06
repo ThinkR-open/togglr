@@ -4,14 +4,14 @@
 \alias{toggl_start}
 \title{toggl_start}
 \usage{
-toggl_start(client = "without client", description = get_context(),
+toggl_start(description = get_context(), client = "without client",
   project_name = get_context_project(), start = now(),
   api_token = get_toggl_api_token(), wid = get_workspace_id(api_token))
 }
 \arguments{
-\item{client}{client name}
-
 \item{description}{the task you are doing}
+
+\item{client}{client name}
 
 \item{project_name}{nom du projet}
 

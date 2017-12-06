@@ -17,7 +17,8 @@ get_current_duration <-
     if (length(out) == 0){out <- 0}
     out
     }
-
+#' @noRd
+#' @export
 print.toggl_time <- function(x){
   print(prettyunits::pretty_ms(as.numeric(x)))
 }
