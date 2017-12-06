@@ -4,11 +4,11 @@
     if (interactive()) {
 
 
-        pdesc <- packageDescription(pkgname)
-        packageStartupMessage('')
-        packageStartupMessage(pdesc$Package, " ", pdesc$Version, " by Vincent Guyader")
-        packageStartupMessage("->  For help type help('togglr')")
-        packageStartupMessage('')
+        # pdesc <- packageDescription(pkgname)
+        # packageStartupMessage('')
+        # packageStartupMessage(pdesc$Package, " ", pdesc$Version, " by Vincent Guyader")
+        # packageStartupMessage("->  For help type help('togglr')")
+        # packageStartupMessage('')
         
 
       if ( is.null(togglr::get_toggl_api_token(ask = FALSE))){

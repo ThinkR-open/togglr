@@ -1,0 +1,98 @@
+---
+title: "togglr"
+author: "Vincent Guyader"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{togglr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  eval= FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Installation of `togglr`
+
+
+### From CRAN
+
+```{r}
+install.packages("togglr")
+```
+
+
+### From Github
+```R
+if (!require(devtools)){install.packages("devtools")}
+devtools::install_github("ThinkR-open/togglr")
+```
+
+
+
+## Set toggl Api token
+
+Go on toogl.com website : `https://toggl.com/app/profile` then select and copy your token api at the bottom of the page.
+
+```{r}
+set_toggl_api_token("your_token_api")
+```
+You just need to do this ones.
+
+
+## Start the tracking system
+
+Without any parameters it will create a new project using your Rstudio project names. 
+
+```{r}
+toggl_start()
+```
+
+By default the client name is "without client" you can choose (and eventualy create a client) by using :
+
+```{r}
+toggl_start(client = "my client")
+```
+
+But can also choose the task and the project
+
+```{r}
+toggl_start(client = "my client",
+            description = "what I'm doing",
+            project_name = "my project")
+```
+
+
+## Stop the tracking system
+
+```{r}
+toggl_stop()
+```
+
+
+## get total time passed on the current project
+
+```{r}
+get_project_task_detail()
+get_current_duration()
+```
+
+## get all your dashboard
+
+```{r}
+get_dashboard()
+```
+
+
+
+## Some other uselfull function are in this package
+
+```{r}
+ls(package:togglr)
+```
+

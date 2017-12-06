@@ -1,6 +1,6 @@
 Package: togglr
 Type: Package
-Title: Toggl Api for Rstudio
+Title: Toggl.com Api for Rstudio
 Version: 0.1.2
 Authors@R: person("Vincent", "Guyader", email = "vincent@thinkr.fr", role = c("aut", "cre"))
 Description: Use the toggl.com timesheets api through R.
@@ -20,3 +20,10 @@ Imports:
     getPass,
     keyring
 RoxygenNote: 6.0.1
+BugReports: https://github.com/ThinkR-open/togglr/issues
+URL: https://github.com/ThinkR-open/togglr
+ByteCompile: true
+Suggests: knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
