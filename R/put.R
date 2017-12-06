@@ -21,8 +21,8 @@
 #' toggl_start()
 #' }
 #' @export
-toggl_start <- function(client = "without client",
-                        description = get_context(),
+toggl_start <- function(description = get_context(),
+                        client = "without client",
                         project_name = get_context_project(),
                         start = now(),
                         api_token = get_toggl_api_token(),
