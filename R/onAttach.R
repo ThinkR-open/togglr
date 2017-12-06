@@ -19,6 +19,9 @@
 }
 
 # enleve les faux positifs du check
-globalVariables(c(".","notify","notifier","name", "project", "time")) # faudra mettre les autres pour que le check ne s'enflamme pas trop a cause des NSE
+globalVariables(c(".","notify","notifier","name", "project", "time",
+                  "case_when", "full_join" ,"tribble"
+                  
+                  )) # faudra mettre les autres pour que le check ne s'enflamme pas trop a cause des NSE
 
 

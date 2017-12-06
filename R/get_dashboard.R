@@ -185,31 +185,37 @@ get_project_task_detail <-
       )$tache[[project_name]]
     
     # sur out on va regarder pour rajouter le temps en cours pour la tache en question
-    get_current(api_token = api_token)$description
-    get_current_duration(api_token = api_token)
+    # get_current(api_token = api_token)$description
+    # get_current_duration(api_token = api_token)
 
     
     # out$title == get_current(api_token = api_token)$description
     
-    if (!is.null(get_current(api_token = api_token)$description)){ 
+    description <- get_current(api_token = api_token)$description
     
-     out<-
-      out %>% mutate(time = case_when(
-      title == get_current(api_token = api_token)$description ~ 
-        (time + get_current_duration(api_token = api_token)) %>% as.double()
-      ,
-      TRUE ~ time %>% as.double()
-      )
+    if (!is.null(description)) {
+      if (description %in% out$title) {
+        out <-      out %>%
+          mutate(time = case_when(
+            title == description ~
+              (time + get_current_duration(api_token = api_token)) %>% as.double()
+            ,
+            TRUE ~ time %>% as.double()
+          ))
+      } else {
+        out <- out %>% full_join(tribble(
+          ~ title,        ~ time,
+          description,    get_current_duration(api_token = api_token) %>% as.double()
+          
+          
+        ))
+        
+      }
       
-      )
+      
+      
     }
      
-# faut gerer le cas ou le truc qui tourne existe deja, c'est fait. 
-# et le cas ou le truc qui tourn n'existe pas pas encore fait.
-# 
-# quand rien ne tourne, dans ce cas c 'est ok
-  #TODOB  
-      
       
       
     if (humain) {

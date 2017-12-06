@@ -29,7 +29,7 @@ install.packages("togglr")
 
 ### From Github
 ```R
-if (!require(devtools)){install.packages("devtools")}
+if (!requireNamespace("devtools")){install.packages("devtools")}
 devtools::install_github("ThinkR-open/togglr")
 ```
 
@@ -95,6 +95,10 @@ get_project_task_detail()# all the project (including the current track)
 get_dashboard()
 ```
 
+
+## use Rstudio Addins
+
+This package comes with 2 Rstudio addins 'start toggl' and 'stop toggl', feel free to use keybindings for convenience.
 
 
 ## Some other uselfull functions are in this package
