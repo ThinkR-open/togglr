@@ -78,8 +78,9 @@ toggl_stop()
 ## get total time passed on the current project
 
 ```{r}
-get_project_task_detail()
-get_current_duration()
+get_current_duration()# the current track
+get_project_task_detail()# all the project (including the current track)
+
 ```
 
 ## get all your dashboard

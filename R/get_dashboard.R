@@ -53,8 +53,19 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
 }
 
 
+
+#' @noRd
+#' @importFrom prettyunits pretty_ms
 n_to_tps <- function(n) {
-  format(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000, "%H:%M:%S")
+  # format(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000, "%H:%M:%S")
+# 
+#   difftime(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000,Sys.Date(),units = "hour") 
+#   
+#   
+# library(lubridate)  
+# new_duration()  
+# duration(104046451/1000,units = "seconds") %>% format("%H:%M:%S")
+  prettyunits::pretty_ms(n)
 }
 
 
@@ -155,6 +166,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 
 #' @export
 #' @importFrom dplyr mutate
+#' @importFrom lubridate years
 #'
 get_project_task_detail <-
   function(project_name = get_context_project(),
@@ -172,8 +184,37 @@ get_project_task_detail <-
       )
     out <- dash$tache[[project_name]]
     
+    # sur out on va regarder pour rajouter le temps en cours pour la tache en question
+    get_current(api_token = api_token)$description
+    get_current_duration(api_token = api_token)
+
+    
+    # out$title == get_current(api_token = api_token)$description
+    
+    if (!is.null(get_current(api_token = api_token)$description)){ 
+    
+     out<-
+      out %>% mutate(time = case_when(
+      title == get_current(api_token = api_token)$description ~ 
+        (time + get_current_duration(api_token = api_token)) %>% as.double()
+      ,
+      TRUE ~ time %>% as.double()
+      )
+      
+      )
+    }
+     
+faut gerer le cas ou le truc qui tourne existe deja, c'est fait. 
+et le cas ou le truc qui tourn n'existe pas pas encore fait.
+
+quand rien ne tourne, dans ce cas c 'est ok
+    
+      
+      
+      
     if (humain) {
-      out <- out %>% mutate(time = n_to_tps(time))
+      out <- 
+        out %>% mutate(time = n_to_tps(time))
     }
     out
   }
