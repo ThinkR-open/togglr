@@ -23,4 +23,3 @@ print.toggl_time <- function(x){
   print(prettyunits::pretty_ms(as.numeric(x)))
 }
 
-
