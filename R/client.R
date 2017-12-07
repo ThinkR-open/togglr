@@ -20,7 +20,6 @@ create_client <- function(name = "wihtout client",
                           wid=get_workspace_id()
                           ){
 
-# TEST CLIENT
 # POST https://www.toggl.com/api/v8/clients
 message(glue("we create the client : {name}"))
 POST("https://www.toggl.com/api/v8/clients",

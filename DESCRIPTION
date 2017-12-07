@@ -1,9 +1,9 @@
 Package: togglr
 Type: Package
-Title: Toggl.com Api for Rstudio
+Title: 'Toggl.com' Api for 'Rstudio'
 Version: 0.1.3
 Authors@R: person("Vincent", "Guyader", email = "vincent@thinkr.fr", role = c("aut", "cre"))
-Description: Use the toggl.com timesheets api through R.
+Description: Use the <http://toggl.com> time tracker api through R.
 License: GPL-3
 LazyData: TRUE
 Imports:

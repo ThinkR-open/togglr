@@ -8,7 +8,7 @@ get_context <- function(){
   if (!is.null(projet)){
     description <- paste0("projet R ", basename(projet))
   }else{
-    description <- "I'm using R"# TODO trouver un truc fun
+    description <- "I'm using R"
   }
   description
 }

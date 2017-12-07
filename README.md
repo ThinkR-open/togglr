@@ -1,3 +1,5 @@
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/togglr)](https://cran.r-project.org/package=togglr)
+[![](http://cranlogs.r-pkg.org/badges/togglr)](https://cran.r-project.org/package=togglr)
 # togglr
 
 an R and Rstudio wrapper for toggl Api.

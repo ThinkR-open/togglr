@@ -1,4 +1,4 @@
-#' recupere les données depuis toggl.com
+#' get all data from <http://toggl.com>
 #'
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id
@@ -97,8 +97,6 @@ get_project_total <- function(project_name = get_context_project(),
     )
   dash$synthese  %>% filter(project == project_name) %>% pull("time") ->tmps
   
-  # CA MARCHE PAS TRES BIEN ICI
-  
   (get_current_duration() + tmps)  %>% as.numeric() %>% n_to_tps
 
 }
@@ -183,13 +181,6 @@ get_project_task_detail <-
         since = since,
         until = until
       )$tache[[project_name]]
-    
-    # sur out on va regarder pour rajouter le temps en cours pour la tache en question
-    # get_current(api_token = api_token)$description
-    # get_current_duration(api_token = api_token)
-
-    
-    # out$title == get_current(api_token = api_token)$description
     
     description <- get_current(api_token = api_token)$description
     
