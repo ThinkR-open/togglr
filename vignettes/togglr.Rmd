@@ -46,6 +46,7 @@ togglr::open_toggl_website()
 then select and copy your token api at the bottom of the page.
 
 ```{r}
+library(togglr)
 set_toggl_api_token("your_token_api")
 ```
 You just need to do this ones.
@@ -101,7 +102,7 @@ get_dashboard()
 This package comes with 2 Rstudio addins 'start toggl' and 'stop toggl', feel free to use keybindings for convenience.
 
 
-## Some other uselfull functions are in this package
+## Some other usefull functions are in this package
 
 ```{r}
 ls(package:togglr)

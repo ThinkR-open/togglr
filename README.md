@@ -5,32 +5,94 @@
 an R and Rstudio wrapper for toggl Api.
 <https://www.toggl.com/>
 
+
+## Installation of `togglr`
+
+
+### From CRAN
+
+```{r}
+install.packages("togglr")
+```
+
+
+### From Github
 ```R
-library(togglr)
-
-# go to https://toggl.com/app/profile and copy your API token
-
-# set_toggl_api_token("PASTE_YOUR_TOKEN_HERE")
-
-toggl_start()
-open_toggl_website() #browseURL("https://www.toggl.com/app/timer")
-
-toggl_start(client = "client")
-toggl_stop()
-toggl_start(client = "another client",project_name = "project name",description = " task description")
-
+if (!requireNamespace("devtools")){install.packages("devtools")}
+devtools::install_github("ThinkR-open/togglr")
 ```
 
 
 
+## Set toggl Api token
 
-## Installation
+Go on toogl.com website : `https://toggl.com/app/profile` 
+
+```{r}
+togglr::open_toggl_website()
+```
+
+then select and copy your token api at the bottom of the page.
+
+```{r}
+library(togglr)
+set_toggl_api_token("your_token_api")
+```
+You just need to do this ones.
 
 
-```R
-# install.packages("devtools")
-devtools::install_github("ThinkR-open/togglr")
+## Start the tracking system
+
+Without any parameters it will create a new project using your Rstudio project names. 
+
+```{r}
+toggl_start()
+```
+
+By default the client name is "without client" you can choose (and eventualy create a client) by using :
+
+```{r}
+toggl_start(client = "my client")
+```
+
+But can also choose the task and the project
+
+```{r}
+toggl_start(client = "my client",
+            description = "what I'm doing",
+            project_name = "my project")
+```
 
 
+## Stop the tracking system
 
+```{r}
+toggl_stop()
+```
+
+
+## get total time passed on the current project
+
+```{r}
+get_current_duration()# the current track
+get_project_task_detail()# all the project (including the current track)
+
+```
+
+## Get all your dashboard
+
+```{r}
+get_dashboard()
+```
+
+
+## use Rstudio Addins
+
+This package comes with 2 Rstudio addins 'start toggl' and 'stop toggl', feel free to use keybindings for convenience.
+
+
+## Some other uselfull functions are in this package
+
+```{r}
+ls(package:togglr)
 ```
