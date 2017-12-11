@@ -49,7 +49,7 @@ then select and copy your token api at the bottom of the page.
 library(togglr)
 set_toggl_api_token("your_token_api")
 ```
-You just need to do this ones.
+You just need to do this once.
 
 
 ## Start the tracking system
@@ -66,7 +66,7 @@ By default the client name is "without client" you can choose (and eventualy cre
 toggl_start(client = "my client")
 ```
 
-But can also choose the task and the project
+But you can also choose the task and the project
 
 ```{r}
 toggl_start(client = "my client",
@@ -82,7 +82,7 @@ toggl_stop()
 ```
 
 
-## get total time passed on the current project
+## Get total time passed on the current project
 
 ```{r}
 get_current_duration()# the current track
@@ -97,12 +97,12 @@ get_dashboard()
 ```
 
 
-## use Rstudio Addins
+## Use Rstudio Addins
 
 This package comes with 2 Rstudio addins 'start toggl' and 'stop toggl', feel free to use keybindings for convenience.
 
 
-## Some other usefull functions are in this package
+## Some other useful functions are in this package
 
 ```{r}
 ls(package:togglr)
