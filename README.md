@@ -29,7 +29,7 @@ devtools::install_github("ThinkR-open/togglr")
 Go on toogl.com website : `https://toggl.com/app/profile` 
 
 ```{r}
-togglr::open_toggl_website()
+togglr::open_toggl_website_profile()
 ```
 
 then select and copy your token api at the bottom of the page.
