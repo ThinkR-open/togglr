@@ -86,7 +86,7 @@ get_dashboard()
 ```
 
 
-## use Rstudio Addins
+## Use Rstudio Addins
 
 This package comes with 2 Rstudio addins 'start toggl' and 'stop toggl', feel free to use keybindings for convenience.
 
