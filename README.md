@@ -2,7 +2,7 @@
 [![](http://cranlogs.r-pkg.org/badges/togglr)](https://cran.r-project.org/package=togglr)
 # togglr
 
-an R and Rstudio wrapper for toggl Api.
+An R and Rstudio wrapper for toggl Api.
 <https://www.toggl.com/>
 
 
@@ -38,12 +38,12 @@ then select and copy your token api at the bottom of the page.
 library(togglr)
 set_toggl_api_token("your_token_api")
 ```
-You just need to do this ones.
+You just need to do this once.
 
 
 ## Start the tracking system
 
-Without any parameters it will create a new project using your Rstudio project names. 
+Without any parameters it will create a new project using your Rstudio project name. 
 
 ```{r}
 toggl_start()
@@ -55,7 +55,7 @@ By default the client name is "without client" you can choose (and eventualy cre
 toggl_start(client = "my client")
 ```
 
-But can also choose the task and the project
+But you can also choose the task and the project
 
 ```{r}
 toggl_start(client = "my client",
@@ -71,7 +71,7 @@ toggl_stop()
 ```
 
 
-## get total time passed on the current project
+## Get total time passed on the current project
 
 ```{r}
 get_current_duration()# the current track
