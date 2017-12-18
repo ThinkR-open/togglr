@@ -1,7 +1,7 @@
 Package: togglr
 Type: Package
 Title: 'Toggl.com' Api for 'Rstudio'
-Version: 0.1.3
+Version: 0.1.31
 Authors@R: person("Vincent", "Guyader", email = "vincent@thinkr.fr", role = c("aut", "cre"))
 Description: Use the <http://toggl.com> time tracker api through R.
 License: GPL-3

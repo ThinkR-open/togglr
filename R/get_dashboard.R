@@ -163,7 +163,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 #'
 
 #' @export
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate case_when
 #' @importFrom lubridate years
 #'
 #'

@@ -7,7 +7,7 @@
 correct_date(time)
 }
 \arguments{
-\item{time}{as POSIXt}
+\item{time}{a POSIXt}
 }
 \description{
 tricks to obtain iso 8601

@@ -9,9 +9,10 @@ knitr::opts_chunk$set(
 #  install.packages("togglr")
 
 ## ------------------------------------------------------------------------
-#  togglr::open_toggl_website()
+#  togglr::open_toggl_website_profile()
 
 ## ------------------------------------------------------------------------
+#  library(togglr)
 #  set_toggl_api_token("your_token_api")
 
 ## ------------------------------------------------------------------------
