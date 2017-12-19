@@ -23,6 +23,8 @@ RoxygenNote: 6.0.1
 BugReports: https://github.com/ThinkR-open/togglr/issues
 URL: https://github.com/ThinkR-open/togglr
 ByteCompile: true
-Suggests: knitr,
-    rmarkdown
+Suggests: 
+    knitr,
+    rmarkdown,
+    covr
 VignetteBuilder: knitr
