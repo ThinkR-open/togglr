@@ -19,7 +19,8 @@ Imports:
     magrittr,
     prettyunits,
     purrr,
-    rstudioapi
+    rstudioapi,
+    rlang (>= 0.1.2)
 Suggests: 
     covr,
     knitr,
