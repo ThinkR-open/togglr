@@ -8,4 +8,5 @@ addons:
     packages:
       - libsecret-1-dev
 after_success:
-    - Rscript -e 'covr::codecov()'      
+    - Rscript -e 'covr::codecov()'
+    
