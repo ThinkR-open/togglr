@@ -1,30 +1,30 @@
-Package: togglr
 Type: Package
+Package: togglr
 Title: 'Toggl.com' Api for 'Rstudio'
 Version: 0.1.31
 Authors@R: person("Vincent", "Guyader", email = "vincent@thinkr.fr", role = c("aut", "cre"))
 Description: Use the <http://toggl.com> time tracker api through R.
 License: GPL-3
-LazyData: TRUE
-Imports:
-    rstudioapi,
-    lubridate,
+URL: https://github.com/ThinkR-open/togglr
+BugReports: https://github.com/ThinkR-open/togglr/issues
+Imports: 
+    assertthat,
+    dplyr,
+    getPass,
+    glue,
     httr,
     jsonlite,
+    keyring,
+    lubridate,
     magrittr,
     prettyunits,
-    dplyr,
-    assertthat,
     purrr,
-    glue,
-    getPass,
-    keyring
-RoxygenNote: 6.0.1
-BugReports: https://github.com/ThinkR-open/togglr/issues
-URL: https://github.com/ThinkR-open/togglr
-ByteCompile: true
+    rstudioapi
 Suggests: 
+    covr,
     knitr,
-    rmarkdown,
-    covr
+    rmarkdown
 VignetteBuilder: knitr
+ByteCompile: true
+LazyData: TRUE
+RoxygenNote: 6.0.1
