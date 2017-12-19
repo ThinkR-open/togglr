@@ -3,3 +3,4 @@
 bidouille
 ^docs$
 ^\.travis\.yml$
+^appveyor\.yml$
