@@ -6,7 +6,7 @@
 #' @param until stop date
 #'
 #' @export
-#'
+#' @import httr
 #' @importFrom lubridate years
 #' @importFrom  dplyr select one_of
 #' @importFrom stats setNames
