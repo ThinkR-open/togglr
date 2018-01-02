@@ -2,6 +2,7 @@
 #' @description  return the toggle api token
 #' @param ask booleen do we have to ask if missing
 #' @importFrom magrittr %>% 
+#' @importFrom  keyring key_set_with_value
 #' @import keyring
 #' @export
 get_toggl_api_token <- function(ask=TRUE){

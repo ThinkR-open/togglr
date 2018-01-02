@@ -1,31 +1,35 @@
 #' Get all time entries between 2 dates
 #'
-#' @param start start time
-#' @param end end time
+#' @param since begin date (One week ago by default)
+#' @param until stop date (Now by defaut)
 #'
-#' @return a lit
+#' @return a data.frame containing all time entries
 #' @export
 #' @importFrom lubridate years
-#' @importFrom  dplyr select one_of
+#' @importFrom  dplyr select mutate case_when
 #' @importFrom stats setNames
 #' @importFrom purrr map
+#' @importFrom parsedate format_iso_8601
 #' @encoding UTF-8
 #' @examples
 #' get_time_entries()
 get_time_entries <- function(api_token = get_toggl_api_token(),
-                             workspace_id = get_workspace_id(),
-                             since = Sys.Date() - lubridate::years(1),
-                             until = Sys.Date()){
-  # GET https://www.toggl.com/api/v8/time_entries
-  
-  wp <- content(GET(url,
-                    # verbose(),
-                    authenticate(api_token, "api_token"),
-                    encode = "json"))
-  
-  
-  # jsonlite:::simplify(wp$data, simplifyDataFrame = TRUE) -> out
-  simplify(wp$data, simplifyDataFrame = TRUE) -> out
-  
+                             since = Sys.time() - lubridate::weeks(1),
+                             until = Sys.time()){
+  url <- glue::glue("https://www.toggl.com/api/v8/time_entries?start_date={format_iso_8601(since)}&end_date={format_iso_8601(until)}")
+  content(GET(url,
+              # verbose(),
+              authenticate(api_token, "api_token"),
+              encode = "json")) %>%
+    map_df(invisible) %>%
+    mutate(
+      pretty_duration = prettyunits::pretty_sec(duration)     ,
+      start = parse_iso_8601(start),
+      stop = case_when(is.na(stop) ~ "0",
+                       TRUE ~ stop),
+      stop = parse_iso_8601(stop)
+    ) %>%
+select(start,stop,pretty_duration,duration,description,pid,wid,everything()) %>% 
+    rev()
   
 }
