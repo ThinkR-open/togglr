@@ -60,7 +60,7 @@ get_project_id <- function(project_name = get_context_project(),
 #' @param workspace_id workspace id
 #'
 #' @importFrom httr GET authenticate content
-#' @importFrom dplyr bind_rows filter
+#' @importFrom dplyr bind_rows filter rename select
 #' @export
 get_project_id_and_name <- function(
                            api_token = get_toggl_api_token(),
@@ -79,7 +79,8 @@ get_project_id_and_name <- function(
     # verbose(),
     authenticate(api_token, "api_token"),
     encode = "json"
-  )) %>% bind_rows()  %>% 
+  )) %>% 
+    bind_rows()  %>% 
     select(id,name) %>% 
     rename(project_name = name)
 
