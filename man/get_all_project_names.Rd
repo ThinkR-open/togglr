@@ -5,7 +5,7 @@
 \title{Get all project's names}
 \usage{
 get_all_project_names(api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(), since = Sys.Date() -
+  workspace_id = get_workspace_id(api_token), since = Sys.Date() -
   lubridate::years(1), until = Sys.Date())
 }
 \arguments{

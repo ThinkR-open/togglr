@@ -5,7 +5,8 @@
 \title{get_project_id}
 \usage{
 get_project_id(project_name = get_context_project(),
-  api_token = get_toggl_api_token(), create = FALSE, client = NULL)
+  api_token = get_toggl_api_token(), create = FALSE, client = NULL,
+  workspace_id = get_workspace_id(api_token))
 }
 \arguments{
 \item{project_name}{the project name}
@@ -15,7 +16,9 @@ get_project_id(project_name = get_context_project(),
 \item{create}{boolean do you want to create the project if it doesnt exist ?}
 
 \item{client}{client name}
+
+\item{workspace_id}{workspace id}
 }
 \description{
-retrieve projet id
+retrieve project id
 }

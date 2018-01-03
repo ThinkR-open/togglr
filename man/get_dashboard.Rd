@@ -6,7 +6,7 @@
 \title{get all data from <http://toggl.com>}
 \usage{
 get_dashboard(api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(), since = Sys.Date() -
+  workspace_id = get_workspace_id(api_token), since = Sys.Date() -
   lubridate::years(1), until = Sys.Date())
 }
 \arguments{

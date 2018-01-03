@@ -31,7 +31,7 @@ toggl_create_project <- function(
   }else{
   
     # gestion du client
-    create_client(name = client,api_token = api_token,wid = workspace_id)
+    create_client(name = client,api_token = api_token,workspace_id = workspace_id)
     client_id <- client_name_to_id(name = client,api_token = api_token)
     
     

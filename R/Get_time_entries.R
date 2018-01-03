@@ -2,14 +2,15 @@
 #'
 #' @param since begin date (One week ago by default)
 #' @param until stop date (Now by defaut)
+#' @param api_token the toggl api token
 #'
 #' @return a data.frame containing all time entries
 #' @export
 #' @importFrom lubridate years
-#' @importFrom  dplyr select mutate case_when
+#' @importFrom  dplyr select mutate case_when slice everything left_join
 #' @importFrom stats setNames
-#' @importFrom purrr map
-#' @importFrom parsedate format_iso_8601
+#' @importFrom purrr map_df
+#' @importFrom parsedate format_iso_8601 parse_iso_8601
 #' @encoding UTF-8
 #' @examples
 #' get_time_entries()
@@ -34,15 +35,17 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
       stop = case_when(is.na(stop) ~ "0",
                        TRUE ~ stop),
       stop = parse_iso_8601(stop)
-    ) %>%
+    ) %>% 
+    left_join(get_project_id_and_name(),by= c("pid"="id"))%>%
     select(start,
            stop,
            pretty_duration,
            duration,
+           project_name,
            description,
            pid,
            wid,
            everything()) %>%
-    slice(nrow(.):1)
+    slice(nrow(.):1) 
   
 }

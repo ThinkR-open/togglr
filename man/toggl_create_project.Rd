@@ -5,15 +5,15 @@
 \title{toggl_create_project}
 \usage{
 toggl_create_project(project_name = get_context_project(),
-  api_token = get_toggl_api_token(), wid = get_workspace_id(),
-  client = NULL)
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token), client = NULL)
 }
 \arguments{
 \item{project_name}{project name}
 
 \item{api_token}{the toggl api token#'}
 
-\item{wid}{workspace_id}
+\item{workspace_id}{workspace_id}
 
 \item{client}{client name}
 }

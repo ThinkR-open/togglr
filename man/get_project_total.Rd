@@ -5,8 +5,9 @@
 \title{get project total time}
 \usage{
 get_project_total(project_name = get_context_project(),
-  api_token = get_toggl_api_token(), workspace_id = get_workspace_id(),
-  since = Sys.Date() - lubridate::years(1), until = Sys.Date())
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token), since = Sys.Date() -
+  lubridate::years(1), until = Sys.Date())
 }
 \arguments{
 \item{project_name}{project name}

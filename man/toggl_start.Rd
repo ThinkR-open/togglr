@@ -6,7 +6,8 @@
 \usage{
 toggl_start(description = get_context(), client = "without client",
   project_name = get_context_project(), start = now(),
-  api_token = get_toggl_api_token(), wid = get_workspace_id(api_token))
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token))
 }
 \arguments{
 \item{description}{the task you are doing}
@@ -19,7 +20,7 @@ toggl_start(description = get_context(), client = "without client",
 
 \item{api_token}{the toggl api token}
 
-\item{wid}{workspace id}
+\item{workspace_id}{workspace id}
 }
 \description{
 start a task

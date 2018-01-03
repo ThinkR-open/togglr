@@ -29,7 +29,7 @@ POST("https://www.toggl.com/api/v8/clients",
      body=toJSON(
        list(client = list(
          name = name,
-         wid=workspace_id
+         wid = workspace_id
        )
        ),
        auto_unbox = TRUE)
