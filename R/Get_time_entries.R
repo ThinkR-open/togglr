@@ -23,13 +23,26 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
               encode = "json")) %>%
     map_df(invisible) %>%
     mutate(
-      pretty_duration = prettyunits::pretty_sec(duration)     ,
-      start = parse_iso_8601(start),
+      start = parse_iso_8601(start)  ,
+      duration = case_when(duration < 0 ~ as.integer(difftime(
+        Sys.time(), start, units = "sec"
+      )),
+      TRUE ~ duration)
+      ,
+      pretty_duration = prettyunits::pretty_sec(duration)
+      ,
       stop = case_when(is.na(stop) ~ "0",
                        TRUE ~ stop),
       stop = parse_iso_8601(stop)
     ) %>%
-select(start,stop,pretty_duration,duration,description,pid,wid,everything()) %>% 
-    rev()
+    select(start,
+           stop,
+           pretty_duration,
+           duration,
+           description,
+           pid,
+           wid,
+           everything()) %>%
+    slice(nrow(.):1)
   
 }

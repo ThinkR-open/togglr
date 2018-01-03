@@ -1,7 +1,7 @@
 
 #' @title toggl_create_project
 #' @param project_name project name
-#' @param wid workspace_id
+#' @param workspace_id workspace_id
 #' @param client client name
 #' @param api_token the toggl api token#'
 #'
@@ -16,7 +16,7 @@
 toggl_create_project <- function(
   project_name=get_context_project(),
   api_token=get_toggl_api_token(),
-  wid=get_workspace_id(),
+  workspace_id=get_workspace_id(api_token),
   client = NULL
   ){
   if (is.null(api_token)){
@@ -31,7 +31,7 @@ toggl_create_project <- function(
   }else{
   
     # gestion du client
-    create_client(name = client,api_token = api_token,wid = wid)
+    create_client(name = client,api_token = api_token,wid = workspace_id)
     client_id <- client_name_to_id(name = client,api_token = api_token)
     
     

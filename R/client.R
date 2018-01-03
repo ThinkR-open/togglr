@@ -2,7 +2,7 @@
 #' @description  create a client
 #'
 #' @param name client name
-#' @param wid workspace id
+#' @param workspace_id workspace id
 #' @param api_token the toggl api token
 #'
 #' @import glue
@@ -16,8 +16,8 @@
 #' }
 #' @export
 create_client <- function(name = "wihtout client",
-                          api_token=get_toggl_api_token(),
-                          wid=get_workspace_id()
+                          api_token = get_toggl_api_token(),
+                          workspace_id = get_workspace_id(api_token)
                           ){
 
 # POST https://www.toggl.com/api/v8/clients
@@ -29,7 +29,7 @@ POST("https://www.toggl.com/api/v8/clients",
      body=toJSON(
        list(client = list(
          name = name,
-         wid=wid
+         wid=workspace_id
        )
        ),
        auto_unbox = TRUE)
