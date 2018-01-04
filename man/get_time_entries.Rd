@@ -22,5 +22,7 @@ a data.frame containing all time entries
 Get all time entries between 2 dates
 }
 \examples{
+\dontrun{
 get_time_entries()
+}
 }
