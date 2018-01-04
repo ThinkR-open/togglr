@@ -25,7 +25,7 @@ get_project_id <- function(project_name = get_context_project(),
   content(GET(
     paste0(
       "https://www.toggl.com/api/v8/workspaces/",
-      wid,
+      workspace_id,
       "/projects"
     ),
     # verbose(),
