@@ -8,7 +8,7 @@
 #' @export
 #' @import httr
 #' @importFrom lubridate years
-#' @importFrom  dplyr select one_of
+#' @importFrom dplyr select one_of
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @encoding UTF-8
@@ -161,9 +161,8 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 #' @param until a date
 #' @param humain boolean humain readable time
 #'
-
 #' @export
-#' @importFrom dplyr mutate case_when
+#' @importFrom dplyr mutate case_when full_join tribble
 #' @importFrom lubridate years
 #'
 #'
