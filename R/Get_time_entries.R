@@ -7,7 +7,7 @@
 #' @return a data.frame containing all time entries
 #' @export
 #' @importFrom lubridate years
-#' @importFrom  dplyr select mutate case_when slice everything left_join
+#' @importFrom dplyr select mutate case_when slice everything left_join as_tibble
 #' @importFrom stats setNames
 #' @importFrom purrr map_df
 #' @importFrom parsedate format_iso_8601 parse_iso_8601
@@ -19,6 +19,7 @@
 get_time_entries <- function(api_token = get_toggl_api_token(),
                              since = Sys.time() - lubridate::weeks(1),
                              until = Sys.time()){
+
   url <- glue::glue("https://www.toggl.com/api/v8/time_entries?start_date={format_iso_8601(since)}&end_date={format_iso_8601(until)}")
   res <- content(GET(url,
               # verbose(),
@@ -28,7 +29,7 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
   if (length(res)==0) {return(data.frame())}
   
   res %>%
-    map_df(invisible) %>%
+    map_df(~as_tibble(.x)) %>% 
     mutate(
       start = parse_iso_8601(start)  ,
       duration = case_when(duration < 0 ~ as.integer(difftime(
