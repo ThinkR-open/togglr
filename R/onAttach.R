@@ -26,6 +26,7 @@ globalVariables(
     "time",
     "case_when",
     "full_join" ,
-    "tribble"
+    "tribble",
+    "id","start","duration","pretty_duration",'project_name','description','pid','wid'
   )
 )

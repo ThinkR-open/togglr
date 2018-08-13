@@ -4,8 +4,8 @@
 \alias{toggl_create}
 \title{toggl_create}
 \usage{
-toggl_create(description = get_context(), start = now(), stop, duration,
-  api_token = get_toggl_api_token())
+toggl_create(description = get_context(), start = now(), stop,
+  duration, api_token = get_toggl_api_token())
 }
 \arguments{
 \item{description}{the task you did}

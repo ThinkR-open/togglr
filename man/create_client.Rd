@@ -4,7 +4,8 @@
 \alias{create_client}
 \title{create_client}
 \usage{
-create_client(name = "wihtout client", api_token = get_toggl_api_token(),
+create_client(name = "wihtout client",
+  api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token))
 }
 \arguments{

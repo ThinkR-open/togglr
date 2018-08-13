@@ -5,8 +5,8 @@
 \alias{get_time_entries}
 \title{Get all time entries between 2 dates}
 \usage{
-get_time_entries(api_token = get_toggl_api_token(), since = Sys.time() -
-  lubridate::weeks(1), until = Sys.time())
+get_time_entries(api_token = get_toggl_api_token(), since = Sys.time()
+  - lubridate::weeks(1), until = Sys.time())
 }
 \arguments{
 \item{api_token}{the toggl api token}
