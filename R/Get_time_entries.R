@@ -1,3 +1,8 @@
+paste2 <- function(x,...){
+  if (!is.list(x)){return(x)}
+  paste(x,...)
+}
+
 #' Get all time entries between 2 dates
 #'
 #' @param since begin date (One week ago by default)
@@ -28,7 +33,10 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
   if (length(res)==0) {return(data.frame())}
   
   res %>%
-    map_df(invisible) %>%
+    # map_df(invisible) %>%
+    
+    map(~map(.x,paste2,collapse=";")) %>%
+    bind_rows() %>% 
     mutate(
       start = parse_iso_8601(start)  ,
       duration = case_when(duration < 0 ~ as.integer(difftime(
