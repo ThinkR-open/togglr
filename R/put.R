@@ -128,7 +128,7 @@ toggl_stop <- function(current=get_current(),
 
 
 #' @title toggl_create
-#' @description  create a
+#' @description  create a time entry
 #' @param start time in POSIXt
 #' @param stop time in POSIXt
 #' @param duration in seconds
