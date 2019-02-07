@@ -4,7 +4,7 @@
 #' @param workspace_id the workspace id
 #'
 #' @export
-#'
+#' @importFrom purrr keep
 get_workspace_users <- function(api_token = get_toggl_api_token(),
                                 workspace_id = get_workspace_id(api_token)){
   

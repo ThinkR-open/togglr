@@ -210,9 +210,16 @@ get_project_task_detail <-
       
       
     if (humain) {
-      out <- 
-        out %>% mutate(time = n_to_tps(time))
+      out <- out %>% to_humain()
     }
     out
   }
 
+#' transforme time column into humain readable column
+#'
+#' @param df a data.frame
+#'
+#' @export
+to_humain <- function(df){
+  df %>% mutate(time = n_to_tps(time))
+}

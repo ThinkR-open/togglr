@@ -8,7 +8,7 @@
 #' @export
 #' @import httr
 #' @importFrom lubridate years
-#' @importFrom  dplyr select one_of
+#' @importFrom  dplyr dplyr
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @encoding UTF-8

@@ -19,7 +19,7 @@ toggl_create(description = get_context(), start = now(), stop,
 \item{api_token}{the toggl api token}
 }
 \description{
-create a
+create a time entry
 }
 \examples{
 \dontrun{

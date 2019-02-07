@@ -10,11 +10,10 @@
 #' @export
 #' @import httr
 #' @importFrom lubridate years
-#' @importFrom  dplyr select one_of
+#' @importFrom  dplyr select one_of as.tbl
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @encoding UTF-8
-get_summary_report() %>% as.tbl()
 get_summary_report <- function(api_token = get_toggl_api_token(),
                               workspace_id = get_workspace_id(api_token),
                               since = Sys.Date() - lubridate::years(1),
@@ -42,7 +41,6 @@ get_summary_report <- function(api_token = get_toggl_api_token(),
   
   
   out %>%
-    # rename(user = title) %>%
     select(-total_currencies)%>% 
     as.tbl() %>%
     select(-title) %>% 
