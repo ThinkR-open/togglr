@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>delete_toggl_api_token — delete_toggl_api_token • togglr</title>
+<title>get_project_id_and_name — get_project_id_and_name • togglr</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="delete_toggl_api_token — delete_toggl_api_token" />
+<meta property="og:title" content="get_project_id_and_name — get_project_id_and_name" />
 
-<meta property="og:description" content="delete the toggle api token" />
+<meta property="og:description" content="retrieve project id and name" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -102,24 +102,39 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>delete_toggl_api_token</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ThinkR-open/togglr/blob/master/R/tools.R'><code>R/tools.R</code></a></small>
-    <div class="hidden name"><code>delete_toggl_api_token.Rd</code></div>
+    <h1>get_project_id_and_name</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ThinkR-open/togglr/blob/master/R/get_project.R'><code>R/get_project.R</code></a></small>
+    <div class="hidden name"><code>get_project_id_and_name.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>delete the toggle api token</p>
+    <p>retrieve project id and name</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>delete_toggl_api_token</span>()</pre>
-        
+    <pre class="usage"><span class='fu'>get_project_id_and_name</span>(<span class='kw'>api_token</span> <span class='kw'>=</span> <span class='fu'><a href='get_toggl_api_token.html'>get_toggl_api_token</a></span>(),
+  <span class='kw'>workspace_id</span> <span class='kw'>=</span> <span class='fu'><a href='get_workspace_id.html'>get_workspace_id</a></span>(<span class='no'>api_token</span>))</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>api_token</th>
+      <td><p>the toggl api token</p></td>
+    </tr>
+    <tr>
+      <th>workspace_id</th>
+      <td><p>workspace id</p></td>
+    </tr>
+    </table>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
                 </ul>
 
   </div>
