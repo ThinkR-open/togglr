@@ -11,6 +11,7 @@
 #' @import dplyr
 #' @importFrom stats setNames
 #' @importFrom purrr map
+#' @importFrom glue glue
 #' @encoding UTF-8
 get_weekly_report <- function(api_token = get_toggl_api_token(),
                           workspace_id = get_workspace_id(api_token),

@@ -12,11 +12,12 @@ paste2 <- function(x,...){
 #' @return a data.frame containing all time entries
 #' @export
 #' @importFrom lubridate years
-#' @importFrom  dplyr select mutate case_when slice everything left_join
+#' @importFrom dplyr select mutate case_when slice everything left_join
 #' @importFrom stats setNames
 #' @importFrom purrr map_df
 #' @importFrom parsedate format_iso_8601 parse_iso_8601
 #' @encoding UTF-8
+#' @importFrom glue glue
 #' @examples
 #' \dontrun{
 #' get_time_entries()

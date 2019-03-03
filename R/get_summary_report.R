@@ -8,6 +8,7 @@
 #' @param until stop date
 #'
 #' @export
+#' @importFrom glue glue
 #' @import httr
 #' @importFrom lubridate years
 #' @importFrom  dplyr select one_of as.tbl

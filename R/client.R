@@ -5,7 +5,7 @@
 #' @param workspace_id workspace id
 #' @param api_token the toggl api token
 #'
-#' @import glue
+#' @importFrom glue glue
 #' @importFrom httr POST authenticate
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON

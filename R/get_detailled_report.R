@@ -8,6 +8,7 @@
 #' @param until stop date
 #'
 #' @import httr
+#' @importFrom glue glue
 #' @importFrom lubridate years
 #' @importFrom  dplyr select left_join as.tbl
 #' @importFrom stats setNames
@@ -28,7 +29,7 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
  
   
   
-  url <- glue::glue("https://toggl.com/reports/api/v2/details?workspace_id={workspace_id}&since={since}&until={until}&user_agent={user_agent}&grouping=users&page={page}",
+  url <- glue("https://toggl.com/reports/api/v2/details?workspace_id={workspace_id}&since={since}&until={until}&user_agent={user_agent}&grouping=users&page={page}",
                     since=format(since, "%Y-%m-%dT00:00:00"),
                     until=format(until, "%Y-%m-%dT00:00:00")
   )
