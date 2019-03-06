@@ -40,10 +40,15 @@ get_project_id <- function(project_name = get_context_project(),
     
   }
   if (is.null(id) & create) {
+    if (is.null(client)){
+      message("You have to specify a client to create a new project")
+      return(NULL)
+    }
+    
     message("we create the project")
     id <-  toggl_create_project(project_name = project_name,
-                           api_token = api_token,
-                           client = client)
+                                api_token = api_token,
+                                client = client)
   }
   
   id
