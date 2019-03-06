@@ -141,11 +141,23 @@ toggl_stop <- function(current=get_current(),
 #' \dontrun{
 #' options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
 #' toggl_create(duration=1200)
+#' 
+#'toggl_create( description="description",
+#'              start=now(),
+#'              pid = get_project_id(project_name = "projectname",
+#'                                  create=TRUE,client = "client"),
+#'              duration=1000,
+#'              api_token=get_toggl_api_token())
+#' 
+#' 
+#' 
+#' 
 #' }
 #' @export
 toggl_create <- function(
   description=get_context(),
   start=now(),
+  pid = get_project_id(),
   stop,
   duration,
   api_token=get_toggl_api_token()){
@@ -173,6 +185,7 @@ toggl_create <- function(
 
        body=toJSON(list(time_entry = list(
          description = description,
+         pid = pid,
                                    created_with = "togglr",
                                    duronly=FALSE,
                                    duration=duration,
