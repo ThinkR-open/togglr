@@ -44,6 +44,7 @@ toggl_start <- function(description = get_context(),
     body = toJSON(list(
       time_entry = list(
         description = description,
+        tags = tags,
         created_with = "togglr",
         wid = workspace_id,
         pid = get_project_id(
