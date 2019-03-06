@@ -160,6 +160,7 @@ toggl_create <- function(
   pid = get_project_id(),
   stop,
   duration,
+  tags=NULL,
   api_token=get_toggl_api_token()){
   if (is.null(api_token)){
 
@@ -176,6 +177,9 @@ toggl_create <- function(
     duration <- round(as.numeric(difftime(stop,start,units = "secs")))
   }
 
+  if ( !missing(tags) && !is.list(tags)){
+    tags <- as.list(tags)
+  }
 
 
   POST("https://www.toggl.com/api/v8/time_entries",
@@ -186,6 +190,7 @@ toggl_create <- function(
        body=toJSON(list(time_entry = list(
          description = description,
          pid = pid,
+         tags = tags,
                                    created_with = "togglr",
                                    duronly=FALSE,
                                    duration=duration,
