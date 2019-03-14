@@ -26,6 +26,7 @@ toggl_start <- function(description = get_context(),
                         project_name = get_context_project(),
                         start = now(),
                         api_token = get_toggl_api_token(),
+                        tags = NULL
                         workspace_id = get_workspace_id(api_token)) {
   if (is.null(api_token)) {
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
