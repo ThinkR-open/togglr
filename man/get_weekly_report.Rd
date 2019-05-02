@@ -17,6 +17,8 @@ get_weekly_report(api_token = get_toggl_api_token(),
 \item{since}{begin date}
 
 \item{until}{stop date}
+
+\item{user_agent}{user_agent}
 }
 \description{
 get weekly report

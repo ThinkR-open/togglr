@@ -19,6 +19,10 @@ get_summary_report(api_token = get_toggl_api_token(),
 \item{since}{begin date}
 
 \item{until}{stop date}
+
+\item{user_agent}{user_agent}
+
+\item{users}{users}
 }
 \description{
 by user then projet

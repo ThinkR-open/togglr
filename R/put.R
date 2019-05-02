@@ -8,8 +8,8 @@
 #' @param api_token the toggl api token
 #' @param client client name
 #' @param workspace_id workspace id
+#' @param tags tags
 #'
-
 #' @importFrom lubridate now
 #' @importFrom httr POST authenticate content
 #' @importFrom magrittr %>%
@@ -136,6 +136,8 @@ toggl_stop <- function(current=get_current(),
 #' @param duration in seconds
 #' @param description the task you did
 #' @param api_token the toggl api token
+#' @param pid pid
+#' @param tags tags
 #' @importFrom lubridate now
 #' @importFrom httr POST authenticate verbose
 #' @importFrom jsonlite toJSON

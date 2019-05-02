@@ -6,11 +6,14 @@
 #' @param workspace_id the workspace id
 #' @param since begin date
 #' @param until stop date
+#' @param page page
+#' @param user_agent user_agent
+#' @param max_page max_page
 #'
 #' @import httr
 #' @importFrom glue glue
 #' @importFrom lubridate years
-#' @importFrom  dplyr select left_join as.tbl
+#' @importFrom dplyr select left_join as.tbl
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @encoding UTF-8
@@ -38,7 +41,7 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
                     authenticate(api_token, "api_token"),
                     encode = "json"))
 
-  togglr:::simplify(wp$data, simplifyDataFrame = TRUE) -> out
+  togglr::simplify(wp$data, simplifyDataFrame = TRUE) -> out
   
   
   
@@ -50,6 +53,8 @@ mem_poss_get_detailled_report_paged <- memoise::memoise(poss_get_detailled_repor
 
 #' @export
 #' @rdname get_detailled_report_paged
+#' @importFrom lubridate dmy days
+#' @importFrom utils txtProgressBar setTxtProgressBar
 get_detailled_report <- function(api_token = get_toggl_api_token(),
                                workspace_id = get_workspace_id(api_token),
                                since = Sys.Date() - lubridate::years(1),
@@ -62,12 +67,12 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
   # message("until =",until)
   # message("since =",since)
   
-  # si la plage plus longue que 1 ans on découpe
+  # si la plage plus longue que 1 ans on d?coupe
   
   
   if  ( difftime(until,since,units = "days") > 366){
     
-    # ou alors demander des années civiles pour optimiser les temps
+    # ou alors demander des ann?es civiles pour optimiser les temps
     
     out <- bind_rows(
     

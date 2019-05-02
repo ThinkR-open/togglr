@@ -13,9 +13,13 @@ toggl_create(description = get_context(), start = now(),
 
 \item{start}{time in POSIXt}
 
+\item{pid}{pid}
+
 \item{stop}{time in POSIXt}
 
 \item{duration}{in seconds}
+
+\item{tags}{tags}
 
 \item{api_token}{the toggl api token}
 }

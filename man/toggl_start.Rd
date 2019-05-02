@@ -6,7 +6,7 @@
 \usage{
 toggl_start(description = get_context(), client = "without client",
   project_name = get_context_project(), start = now(),
-  api_token = get_toggl_api_token(),
+  api_token = get_toggl_api_token(), tags = NULL,
   workspace_id = get_workspace_id(api_token))
 }
 \arguments{
@@ -19,6 +19,8 @@ toggl_start(description = get_context(), client = "without client",
 \item{start}{start time in POSIXt}
 
 \item{api_token}{the toggl api token}
+
+\item{tags}{tags}
 
 \item{workspace_id}{workspace id}
 }

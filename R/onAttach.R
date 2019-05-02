@@ -14,19 +14,3 @@
     }
   }
 }
-
-# enleve les faux positifs du check
-globalVariables(
-  c(
-    ".",
-    "notify",
-    "notifier",
-    "name",
-    "project",
-    "time",
-    "case_when",
-    "full_join" ,
-    "tribble",
-    "id","start","duration","pretty_duration",'project_name','description','pid','wid'
-  )
-)
