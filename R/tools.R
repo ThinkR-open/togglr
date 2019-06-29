@@ -84,5 +84,9 @@ ask_toggl_api_token <- function (msg="toggl api token")
 #'
 #' @param time a POSIXt
 correct_date <- function(time){
-  paste0(gsub(" ","T",as.character(time)),"+01:00")
+  if (! is.null(time)) {
+    paste0(gsub(" ","T",as.character(time)),"+01:00")
+  } else {
+    return(NULL)
+  }
 }
