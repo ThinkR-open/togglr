@@ -81,8 +81,21 @@ ask_toggl_api_token <- function (msg="toggl api token")
 
 #' correct_date
 #' @description  tricks to obtain iso 8601
+#' @return time in iso 8601
 #'
 #' @param time a POSIXt
 correct_date <- function(time){
-  paste0(gsub(" ","T",as.character(time)),"+01:00")
+  if (! is.null(time)) {
+    tm <- strftime(time, "%Y-%m-%dT%H:%M:%S")
+    time_z <- strftime(time, "%z") # format +0200
+    # Add : between hour and rest
+    time_z_colon <- paste0(
+      substring(time_z, 1, 3),
+      ":",
+      substring(time_z, 4, 5))
+
+    paste0(tm, time_z_colon)
+  } else {
+    return(NULL)
+  }
 }
