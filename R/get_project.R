@@ -35,7 +35,7 @@ get_project_id <- function(project_name = get_context_project(),
     filter(name == project_name) %>% .$id -> id
   
   if (length(id) == 0) {
-    warning(paste("the project ", project_name, " don't exist"))
+    warning(paste("the project ", project_name, " doesn't exist"))
     id <- NULL
     
   }
