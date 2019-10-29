@@ -7,7 +7,7 @@
 toggl_create_project(project_name = get_context_project(),
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token), client = NULL,
-  private = false)
+  private = FALSE)
 }
 \arguments{
 \item{project_name}{project name}
