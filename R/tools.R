@@ -1,4 +1,4 @@
-#' @title get_toggl_api_token
+#' get_toggl_api_token
 #' @description  return the toggle api token
 #' @param ask booleen do we have to ask if missing
 #' @importFrom magrittr %>% 
@@ -21,7 +21,7 @@ get_toggl_api_token <- function(ask=TRUE){
 }
 
 
-#' @title set_toggl_api_token
+#' set_toggl_api_token
 #' @description  set the toggle api token
 #' @param token toggl api token
 #' @importFrom magrittr %>% 
@@ -42,7 +42,7 @@ set_toggl_api_token <- function(token){
   token
 }
 
-#' @title update_toggl_api_token
+#' update_toggl_api_token
 #' @description  update the toggle api token
 #' @importFrom magrittr %>% 
 #' @export
@@ -59,8 +59,7 @@ delete_toggl_api_token <- function(){
 }
 
 
-#'
-#' @title ask_toggl_api_token
+#' ask_toggl_api_token
 #' @param msg the message
 #' @description  ask for the toggle api token
 #' @import getPass
@@ -80,7 +79,7 @@ ask_toggl_api_token <- function (msg="toggl api token")
 
 
 
-#' @title correct_date
+#' correct_date
 #' @description  tricks to obtain iso 8601
 #'
 #' @param time a POSIXt

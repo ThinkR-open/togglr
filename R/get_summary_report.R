@@ -6,6 +6,8 @@
 #' @param workspace_id the workspace id
 #' @param since begin date
 #' @param until stop date
+#' @param user_agent user_agent
+#' @param users users
 #'
 #' @export
 #' @importFrom glue glue
@@ -37,7 +39,7 @@ get_summary_report <- function(api_token = get_toggl_api_token(),
                     encode = "json"))
   
   
-  togglr:::simplify(wp$data, simplifyDataFrame = TRUE) -> out
+  togglr::simplify(wp$data, simplifyDataFrame = TRUE) -> out
 
   
   

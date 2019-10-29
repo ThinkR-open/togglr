@@ -4,6 +4,7 @@
 #' @param workspace_id the workspace id
 #' @param since begin date
 #' @param until stop date
+#' @param user_agent user_agent
 #'
 #' @export
 #' @import httr
@@ -42,7 +43,7 @@ get_weekly_report <- function(api_token = get_toggl_api_token(),
   # wp$data
   
   # jsonlite:::simplify(wp$data, simplifyDataFrame = TRUE) -> out
-  togglr:::simplify(wp$data, simplifyDataFrame = TRUE) -> out
+  togglr::simplify(wp$data, simplifyDataFrame = TRUE) -> out
   # 
   # 
   # synthese <-

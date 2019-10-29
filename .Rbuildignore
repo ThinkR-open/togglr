@@ -5,3 +5,7 @@ bidouille
 ^\.travis\.yml$
 ^appveyor\.yml$
 ^codecov\.yml$
+^dev_history\.R$
+^_pkgdown\.yml$
+^pkgdown$
+^README\.Rmd$

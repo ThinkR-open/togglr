@@ -24,6 +24,12 @@ get_detailled_report(api_token = get_toggl_api_token(),
 \item{since}{begin date}
 
 \item{until}{stop date}
+
+\item{page}{page}
+
+\item{user_agent}{user_agent}
+
+\item{max_page}{max_page}
 }
 \description{
 by user then projet

@@ -20,6 +20,8 @@ toggl_start(description = get_context(), client = "without client",
 
 \item{api_token}{the toggl api token}
 
+\item{tags}{tags}
+
 \item{workspace_id}{workspace id}
 }
 \description{
