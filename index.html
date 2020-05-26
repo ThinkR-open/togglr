@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Toggl.com Api for Rstudio • togglr</title>
-<!-- jquery --><script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="cosmo.css" rel="stylesheet">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script><!-- Bootstrap --><link href="cosmo.css" rel="stylesheet">
 <link href="thinkr.css" rel="stylesheet">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
@@ -81,7 +82,7 @@
 </div>
         </li>
         <li>
-  <a href="https://github.com/ThinkR-open/togglr">
+  <a href="https://github.com/ThinkR-open/togglr/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -112,52 +113,52 @@
 <div id="from-cran" class="section level3">
 <h3 class="hasAnchor">
 <a href="#from-cran" class="anchor"></a>From CRAN</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"togglr"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"togglr"</span>)</pre></div>
 </div>
 <div id="from-github" class="section level3">
 <h3 class="hasAnchor">
 <a href="#from-github" class="anchor"></a>From Github</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"devtools"</span>)){<span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)}</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"ThinkR-open/togglr"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="r"><span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"devtools"</span>)){<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)}
+<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"ThinkR-open/togglr"</span>)</pre></div>
 </div>
 </div>
 <div id="set-toggl-api-token" class="section level2">
 <h2 class="hasAnchor">
 <a href="#set-toggl-api-token" class="anchor"></a>Set toggl Api token</h2>
 <p>Go on toogl.com website : <code>https://toggl.com/app/profile</code></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">togglr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/togglr/man/open_toggl_website_profile.html">open_toggl_website_profile</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="r"><span class="kw pkg">togglr</span><span class="kw ns">::</span><span class="fu"><a href="reference/open_toggl_website_profile.html">open_toggl_website_profile</a></span>()</pre></div>
 <p>then select and copy your token api at the bottom of the page.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(togglr)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="reference/set_toggl_api_token.html">set_toggl_api_token</a></span>(<span class="st">"your_token_api"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">togglr</span>)
+<span class="fu"><a href="reference/set_toggl_api_token.html">set_toggl_api_token</a></span>(<span class="st">"your_token_api"</span>)</pre></div>
 <p>You just need to do this once.</p>
 </div>
 <div id="start-the-tracking-system" class="section level2">
 <h2 class="hasAnchor">
 <a href="#start-the-tracking-system" class="anchor"></a>Start the tracking system</h2>
 <p>Without any parameters it will create a new project using your Rstudio project name.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="reference/toggl_start.html">toggl_start</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="r"><span class="fu"><a href="reference/toggl_start.html">toggl_start</a></span>()</pre></div>
 <p>By default the client name is “without client” you can choose (and eventualy create a client) by using :</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="reference/toggl_start.html">toggl_start</a></span>(<span class="dt">client =</span> <span class="st">"my client"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="reference/toggl_start.html">toggl_start</a></span>(<span class="kw">client</span> <span class="kw">=</span> <span class="st">"my client"</span>)</pre></div>
 <p>But you can also choose the task and the project</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="reference/toggl_start.html">toggl_start</a></span>(<span class="dt">client =</span> <span class="st">"my client"</span>,</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">            <span class="dt">description =</span> <span class="st">"what I'm doing"</span>,</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">            <span class="dt">project_name =</span> <span class="st">"my project"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="r"><span class="fu"><a href="reference/toggl_start.html">toggl_start</a></span>(<span class="kw">client</span> <span class="kw">=</span> <span class="st">"my client"</span>,
+            <span class="kw">description</span> <span class="kw">=</span> <span class="st">"what I'm doing"</span>,
+            <span class="kw">project_name</span> <span class="kw">=</span> <span class="st">"my project"</span>)</pre></div>
 </div>
 <div id="stop-the-tracking-system" class="section level2">
 <h2 class="hasAnchor">
 <a href="#stop-the-tracking-system" class="anchor"></a>Stop the tracking system</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="reference/toggl_stop.html">toggl_stop</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="r"><span class="fu"><a href="reference/toggl_stop.html">toggl_stop</a></span>()</pre></div>
 </div>
 <div id="get-total-time-passed-on-the-current-project" class="section level2">
 <h2 class="hasAnchor">
 <a href="#get-total-time-passed-on-the-current-project" class="anchor"></a>Get total time passed on the current project</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="reference/get_current_duration.html">get_current_duration</a></span>()<span class="co"># the current track</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw"><a href="reference/get_project_task_detail.html">get_project_task_detail</a></span>()<span class="co"># all the project (including the current track)</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="r"><span class="fu"><a href="reference/get_current_duration.html">get_current_duration</a></span>()<span class="co"># the current track</span>
+<span class="fu"><a href="reference/get_project_task_detail.html">get_project_task_detail</a></span>()<span class="co"># all the project (including the current track)</span></pre></div>
 </div>
 <div id="get-all-your-dashboard" class="section level2">
 <h2 class="hasAnchor">
 <a href="#get-all-your-dashboard" class="anchor"></a>Get all your dashboard</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="reference/get_dashboard.html">get_dashboard</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="r"><span class="fu"><a href="reference/get_dashboard.html">get_dashboard</a></span>()</pre></div>
 </div>
 <div id="use-rstudio-addins" class="section level2">
 <h2 class="hasAnchor">
@@ -167,19 +168,19 @@
 <div id="some-other-uselfull-functions-are-in-this-package" class="section level2">
 <h2 class="hasAnchor">
 <a href="#some-other-uselfull-functions-are-in-this-package" class="anchor"></a>Some other uselfull functions are in this package</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(package<span class="op">:</span>togglr)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span>(<span class="no">package</span>:<span class="no">togglr</span>)</pre></div>
 </div>
 </div>
 
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
 <li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=togglr">https://​cloud.r-project.org/​package=togglr</a>
 </li>
-<li>Browse source code at <br><a href="https://github.com/ThinkR-open/togglr">https://​github.com/​ThinkR-open/​togglr</a>
+<li>Browse source code at <br><a href="https://github.com/ThinkR-open/togglr/">https://​github.com/​ThinkR-open/​togglr/​</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/ThinkR-open/togglr/issues">https://​github.com/​ThinkR-open/​togglr/​issues</a>
 </li>
