@@ -4,10 +4,13 @@
 \alias{toggl_create_project}
 \title{toggl_create_project}
 \usage{
-toggl_create_project(project_name = get_context_project(),
+toggl_create_project(
+  project_name = get_context_project(),
   api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(api_token), client = NULL,
-  private = FALSE)
+  workspace_id = get_workspace_id(api_token),
+  client = NULL,
+  private = FALSE
+)
 }
 \arguments{
 \item{project_name}{project name}

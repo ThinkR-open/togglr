@@ -5,11 +5,14 @@
 \alias{get_summary_report}
 \title{get summary report}
 \usage{
-get_summary_report(api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(api_token), since = Sys.Date() -
-  lubridate::years(1), until = Sys.Date(), user_agent = "togglr",
-  users = get_workspace_users(api_token = api_token, workspace_id =
-  workspace_id))
+get_summary_report(
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token),
+  since = Sys.Date() - lubridate::years(1),
+  until = Sys.Date(),
+  user_agent = "togglr",
+  users = get_workspace_users(api_token = api_token, workspace_id = workspace_id)
+)
 }
 \arguments{
 \item{api_token}{the toggl api token}
