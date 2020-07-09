@@ -4,8 +4,10 @@
 \alias{get_workspace_users}
 \title{Title}
 \usage{
-get_workspace_users(api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(api_token))
+get_workspace_users(
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token)
+)
 }
 \arguments{
 \item{api_token}{the toggl api token}

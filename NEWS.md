@@ -1,3 +1,8 @@
+# togglr 0.1.34.9000
+
+* `get_time_entries()` can now handle multiple tags, stored in a list column (#21, @pat-s)
+
+
 # togglr 0.1.34
 
 * Added pkgdown documentation

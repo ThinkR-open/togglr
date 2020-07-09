@@ -4,10 +4,14 @@
 \alias{get_project_task_detail}
 \title{get all task from a project}
 \usage{
-get_project_task_detail(project_name = get_context_project(),
-  api_token = get_toggl_api_token(), workspace_id = get_workspace_id(),
-  since = Sys.Date() - lubridate::years(1), until = Sys.Date(),
-  humain = TRUE)
+get_project_task_detail(
+  project_name = get_context_project(),
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(),
+  since = Sys.Date() - lubridate::years(1),
+  until = Sys.Date(),
+  humain = TRUE
+)
 }
 \arguments{
 \item{project_name}{project name}

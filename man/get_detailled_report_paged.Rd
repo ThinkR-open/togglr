@@ -6,15 +6,23 @@
 \alias{get_detailled_report}
 \title{get detailled report}
 \usage{
-get_detailled_report_paged(api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(api_token), since = Sys.Date() -
-  lubridate::years(3), until = Sys.Date() + lubridate::days(1),
-  page = 1, user_agent = "togglr")
+get_detailled_report_paged(
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token),
+  since = Sys.Date() - lubridate::years(3),
+  until = Sys.Date() + lubridate::days(1),
+  page = 1,
+  user_agent = "togglr"
+)
 
-get_detailled_report(api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(api_token), since = Sys.Date() -
-  lubridate::years(1), until = Sys.Date(), user_agent = "togglr",
-  max_page = 10)
+get_detailled_report(
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token),
+  since = Sys.Date() - lubridate::years(1),
+  until = Sys.Date(),
+  user_agent = "togglr",
+  max_page = 10
+)
 }
 \arguments{
 \item{api_token}{the toggl api token}
