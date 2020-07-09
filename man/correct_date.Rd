@@ -9,6 +9,9 @@ correct_date(time)
 \arguments{
 \item{time}{a POSIXt}
 }
+\value{
+time in iso 8601
+}
 \description{
 tricks to obtain iso 8601
 }

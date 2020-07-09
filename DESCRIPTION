@@ -1,7 +1,7 @@
 Type: Package
 Package: togglr
 Title: 'Toggl.com' Api for 'Rstudio'
-Version: 0.1.34
+Version: 0.1.36
 Authors@R: 
     c(person(given = "Vincent",
              family = "Guyader",
