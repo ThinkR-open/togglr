@@ -4,8 +4,10 @@
 \alias{get_project_id_and_name}
 \title{get_project_id_and_name}
 \usage{
-get_project_id_and_name(api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(api_token))
+get_project_id_and_name(
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token)
+)
 }
 \arguments{
 \item{api_token}{the toggl api token}

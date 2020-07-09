@@ -1,9 +1,11 @@
 
 #' @title toggl_create_project
 #' @param project_name project name
+#'
 #' @param workspace_id workspace_id
 #' @param client client name
 #' @param api_token the toggl api token#'
+#' @param private whether project is accessible for only project users or for all workspace users (boolean, default false)
 #'
 #' @description  create a project
 #' @importFrom httr POST authenticate verbose
@@ -17,7 +19,8 @@ toggl_create_project <- function(
   project_name=get_context_project(),
   api_token=get_toggl_api_token(),
   workspace_id=get_workspace_id(api_token),
-  client = NULL
+  client = NULL,
+  private= FALSE
   ){
   if (is.null(api_token)){
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
@@ -43,7 +46,9 @@ toggl_create_project <- function(
        authenticate(api_token,"api_token"),
        encode="json",
        body=toJSON(list(project = list(name = project_name , 
-                                       cid = client_id)
+                                       cid = client_id,
+                                       is_private = private
+                                       )
        ),auto_unbox = TRUE)
   )%>%  content() %>% .$data %>% .$id -> id
   }

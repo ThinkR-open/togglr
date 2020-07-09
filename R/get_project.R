@@ -35,7 +35,7 @@ get_project_id <- function(project_name = get_context_project(),
     filter(name == project_name) %>% .$id -> id
   
   if (length(id) == 0) {
-    warning(paste("the project ", project_name, " don't exist"))
+    warning(paste("the project ", project_name, " don't exist "))
     id <- NULL
     
   }
@@ -45,7 +45,7 @@ get_project_id <- function(project_name = get_context_project(),
       return(NULL)
     }
     
-    message("we create the project")
+    message(" we create the project")
     id <-  toggl_create_project(project_name = project_name,
                                 api_token = api_token,
                                 client = client)

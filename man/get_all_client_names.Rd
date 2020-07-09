@@ -4,9 +4,12 @@
 \alias{get_all_client_names}
 \title{get all client's name}
 \usage{
-get_all_client_names(api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(), since = Sys.Date() -
-  lubridate::years(1), until = Sys.Date())
+get_all_client_names(
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(),
+  since = Sys.Date() - lubridate::years(1),
+  until = Sys.Date()
+)
 }
 \arguments{
 \item{api_token}{the toggl api token}
