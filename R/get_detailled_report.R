@@ -13,7 +13,7 @@
 #' @import httr
 #' @importFrom glue glue
 #' @importFrom lubridate years
-#' @importFrom dplyr select left_join as.tbl
+#' @importFrom dplyr select left_join as_tibble
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @encoding UTF-8
@@ -45,7 +45,7 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
   
   
   
-  out %>% as.tbl()
+  out %>% as_tibble()
 }
 
 poss_get_detailled_report_paged <- purrr::possibly(get_detailled_report_paged,data.frame())
