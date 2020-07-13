@@ -13,7 +13,7 @@
 #' @importFrom glue glue
 #' @import httr
 #' @importFrom lubridate years
-#' @importFrom  dplyr select one_of as.tbl
+#' @importFrom  dplyr select one_of as_tibble
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @encoding UTF-8
@@ -45,7 +45,7 @@ get_summary_report <- function(api_token = get_toggl_api_token(),
   
   out %>%
     select(-total_currencies)%>% 
-    as.tbl() %>%
+    as_tibble() %>%
     select(-title) %>% 
     left_join(users %>% select(id,fullname),by="id") %>% 
     select(id,user=fullname,time,items)

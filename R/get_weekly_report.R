@@ -61,5 +61,5 @@ get_weekly_report <- function(api_token = get_toggl_api_token(),
   # res <- list(synthese = synthese,
   #             tache = tache)
   # class(res) <- "toggl"
-  out%>% as.tbl()
+  out%>% as_tibble()
 }
