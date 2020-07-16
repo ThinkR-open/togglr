@@ -22,7 +22,8 @@ get_project_id <- function(project_name = get_context_project(),
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
-  content(GET(
+  
+  project_tbl <- content(GET(
     paste0(
       "https://www.toggl.com/api/v8/workspaces/",
       workspace_id,
@@ -31,8 +32,14 @@ get_project_id <- function(project_name = get_context_project(),
     # verbose(),
     authenticate(api_token, "api_token"),
     encode = "json"
-  )) %>% bind_rows() %>%
-    filter(name == project_name) %>% .$id -> id
+  )) %>% bind_rows()
+  
+  if (ncol(project_tbl) == 0) {
+    id <- NULL
+  } else {
+    project_tbl %>%
+      filter(name == project_name) %>% .$id -> id
+  }
   
   if (length(id) == 0) {
     warning(paste("the project ", project_name, " doesn't exist "))
