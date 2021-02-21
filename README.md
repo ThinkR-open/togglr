@@ -1,14 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<!-- badges: start -->
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/togglr)](https://cran.r-project.org/package=togglr)
 [![](http://cranlogs.r-pkg.org/badges/togglr)](https://cran.r-project.org/package=togglr)
-[![Travis build
-status](https://travis-ci.org/ThinkR-open/togglr.svg?branch=master)](https://travis-ci.org/ThinkR-open/togglr)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/ThinkR-open/togglr?branch=master&svg=true)](https://ci.appveyor.com/project/ThinkR-open/togglr)
-[![Coverage
-status](https://codecov.io/gh/ThinkR-open/togglr/branch/master/graph/badge.svg)](https://codecov.io/github/ThinkR-open/togglr?branch=master)
+[![R-CMD-check](https://github.com/ThinkR-open/togglr/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/togglr/actions)
+<!-- badges: end -->
 
 # togglr
 

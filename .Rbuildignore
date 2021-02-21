@@ -9,3 +9,4 @@ bidouille
 ^_pkgdown\.yml$
 ^pkgdown$
 ^README\.Rmd$
+^\.github$
