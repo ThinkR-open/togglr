@@ -25,7 +25,7 @@ get_current <- function(api_token=get_toggl_api_token()){
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
-  content(GET("https://www.toggl.com/api/v8/time_entries/current",
+  content(GET("https://api.track.toggl.com/api/v8/time_entries/current",
               # verbose(),
               authenticate(api_token,"api_token"),
               encode="json"))$data

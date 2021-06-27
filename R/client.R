@@ -20,9 +20,9 @@ create_client <- function(name = "wihtout client",
                           workspace_id = get_workspace_id(api_token)
                           ){
 
-# POST https://www.toggl.com/api/v8/clients
+# POST https://api.track.toggl.com/api/v8/clients
 message(glue("we create the client : {name}"))
-POST("https://www.toggl.com/api/v8/clients",
+POST("https://api.track.toggl.com/api/v8/clients",
      verbose(),
      authenticate(api_token,"api_token"),
      encode="json",
@@ -49,7 +49,7 @@ POST("https://www.toggl.com/api/v8/clients",
 #' }
 #' @export
 get_all_client_info <- function(api_token=get_toggl_api_token()){
-  GET("https://www.toggl.com/api/v8/clients",authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
+  GET("https://api.track.toggl.com/api/v8/clients",authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
 }
 
 
@@ -99,7 +99,7 @@ client_id_to_name <- function(id, api_token = get_toggl_api_token()) {
 #'
 get_client_project <- function(id,api_token=get_toggl_api_token()){
   
-  GET(glue("https://www.toggl.com/api/v8/clients/{id}/projects"),authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
+  GET(glue("https://api.track.toggl.com/api/v8/clients/{id}/projects"),authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
   
 
 }

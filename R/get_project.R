@@ -25,7 +25,7 @@ get_project_id <- function(project_name = get_context_project(),
   
   project_tbl <- content(GET(
     paste0(
-      "https://www.toggl.com/api/v8/workspaces/",
+      "https://api.track.toggl.com/api/v8/workspaces/",
       workspace_id,
       "/projects"
     ),
@@ -84,7 +84,7 @@ get_project_id_and_name <- function(
   }
   content(GET(
     paste0(
-      "https://www.toggl.com/api/v8/workspaces/",
+      "https://api.track.toggl.com/api/v8/workspaces/",
       workspace_id,
       "/projects"
     ),
