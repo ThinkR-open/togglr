@@ -11,7 +11,7 @@ get_workspace_id <- function(
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
 
   }
-  content(GET("https://www.toggl.com/api/v8/workspaces",
+  content(GET("https://api.track.toggl.com/api/v8/workspaces",
               # verbose(),
               authenticate(api_token,"api_token"),
               encode="json")) %>%
