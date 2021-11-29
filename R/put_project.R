@@ -41,7 +41,7 @@ toggl_create_project <- function(
     
     
     
-  POST("https://www.toggl.com/api/v8/projects",
+  POST("https://api.track.toggl.com/api/v8/projects",
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json",

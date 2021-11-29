@@ -63,7 +63,7 @@ toggl_update_entries <- function(
 
   POST(
     paste0(
-      "https://www.toggl.com/api/v8/time_entries/",
+      "https://api.track.toggl.com/api/v8/time_entries/",
       # Separate multiple ids with commas
       paste(time_entry_ids, collapse = ",")
     ),

@@ -38,7 +38,7 @@ toggl_start <- function(description = get_context(),
   
   
   POST(
-    "https://www.toggl.com/api/v8/time_entries/start",
+    "https://api.track.toggl.com/api/v8/time_entries/start",
     # verbose(),
     authenticate(api_token, "api_token"),
     encode = "json",
@@ -106,7 +106,7 @@ toggl_stop <- function(current=get_current(),
     stop("i can't find any task to stop...")
     
   }
-  PUT(paste0("https://www.toggl.com/api/v8/time_entries/",current$id,"/stop"),
+  PUT(paste0("https://api.track.toggl.com/api/v8/time_entries/",current$id,"/stop"),
 
        # verbose(),
        authenticate(api_token,"api_token"),
@@ -186,7 +186,7 @@ toggl_create <- function(
   }
 
 
-  POST("https://www.toggl.com/api/v8/time_entries",
+  POST("https://api.track.toggl.com/api/v8/time_entries",
        verbose(),
        authenticate(api_token,"api_token"),
        encode="json",
