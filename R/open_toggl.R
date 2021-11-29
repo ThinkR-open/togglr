@@ -4,8 +4,8 @@
 #' @importFrom utils browseURL
 #'
 open_toggl_website_profile <- function(){
-  message("opening https://toggl.com/app/profile")
-  browseURL("https://toggl.com/app/profile")
+  message("opening https://track.toggl.com/profile")
+  browseURL("https://track.toggl.com/profile")
   
 }
 
@@ -15,7 +15,7 @@ open_toggl_website_profile <- function(){
 #' @importFrom utils browseURL
 #'
 open_toggl_website_app <- function(){
-  message("opening https://toggl.com/app")
-  browseURL("https://toggl.com/app")
+  message("opening https://track.toggl.com/timer")
+  browseURL("https://track.toggl.com/timer")
   
 }

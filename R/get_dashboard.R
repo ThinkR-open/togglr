@@ -18,7 +18,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
                           until = Sys.Date()) {
   url <-
     sprintf(
-      "https://toggl.com/reports/api/v2/summary?workspace_id=%s&since=%s&until=%s&user_agent=api_test",
+      "https://api.toggl.com/reports/api/v2/summary?workspace_id=%s&since=%s&until=%s&user_agent=api_test",
       workspace_id,
       format(since, "%Y-%m-%d"),
       format(until, "%Y-%m-%d")
