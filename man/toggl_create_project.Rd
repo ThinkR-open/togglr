@@ -9,7 +9,8 @@ toggl_create_project(
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token),
   client = NULL,
-  private = FALSE
+  private = FALSE,
+  color = NULL
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ toggl_create_project(
 \item{client}{client name}
 
 \item{private}{whether project is accessible for only project users or for all workspace users (boolean, default false)}
+
+\item{color}{id of the color selected for the project}
 }
 \description{
 create a project

@@ -1,16 +1,12 @@
 Type: Package
 Package: togglr
 Title: 'Toggl.com' Api for 'Rstudio'
-Version: 0.1.36
-Authors@R: 
-    c(person(given = "Vincent",
-             family = "Guyader",
-             role = c("aut", "cre"),
-             email = "vincent@thinkr.fr"),
-      person(given = "ThinkR",
-             role = c("cph", "fnd")))
-Description: Use the <http://toggl.com> time tracker api through
-    R.
+Version: 0.1.37
+Authors@R: c(
+    person("Vincent", "Guyader", , "vincent@thinkr.fr", role = c("aut", "cre")),
+    person("ThinkR", role = c("cph", "fnd"))
+  )
+Description: Use the <http://toggl.com> time tracker api through R.
 License: GPL-3
 URL: https://github.com/ThinkR-open/togglr
 BugReports: https://github.com/ThinkR-open/togglr/issues
@@ -32,9 +28,7 @@ Imports:
     stats,
     utils
 Suggests:
-    covr,
     knitr,
-    pkgdown,
     rmarkdown
 VignetteBuilder: 
     knitr
