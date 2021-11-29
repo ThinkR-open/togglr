@@ -8,7 +8,9 @@
 get_workspace_users <- function(api_token = get_toggl_api_token(),
                                 workspace_id = get_workspace_id(api_token)){
   
+
   url <- glue::glue("https://api.track.toggl.com/api/v8/workspaces/{workspace_id}/users")
+
   
   wp <- content(GET(url,
                     # verbose(),

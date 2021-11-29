@@ -8,16 +8,17 @@
 #' @param client client name
 #' @param api_token the toggl api token
 #' @param workspace_id workspace id
+#' @param color id of the color selected for the project
 #'
 #' @importFrom httr GET authenticate content
 #' @importFrom dplyr bind_rows filter
 #' @export
 get_project_id <- function(project_name = get_context_project(),
-                           api_token = get_toggl_api_token(),
-                           
-                           create = FALSE,
-                           client = NULL,
-                           workspace_id = get_workspace_id(api_token)) {
+         api_token = get_toggl_api_token(),
+         
+         create = FALSE,
+         client = NULL,
+         workspace_id = get_workspace_id(api_token),color=NULL) {
   if (is.null(api_token)) {
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
@@ -55,12 +56,13 @@ get_project_id <- function(project_name = get_context_project(),
     message(" we create the project")
     id <-  toggl_create_project(project_name = project_name,
                                 api_token = api_token,
-                                client = client)
+                                client = client,color = color)
   }
   
   id
   
 }
+
 
 
 
