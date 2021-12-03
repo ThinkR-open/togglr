@@ -21,7 +21,7 @@ get_weekly_report <- function(api_token = get_toggl_api_token(),
                           user_agent="togglr") {
   
   
-  url <- glue::glue("https://toggl.com/reports/api/v2/weekly?workspace_id={workspace_id}&since={since}&until={until}&user_agent={user_agent}",
+  url <- glue::glue("https://api.track.toggl.com/reports/api/v2/weekly?workspace_id={workspace_id}&since={since}&until={until}&user_agent={user_agent}",
                     
                     since=format(since, "%Y-%m-%d"),
                     until=format(until, "%Y-%m-%d")
