@@ -30,7 +30,7 @@ devtools::install_github("ThinkR-open/togglr")
 
 ## Set toggl Api token
 
-Go on toogl.com website : `https://toggl.com/app/profile`
+Go on toogl.com website : `https://track.toggl.com/profile`
 
 ``` r
 togglr::open_toggl_website_profile()

@@ -47,6 +47,7 @@ toggl_create_project <- function(
       client_id <- NULL
     }
     
+
     POST("https://api.track.toggl.com/api/v8/projects",
          verbose(),
          authenticate(api_token,"api_token"),
@@ -58,6 +59,7 @@ toggl_create_project <- function(
          )
          ),auto_unbox = TRUE)
     )%>%  content() %>% .$data %>% .$id -> id
+
   }
   
   # content %>% .$data %>% .$id -> id
