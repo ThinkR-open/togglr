@@ -22,7 +22,7 @@ toggl_create_project <- function(
   workspace_id=get_workspace_id(api_token),
   client = NULL,
   private= FALSE, 
-  color = NULL
+  color = NULL,active=TRUE
 ){
   if (is.null(api_token)){
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
@@ -55,7 +55,7 @@ toggl_create_project <- function(
          body=toJSON(list(project = list(name = project_name , 
                                          cid = client_id,
                                          is_private = private, 
-                                         color = color
+                                         color = color,active = active
          )
          ),auto_unbox = TRUE)
     )%>%  content() %>% .$data %>% .$id -> id
