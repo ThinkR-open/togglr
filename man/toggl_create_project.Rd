@@ -26,6 +26,8 @@ toggl_create_project(
 \item{private}{whether project is accessible for only project users or for all workspace users (boolean, default false)}
 
 \item{color}{id of the color selected for the project}
+
+\item{active}{boolean set project as active, TRUE by default}
 }
 \description{
 create a project
