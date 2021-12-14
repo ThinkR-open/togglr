@@ -1,5 +1,3 @@
-
-
 #' @title get_project_id
 #' @description  retrieve project id
 #'
@@ -28,7 +26,7 @@ get_project_id <- function(project_name = get_context_project(),
     paste0(
       "https://api.track.toggl.com/api/v8/workspaces/",
       workspace_id,
-      "/projects"
+      "/projects?active=both"
     ),
     # verbose(),
     authenticate(api_token, "api_token"),
@@ -84,18 +82,21 @@ get_project_id_and_name <- function(
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
     
   }
+  
+  # active: possible values true/false/both. By default true. If false, only archived projects are returned.
+  
   content(GET(
     paste0(
       "https://api.track.toggl.com/api/v8/workspaces/",
       workspace_id,
-      "/projects"
+      "/projects?active=both"
     ),
     # verbose(),
     authenticate(api_token, "api_token"),
     encode = "json"
   )) %>% 
     bind_rows()  %>% 
-    select(id,name) %>% 
+    select(id,name,active) %>% 
     rename(project_name = name)
 
 }

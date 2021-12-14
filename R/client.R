@@ -99,7 +99,7 @@ client_id_to_name <- function(id, api_token = get_toggl_api_token()) {
 #'
 get_client_project <- function(id,api_token=get_toggl_api_token()){
   
-  GET(glue("https://api.track.toggl.com/api/v8/clients/{id}/projects"),authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
+  GET(glue("https://api.track.toggl.com/api/v8/clients/{id}/projects?active=both"),authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
   
 
 }

@@ -10,7 +10,8 @@ toggl_create_project(
   workspace_id = get_workspace_id(api_token),
   client = NULL,
   private = FALSE,
-  color = NULL
+  color = NULL,
+  active = TRUE
 )
 }
 \arguments{
