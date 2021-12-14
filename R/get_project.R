@@ -96,7 +96,7 @@ get_project_id_and_name <- function(
     encode = "json"
   )) %>% 
     bind_rows()  %>% 
-    select(id,name,active) %>% 
+    select(id,name,'active') %>% 
     rename(project_name = name)
 
 }

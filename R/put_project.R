@@ -7,6 +7,7 @@
 #' @param api_token the toggl api token#'
 #' @param private whether project is accessible for only project users or for all workspace users (boolean, default false)
 #' @param color id of the color selected for the project
+#' @param active boolean set project as active, TRUE by default
 #'
 #' @description  create a project
 #' @importFrom httr POST authenticate verbose
