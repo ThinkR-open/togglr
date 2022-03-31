@@ -109,5 +109,17 @@ close(pb)
   
  out <-  bind_rows(res)
   }
+  if (nrow(out) == 0){
+    
+    out <- structure(list(id = numeric(0), pid = integer(0), tid = logical(0), 
+                          uid = integer(0), description = character(0), start = character(0), 
+                          end = character(0), updated = character(0), dur = integer(0), 
+                          user = character(0), use_stop = logical(0), client = character(0), 
+                          project = character(0), project_color = character(0), project_hex_color = character(0), 
+                          task = logical(0), billable = numeric(0), is_billable = logical(0), 
+                          cur = character(0), tags = list()), row.names = integer(0), class = c("tbl_df", 
+                                                                                                "tbl", "data.frame"))
+  }
+  
   out
 }
