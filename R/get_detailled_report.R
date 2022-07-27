@@ -48,10 +48,11 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
   out %>% as_tibble()
 }
 
-poss_get_detailled_report_paged <- purrr::possibly(get_detailled_report_paged,data.frame())
-mem_poss_get_detailled_report_paged <- memoise::memoise(poss_get_detailled_report_paged)
+
+
 
 #' @export
+#' @param memoise_cache_dir cache folder for memoise function, can be edited with `options('togglr_memoise_dir')` or `rappdirs::user_cache_dir("togglr")` by default
 #' @rdname get_detailled_report_paged
 #' @importFrom lubridate dmy days
 #' @importFrom utils txtProgressBar setTxtProgressBar
@@ -60,13 +61,18 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
                                since = Sys.Date() - lubridate::years(1),
                                until = Sys.Date(),
                                user_agent="togglr",
-                               max_page=10
+                               max_page=10,
+                               memoise_cache_dir = getOption("togglr_memoise_dir",default = rappdirs::user_cache_dir("togglr"))
                                # users = get_workspace_users(api_token=api_token, workspace_id=workspace_id)
 ) {
   
   # message("until =",until)
   # message("since =",since)
-  
+  cd <- cachem::cache_disk(dir =  memoise_cache_dir)
+poss_get_detailled_report_paged <- purrr::possibly(get_detailled_report_paged,data.frame())
+mem_poss_get_detailled_report_paged <- memoise::memoise(poss_get_detailled_report_paged,
+                                                        cache = cd)
+
   # si la plage plus longue que 1 ans on d?coupe
   
   
