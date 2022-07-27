@@ -2,6 +2,7 @@
 
 S3method(print,toggl_time)
 export(ask_toggl_api_token)
+export(clean_memoise_cache)
 export(client_id_to_name)
 export(client_name_to_id)
 export(create_client)

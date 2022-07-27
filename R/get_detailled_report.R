@@ -1,6 +1,6 @@
 #' get detailled report
 #' 
-#' by user then projet
+#' get detailled report by user then projet
 #'
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id
@@ -128,4 +128,22 @@ close(pb)
   }
   
   out
+}
+
+
+
+#' clean memoise cache 
+#'
+#' @rdname get_detailled_report_paged
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' clean_memoise_cache()
+#' }
+clean_memoise_cache <- function(memoise_cache_dir = getOption("togglr_memoise_dir",default = rappdirs::user_cache_dir("togglr"))){
+  
+  unlink(memoise_cache_dir,recursive = TRUE,force = TRUE)
+  
 }
