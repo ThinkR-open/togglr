@@ -50,7 +50,7 @@ clean_memoise_cache(
 \item{memoise_cache_dir}{cache folder for memoise function, can be edited with `options('togglr_memoise_dir')` or `rappdirs::user_cache_dir("togglr")` by default}
 }
 \description{
-by user then projet
+get detailled report by user then projet
 }
 \examples{
 \dontrun{
