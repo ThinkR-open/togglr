@@ -54,7 +54,7 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
 #' @export
 #' @param memoise_cache_dir cache folder for memoise function, can be edited with `options('togglr_memoise_dir')` or `rappdirs::user_cache_dir("togglr")` by default
 #' @rdname get_detailled_report_paged
-#' @importFrom lubridate dmy days
+#' @importFrom lubridate dmy days year
 #' @importFrom utils txtProgressBar setTxtProgressBar
 get_detailled_report <- function(api_token = get_toggl_api_token(),
                                workspace_id = get_workspace_id(api_token),
