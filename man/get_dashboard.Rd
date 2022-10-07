@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{get_dashboard}
 \alias{get_dashboard}
-\title{get all data from <http://toggl.com>}
+\title{get all data from <https://toggl.com>}
 \usage{
 get_dashboard(
   api_token = get_toggl_api_token(),
@@ -22,5 +22,5 @@ get_dashboard(
 \item{until}{stop date}
 }
 \description{
-get all data from <http://toggl.com>
+get all data from <https://toggl.com>
 }

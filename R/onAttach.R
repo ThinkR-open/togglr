@@ -9,8 +9,8 @@
     # packageStartupMessage('')
     
     
-    if (is.null(togglr::get_toggl_api_token(ask = FALSE))) {
-      packageStartupMessage("  => you have to set your api token using set_toggl_api_token()")
-    }
+    # if (is.null(togglr::get_toggl_api_token(ask = FALSE))) {
+    #   packageStartupMessage("  => you have to set your api token using set_toggl_api_token()")
+    # }
   }
 }

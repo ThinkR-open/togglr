@@ -1,4 +1,4 @@
-#' get all data from <http://toggl.com>
+#' get all data from <https://toggl.com>
 #'
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id

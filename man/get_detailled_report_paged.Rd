@@ -4,6 +4,7 @@
 \name{get_detailled_report_paged}
 \alias{get_detailled_report_paged}
 \alias{get_detailled_report}
+\alias{clean_memoise_cache}
 \title{get detailled report}
 \usage{
 get_detailled_report_paged(
@@ -21,7 +22,14 @@ get_detailled_report(
   since = Sys.Date() - lubridate::years(1),
   until = Sys.Date(),
   user_agent = "togglr",
-  max_page = 10
+  max_page = 10,
+  memoise_cache_dir = getOption("togglr_memoise_dir", default =
+    rappdirs::user_cache_dir("togglr"))
+)
+
+clean_memoise_cache(
+  memoise_cache_dir = getOption("togglr_memoise_dir", default =
+    rappdirs::user_cache_dir("togglr"))
 )
 }
 \arguments{
@@ -38,7 +46,14 @@ get_detailled_report(
 \item{user_agent}{user_agent}
 
 \item{max_page}{max_page}
+
+\item{memoise_cache_dir}{cache folder for memoise function, can be edited with `options('togglr_memoise_dir')` or `rappdirs::user_cache_dir("togglr")` by default}
 }
 \description{
-by user then projet
+get detailled report by user then projet
+}
+\examples{
+\dontrun{
+clean_memoise_cache()
+}
 }
