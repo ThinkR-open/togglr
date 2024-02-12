@@ -22,15 +22,16 @@ create_client <- function(name = "wihtout client",
 
 # POST https://api.track.toggl.com/api/v8/clients
 message(glue("we create the client : {name}"))
-POST("https://api.track.toggl.com/api/v8/clients",
+POST(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),
      verbose(),
      authenticate(api_token,"api_token"),
      encode="json",
      body=toJSON(
-       list(client = list(
+       list(
+         # client = list(
          name = name,
          wid = workspace_id
-       )
+       # )
        ),
        auto_unbox = TRUE)
 )  
@@ -40,6 +41,7 @@ POST("https://api.track.toggl.com/api/v8/clients",
 #' get_all_client_info
 #'
 #' @param api_token the toggl api token
+#' @param workspace_id workspace_id
 #'
 #' @return a data.frame
 #' @export
@@ -48,8 +50,9 @@ POST("https://api.track.toggl.com/api/v8/clients",
 #' get_all_client_info()
 #' }
 #' @export
-get_all_client_info <- function(api_token=get_toggl_api_token()){
-  GET("https://api.track.toggl.com/api/v8/clients",authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
+get_all_client_info <- function(api_token=get_toggl_api_token(),workspace_id = get_workspace_id(api_token) ){
+  # GET("https://api.track.toggl.com/api/v8/clients",authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
+  GET(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
 }
 
 

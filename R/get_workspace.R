@@ -11,13 +11,12 @@ get_workspace_id <- function(
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
 
   }
-  content(GET("https://api.track.toggl.com/api/v8/workspaces",
+ ppp <- content(GET("https://api.track.toggl.com/api/v9/workspaces",
               # verbose(),
               authenticate(api_token,"api_token"),
-              encode="json")) %>%
-    as.data.frame()  %>%
-     .$id -> id
-  id <- id[1] # si plusieurs workspace , il faudra adapter
+              encode="json")) 
+  
+ ppp[[1]]$id -> id # si plusieurs workspace , il faudra adapter
   if (length(id) == 0){
     stop(paste("cant find workspace id - is your api token ok ?"))
     id <- NULL

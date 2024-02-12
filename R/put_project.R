@@ -33,11 +33,9 @@ toggl_create_project <- function(
   if (!is.null(id<-suppressWarnings(get_project_id(project_name = project_name)))){
     warning("the project " ,project_name," already exist")
     
-    
   }else{
     
     # gestion du client
-    
     if (!is.null(client)) {
       create_client(name = client,
                     api_token = api_token,
@@ -48,22 +46,31 @@ toggl_create_project <- function(
       client_id <- NULL
     }
     
-
-    POST("https://api.track.toggl.com/api/v8/projects",
+    
+    
+    
+    POST(
+      
+      glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects"),
          verbose(),
          authenticate(api_token,"api_token"),
          encode="json",
-         body=toJSON(list(project = list(name = project_name , 
-                                         cid = client_id,
-                                         is_private = private, 
-                                         color = color,active = active
+         body=toJSON(
+           list(active=active,
+                name = project_name ,
+                client_name = client,
+                                         is_private = FALSE, 
+                project =
+                  list(color = color,
+                       active = active
          )
          ),auto_unbox = TRUE)
-    )%>%  content() %>% .$data %>% .$id -> id
+    ) ->ll
+    
+  ll  %>%  content()%>% .$id -> id
 
   }
   
-  # content %>% .$data %>% .$id -> id
   id
   
 }
