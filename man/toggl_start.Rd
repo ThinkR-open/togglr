@@ -10,7 +10,7 @@ toggl_start(
   project_name = get_context_project(),
   start = now(),
   api_token = get_toggl_api_token(),
-  tags = NULL,
+  tags = "",
   workspace_id = get_workspace_id(api_token)
 )
 }

@@ -12,11 +12,12 @@ toggl_update_entries(
   stop = NULL,
   duration = NULL,
   tags = NULL,
-  api_token = get_toggl_api_token()
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token)
 )
 }
 \arguments{
-\item{time_entry_ids}{id(s) of time entries to update}
+\item{time_entry_ids}{id(s) of time entries to update .}
 
 \item{description}{the task you did}
 
@@ -31,6 +32,8 @@ toggl_update_entries(
 \item{tags}{tags}
 
 \item{api_token}{the toggl api token}
+
+\item{workspace_id}{workspace id}
 }
 \description{
 update time entries
@@ -38,8 +41,7 @@ update time entries
 \examples{
 \dontrun{
 options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
-time_entry <- toggl_create(duration=1200)
-time_entry_id <- content(time_entry)$data$id
+time_entry_id <- toggl_create(duration=1200)
 
 toggl_update_entries( time_entry_id,
                     description = "new description",

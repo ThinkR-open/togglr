@@ -11,7 +11,8 @@ toggl_create(
   stop,
   duration,
   tags = NULL,
-  api_token = get_toggl_api_token()
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token)
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ toggl_create(
 \item{tags}{tags}
 
 \item{api_token}{the toggl api token}
+
+\item{workspace_id}{workspace id}
 }
 \description{
 create a time entry

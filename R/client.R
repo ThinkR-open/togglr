@@ -20,7 +20,6 @@ create_client <- function(name = "wihtout client",
                           workspace_id = get_workspace_id(api_token)
                           ){
 
-# POST https://api.track.toggl.com/api/v8/clients
 message(glue("we create the client : {name}"))
 POST(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),
      verbose(),
@@ -51,7 +50,6 @@ POST(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/cl
 #' }
 #' @export
 get_all_client_info <- function(api_token=get_toggl_api_token(),workspace_id = get_workspace_id(api_token) ){
-  # GET("https://api.track.toggl.com/api/v8/clients",authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
   GET(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
 }
 
@@ -95,14 +93,15 @@ client_id_to_name <- function(id, api_token = get_toggl_api_token()) {
 #'
 #' @param id client id
 #' @param api_token the toggl api token
+#' @param workspace_id workspace_id
 #' @import assertthat
 #' @importFrom dplyr filter pull
 #' @return the client name
 #' @export
 #'
-get_client_project <- function(id,api_token=get_toggl_api_token()){
+get_client_project <- function(id,api_token=get_toggl_api_token(),workspace_id = get_workspace_id(api_token)){
   
-  GET(glue("https://api.track.toggl.com/api/v8/clients/{id}/projects?active=both"),authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
-  
+  get_all_projects() %>%
+    dplyr::filter(client_id == !! id)
 
 }
