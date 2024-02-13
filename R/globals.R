@@ -9,7 +9,7 @@ globalVariables(
     "time",
     "case_when",
     "full_join" ,
-    "tribble",
+    "tribble","client_id",
     "id","start","duration","pretty_duration",'project_name','description','pid','wid',
     # get_summary_report
     "total_currencies", "title", "id", "fullname", "time", "items"

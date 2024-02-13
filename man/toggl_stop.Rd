@@ -4,12 +4,18 @@
 \alias{toggl_stop}
 \title{toggl_stop}
 \usage{
-toggl_stop(current = get_current(), api_token = get_toggl_api_token())
+toggl_stop(
+  current = get_current(),
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token)
+)
 }
 \arguments{
 \item{current}{list task id and start time}
 
 \item{api_token}{the toggl api token}
+
+\item{workspace_id}{workspace id}
 }
 \description{
 stop the active task

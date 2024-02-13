@@ -22,17 +22,13 @@ get_project_id <- function(project_name = get_context_project(),
     
   }
   
-  project_tbl <- content(GET(
-    paste0(
-      "https://api.track.toggl.com/api/v8/workspaces/",
-      workspace_id,
-      "/projects?active=both"
-    ),
-    # verbose(),
-    authenticate(api_token, "api_token"),
-    encode = "json"
-  )) %>% bind_rows()
+  # TODO la V9 permet de ne pas faire comme ceci et de faire la requete directement.
   
+  
+
+  project_tbl <- get_all_projects()
+    
+    
   if (ncol(project_tbl) == 0) {
     id <- NULL
   } else {
@@ -85,18 +81,48 @@ get_project_id_and_name <- function(
   
   # active: possible values true/false/both. By default true. If false, only archived projects are returned.
   
-  content(GET(
-    paste0(
-      "https://api.track.toggl.com/api/v8/workspaces/",
-      workspace_id,
-      "/projects?active=both"
-    ),
-    # verbose(),
-    authenticate(api_token, "api_token"),
-    encode = "json"
-  )) %>% 
-    bind_rows()  %>% 
+get_all_projects() %>% 
     select(id,name,'active') %>% 
     rename(project_name = name)
 
+}
+
+
+get_all_projects <- function(api_token = get_toggl_api_token(),
+                             workspace_id = get_workspace_id(api_token)){
+  nb_page <- 1
+  all_projects <- list()
+  
+  
+  while (TRUE) {
+    
+    # message("page = ",nb_page)
+    project_tbl_ <-   content(GET(
+      paste0(
+        "https://api.track.toggl.com/api/v9/workspaces/",
+        workspace_id,
+        "/projects"
+      ),
+      # verbose(),
+      authenticate(api_token, "api_token"),
+      encode = "json",query = list(page = nb_page, per_page = 200)
+      
+    )) %>% bind_rows()
+    
+    all_projects[[nb_page]] <- project_tbl_
+    
+    
+    if (nrow(project_tbl_) < 200) {
+      break  # 
+    } else {
+      nb_page <- nb_page + 1  # Passer à la page suivante
+    }
+    
+    
+    
+    
+  }
+  
+  all_projects %>% bind_rows
+  
 }

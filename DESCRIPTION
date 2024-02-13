@@ -1,7 +1,7 @@
 Type: Package
 Package: togglr
 Title: 'Toggl.com' Api for 'Rstudio'
-Version: 0.1.99.9001
+Version: 0.1.99.9002
 Authors@R: c(
     person("Vincent", "Guyader", , "vincent@thinkr.fr", role = c("aut", "cre")),
     person("ThinkR", role = c("cph", "fnd"))
@@ -37,4 +37,4 @@ VignetteBuilder:
 ByteCompile: true
 Encoding: UTF-8
 LazyData: TRUE
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3

@@ -4,10 +4,15 @@
 \alias{get_all_client_info}
 \title{get_all_client_info}
 \usage{
-get_all_client_info(api_token = get_toggl_api_token())
+get_all_client_info(
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token)
+)
 }
 \arguments{
 \item{api_token}{the toggl api token}
+
+\item{workspace_id}{workspace_id}
 }
 \value{
 a data.frame
