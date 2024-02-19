@@ -47,7 +47,20 @@ toggl_create_project <- function(
     }
     
     
+    info <- list(active=active,
+                 name = project_name ,
+                 # client_name = "client",
+                 is_private = FALSE, 
+                 project =
+                   list(color = color,
+                        active = active
+                   )
+    )
     
+    
+    if (client != "" & !is.null(client)){
+      info$client <- client
+          }
     
     POST(
       
@@ -56,15 +69,9 @@ toggl_create_project <- function(
          authenticate(api_token,"api_token"),
          encode="json",
          body=toJSON(
-           list(active=active,
-                name = project_name ,
-                client_name = client,
-                                         is_private = FALSE, 
-                project =
-                  list(color = color,
-                       active = active
-         )
-         ),auto_unbox = TRUE)
+           info
+           
+           ,auto_unbox = TRUE)
     ) ->ll
     
   ll  %>%  content()%>% .$id -> id

@@ -38,15 +38,15 @@ install.packages("togglr")
 
 ### From Github
 ```R
-if (!requireNamespace("devtools")){install.packages("devtools")}
-devtools::install_github("ThinkR-open/togglr")
+if (!requireNamespace("remotes")){install.packages("remotes")}
+remotes::install_github("ThinkR-open/togglr")
 ```
 
 
 
 ## Set toggl Api token
 
-Go on toggl.com website : `https://track.toggl.com/profile`
+Go on toogl.com website : `https://track.toggl.com/profile`
 
 ```{r}
 togglr::open_toggl_website_profile()
@@ -95,7 +95,7 @@ toggl_stop()
 
 ```{r}
 get_current_duration()# the current track
-get_project_task_detail()# all the project (including the current track)
+get_current_project_task_detail()# (including the current track)
 
 ```
 

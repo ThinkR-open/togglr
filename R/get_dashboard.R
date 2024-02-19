@@ -36,7 +36,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
   
   synthese <-
     data.frame(id = out$id, out$title, time = out$time) %>%
-  select(-one_of(c("color","hex_color")))
+    select(-one_of(c("color","hex_color")))
   
   tache <- out$items %>%
     setNames(synthese$project) %>%
@@ -44,7 +44,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
       .x$title <-  .x$title$time_entry
       .x
     })
-
+  
   
   res <- list(synthese = synthese,
               tache = tache)
@@ -58,13 +58,13 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
 #' @importFrom prettyunits pretty_ms
 n_to_tps <- function(n) {
   # format(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000, "%H:%M:%S")
-# 
-#   difftime(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000,Sys.Date(),units = "hour") 
-#   
-#   
-# library(lubridate)  
-# new_duration()  
-# duration(104046451/1000,units = "seconds") %>% format("%H:%M:%S")
+  # 
+  #   difftime(as.POSIXct(0, origin = Sys.Date(), tz = "GMT") + n / 1000,Sys.Date(),units = "hour") 
+  #   
+  #   
+  # library(lubridate)  
+  # new_duration()  
+  # duration(104046451/1000,units = "seconds") %>% format("%H:%M:%S")
   prettyunits::pretty_ms(n)
 }
 
@@ -83,7 +83,7 @@ n_to_tps <- function(n) {
 #' @export
 #'
 get_project_total <- function(project_name = get_context_project(),
-
+                              
                               api_token = get_toggl_api_token(),
                               workspace_id = get_workspace_id(api_token),
                               since = Sys.Date() - lubridate::years(1),
@@ -98,7 +98,7 @@ get_project_total <- function(project_name = get_context_project(),
   dash$synthese  %>% filter(project == project_name) %>% pull("time") ->tmps
   
   (get_current_duration() + tmps)  %>% as.numeric() %>% n_to_tps
-
+  
 }
 
 #' Get all project's names
@@ -122,7 +122,7 @@ get_all_project_names <- function(api_token = get_toggl_api_token(),
       since = since,
       until = until
     )
-
+  
   dash$synthese$project
 }
 
@@ -148,7 +148,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
       since = since,
       until = until
     )
-
+  
   dash$synthese$client %>% unique()
 }
 
@@ -167,26 +167,45 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 #' @importFrom lubridate years
 #'
 #'
-get_project_task_detail <-
+get_current_project_task_detail <-
   function(project_name = get_context_project(),
            api_token = get_toggl_api_token(),
            workspace_id = get_workspace_id(),
            since = Sys.Date() - lubridate::years(1),
            until = Sys.Date(),
            humain = TRUE) {
-    out <-
+    gd <-
       get_dashboard(
         api_token = api_token,
         workspace_id = workspace_id,
         since = since,
         until = until
-      )$tache[[project_name]]
+      )
+    if (isTRUE(project_name %in%  names(gd$tache))) {
+      info <- gd$tache[[project_name]]
+    } else{
+      info <-
+        structure(
+          list(
+            title = character(0),
+            time = numeric(0),
+            cur = numeric(0),
+            sum = numeric(0),
+            rate = numeric(0),
+            local_start = character(0)
+          ),
+          row.names = integer(0),
+          class = "data.frame"
+        )
+    }
+    
+    
     
     description <- get_current(api_token = api_token)$description
     
     if (!is.null(description)) {
-      if (description %in% out$title) {
-        out <-      out %>%
+      if (description %in% info$title) {
+        info <-      info %>%
           mutate(time = case_when(
             title == description ~
               (time + get_current_duration(api_token = api_token)) %>% as.double()
@@ -194,7 +213,7 @@ get_project_task_detail <-
             TRUE ~ time %>% as.double()
           ))
       } else {
-        out <- out %>% full_join(tribble(
+        info <- info %>% full_join(by = c("title", "time"),tribble(
           ~ title,        ~ time,
           description,    get_current_duration(api_token = api_token) %>% as.double()
           
@@ -206,13 +225,13 @@ get_project_task_detail <-
       
       
     }
-     
-      
-      
-    if (humain) {
-      out <- out %>% to_humain()
+    
+    
+    
+    if (humain & nrow(info)>0) {
+      info <- info %>% to_humain()
     }
-    out
+    info
   }
 
 #' transforme time column into humain readable column

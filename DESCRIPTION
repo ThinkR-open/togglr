@@ -1,7 +1,7 @@
 Type: Package
 Package: togglr
 Title: 'Toggl.com' Api for 'Rstudio'
-Version: 0.1.99.9002
+Version: 0.2.1
 Authors@R: c(
     person("Vincent", "Guyader", , "vincent@thinkr.fr", role = c("aut", "cre")),
     person("ThinkR", role = c("cph", "fnd"))
