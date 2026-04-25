@@ -53,7 +53,14 @@ jobs:
 
       - name: Install pak and query dependencies
         run: |
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+          # Use the stable pak repo, which serves OS-correct binaries.
+          # The dev/ repo currently returns a Linux tarball when an R 4.6 Windows
+          # runner asks for pak, so install.packages() fails with
+          # "installation of package 'pak' had non-zero exit status".
+          install.packages("pak", repos = sprintf(
+            "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
+            .Platform$pkgType, R.Version()$os, R.Version()$arch
+          ))
           saveRDS(pak::pkg_deps("local::.", dependencies = TRUE), ".github/r-depends.rds")
         shell: Rscript {0}
 
