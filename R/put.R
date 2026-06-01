@@ -10,7 +10,7 @@
 #' @param workspace_id workspace id
 #' @param tags tags
 #'
-#' @importFrom lubridate now
+#' @importFrom lubridate now with_tz
 #' @importFrom httr POST authenticate content
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON
@@ -32,10 +32,10 @@ toggl_start <- function(description = get_context(),
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
   }
   
- # je n'aime pas devoir faire cette bidouille
-  current_time_with_offset <- as.POSIXlt(start) - 3600
-  formatted_time <- format(current_time_with_offset, "%Y-%m-%dT%H:%M:%SZ")
-  # correct_date me semble a utiliser
+  formatted_time <- format(
+    lubridate::with_tz(start, "UTC"),
+    "%Y-%m-%dT%H:%M:%SZ"
+  )
   
   
   POST(
@@ -195,10 +195,10 @@ toggl_create <- function(
   }
 
   
-  # je n'aime pas devoir faire cette bidouille
-  current_time_with_offset <- as.POSIXlt(start) - 3600
-  formatted_time <- format(current_time_with_offset, "%Y-%m-%dT%H:%M:%SZ")
-  # correct_date me semble a utiliser
+  formatted_time <- format(
+    lubridate::with_tz(start, "UTC"),
+    "%Y-%m-%dT%H:%M:%SZ"
+  )
   
   
   
