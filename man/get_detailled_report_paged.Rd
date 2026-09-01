@@ -24,7 +24,8 @@ get_detailled_report(
   user_agent = "togglr",
   max_page = 10,
   memoise_cache_dir = getOption("togglr_memoise_dir", default =
-    rappdirs::user_cache_dir("togglr"))
+    rappdirs::user_cache_dir("togglr")),
+  forget = FALSE
 )
 
 clean_memoise_cache(

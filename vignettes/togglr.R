@@ -6,37 +6,37 @@ knitr::opts_chunk$set(
 )
 
 ## -----------------------------------------------------------------------------
-#  install.packages("togglr")
+# install.packages("togglr")
 
 ## -----------------------------------------------------------------------------
-#  togglr::open_toggl_website_profile()
+# togglr::open_toggl_website_profile()
 
 ## -----------------------------------------------------------------------------
-#  library(togglr)
-#  set_toggl_api_token("your_token_api")
+# library(togglr)
+# set_toggl_api_token("your_token_api")
 
 ## -----------------------------------------------------------------------------
-#  toggl_start()
+# toggl_start()
 
 ## -----------------------------------------------------------------------------
-#  toggl_start(client = "my client")
+# toggl_start(client = "my client")
 
 ## -----------------------------------------------------------------------------
-#  toggl_start(client = "my client",
-#              description = "what I'm doing",
-#              project_name = "my project")
+# toggl_start(client = "my client",
+#             description = "what I'm doing",
+#             project_name = "my project")
 
 ## -----------------------------------------------------------------------------
-#  toggl_stop()
+# toggl_stop()
 
 ## -----------------------------------------------------------------------------
-#  get_current_duration()# the current track
-#  get_project_task_detail()# all the project (including the current track)
-#  
+# get_current_duration()# the current track
+# get_project_task_detail()# all the project (including the current track)
+# 
 
 ## -----------------------------------------------------------------------------
-#  get_dashboard()
+# get_dashboard()
 
 ## -----------------------------------------------------------------------------
-#  ls(package:togglr)
+# ls(package:togglr)
 

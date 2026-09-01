@@ -62,16 +62,20 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
                                until = Sys.Date(),
                                user_agent="togglr",
                                max_page=10,
-                               memoise_cache_dir = getOption("togglr_memoise_dir",default = rappdirs::user_cache_dir("togglr"))
+                               memoise_cache_dir = getOption("togglr_memoise_dir",default = rappdirs::user_cache_dir("togglr")),
+                               forget = FALSE
                                # users = get_workspace_users(api_token=api_token, workspace_id=workspace_id)
 ) {
   
   # message("until =",until)
   # message("since =",since)
   cd <- cachem::cache_disk(dir =  memoise_cache_dir)
-poss_get_detailled_report_paged <- purrr::possibly(get_detailled_report_paged,data.frame())
+poss_get_detailled_report_paged <- purrr::possibly(get_detailled_report_paged,otherwise = data.frame())
 mem_poss_get_detailled_report_paged <- memoise::memoise(poss_get_detailled_report_paged,
                                                         cache = cd)
+
+
+
 
   # si la plage plus longue que 1 ans on d?coupe
   
@@ -86,8 +90,8 @@ mem_poss_get_detailled_report_paged <- memoise::memoise(poss_get_detailled_repor
     # get_detailled_report(until = until - years(1), since=since)
       
       
-    get_detailled_report(until = until,since = dmy(glue("0101{year(until)}"))),
-    get_detailled_report(until = dmy(glue("0101{year(until)}"))-days(1), since=since)
+    get_detailled_report(until = until,since = dmy(glue("0101{year(until)}")),forget = forget),
+    get_detailled_report(until = dmy(glue("0101{year(until)}"))-days(1), since=since,forget = forget)
     
     
     )
@@ -101,6 +105,16 @@ mem_poss_get_detailled_report_paged <- memoise::memoise(poss_get_detailled_repor
 i <- 1 
 estimi <- 100
   repeat {
+    
+    if (isTRUE(forget)){
+      # message("drop_cache")
+      memoise::drop_cache(mem_poss_get_detailled_report_paged)(api_token = api_token ,
+                                                               workspace_id = workspace_id ,
+                                                               since = since,until = until,
+                                                               user_agent = user_agent,page = i)
+    }
+    
+    
     # print(i)
     res[[i]] <- mem_poss_get_detailled_report_paged(api_token = api_token ,
                                workspace_id = workspace_id ,
