@@ -71,7 +71,7 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
   # message("since =",since)
   cd <- cachem::cache_disk(dir =  memoise_cache_dir)
 poss_get_detailled_report_paged <- purrr::possibly(get_detailled_report_paged,otherwise = data.frame())
-mem_poss_get_detailled_report_paged <- memoise::memoise(poss_get_detailled_report_paged,
+mem_poss_get_detailled_report_paged <- memoise::memoise(poss_get_detailled_report_paged,omit_args = c("api_token","user_agent"),
                                                         cache = cd)
 
 
@@ -108,8 +108,8 @@ estimi <- 100
     
     if (isTRUE(forget)){
       # message("drop_cache")
-      memoise::drop_cache(mem_poss_get_detailled_report_paged)(api_token = api_token ,
-                                                               workspace_id = workspace_id ,
+      memoise::drop_cache(mem_poss_get_detailled_report_paged)(api_token = api_token,
+                                                               workspace_id = workspace_id,
                                                                since = since,until = until,
                                                                user_agent = user_agent,page = i)
     }
@@ -120,9 +120,33 @@ estimi <- 100
                                workspace_id = workspace_id ,
                                since = since,until = until,
                                user_agent = user_agent,page = i)
+    
+    
+    if (isTRUE(forget) && nrow(res[[i]])==0 ){
+      
+      
+      
+      message("drop_cache")
+      memoise::drop_cache(mem_poss_get_detailled_report_paged)(api_token = api_token,
+                                                               workspace_id = workspace_id,
+                                                               since = since,until = until,
+                                                               user_agent = user_agent,page = i)
+      
+      res[[i]] <- mem_poss_get_detailled_report_paged(api_token = api_token ,
+                                                      workspace_id = workspace_id ,
+                                                      since = since,until = until,
+                                                      user_agent = user_agent,page = i)
+      
+    }
+    
+    
+    
     setTxtProgressBar(pb, i/estimi)
     
-    if (nrow(res[[i]]) == 0){break}
+    if (nrow(res[[i]]) == 0){
+      
+      message("on sort  pour i = ", i)
+      break}
     i <- i +1
   }
 close(pb)
