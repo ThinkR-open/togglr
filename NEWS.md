@@ -71,6 +71,9 @@
   `since` after `until` (#61).
 * Default periods ("one year ago") are computed with `%m-%`: they were `NA`
   on February 29th (#62).
+* `get_detailled_report_paged()` has the same default period as
+  `get_detailled_report()` (the last year, until today): it was three years,
+  beyond the one year limit of the reports API v2, until tomorrow (#63).
 
 # togglr 0.3.0
 

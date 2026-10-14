@@ -69,3 +69,14 @@ test_that("get_detailled_report defaults are valid on February 29th (#62)", {
   # 366 jours d'ecart (un jour de plus qu'un an) : decoupe au nouvel an (#58)
   expect_equal(asked(), c("2027-02-28 2027-12-31", "2028-01-01 2028-02-29"))
 })
+
+# ---- M5 (#63) : un seul defaut de periode -------------------------------------------
+
+test_that("the paged and the full detailled report share the same default period (#63)", {
+  local_mocked_bindings(toggl_today = function() as.Date("2026-10-14"))
+  urls <- capture_url()
+  expect_error(get_detailled_report_paged(api_token = "t", workspace_id = 1), "captured")
+  expect_match(urls(), "since=2025-10-14T00:00:00&until=2026-10-14T00:00:00")
+  expect_equal(formals(get_detailled_report_paged)$since, formals(get_detailled_report)$since)
+  expect_equal(formals(get_detailled_report_paged)$until, formals(get_detailled_report)$until)
+})

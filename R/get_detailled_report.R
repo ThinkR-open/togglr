@@ -20,8 +20,8 @@
 #' @encoding UTF-8
 get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
                                        workspace_id = get_workspace_id(api_token),
-                                       since = Sys.Date() - lubridate::years(3),
-                                       until = Sys.Date() + lubridate::days(1),
+                                       since = toggl_today() %m-% lubridate::years(1),
+                                       until = toggl_today(),
                                        page = 1,
                                        user_agent = "togglr") {
   period <- as_toggl_period(since, until)
