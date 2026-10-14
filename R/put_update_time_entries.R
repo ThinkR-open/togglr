@@ -10,7 +10,7 @@
 #' @param pid pid
 #' @param tags tags
 #' @importFrom lubridate now
-#' @importFrom httr POST authenticate verbose
+#' @importFrom httr POST authenticate
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{

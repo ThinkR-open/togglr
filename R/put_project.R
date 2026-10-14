@@ -10,7 +10,7 @@
 #' @param active boolean set project as active, TRUE by default
 #'
 #' @description  create a project
-#' @importFrom httr POST authenticate verbose
+#' @importFrom httr POST authenticate
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
@@ -65,7 +65,6 @@ toggl_create_project <- function(
     POST(
       
       glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects"),
-         verbose(),
          authenticate(api_token,"api_token"),
          encode="json",
          body=toJSON(

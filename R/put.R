@@ -147,7 +147,7 @@ toggl_stop <- function(current=get_current(),
 #' @param tags tags
 #' @param workspace_id workspace id
 #' @importFrom lubridate now
-#' @importFrom httr POST authenticate verbose
+#' @importFrom httr POST authenticate
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{

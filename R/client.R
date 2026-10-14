@@ -22,7 +22,6 @@ create_client <- function(name = "wihtout client",
 
 message(glue("we create the client : {name}"))
 POST(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),
-     verbose(),
      authenticate(api_token,"api_token"),
      encode="json",
      body=toJSON(
