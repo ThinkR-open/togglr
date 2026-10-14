@@ -90,6 +90,9 @@
   0, the next request waits for the reset (or fails within `max_wait`) instead
   of receiving a 402; with fewer than `options(togglr.quota_spread)` (10)
   requests left, they are spread until the reset (#68).
+* `simplify()` no longer calls an internal function of jsonlite
+  (`getFromNamespace()`): it uses the public `toJSON()` / `fromJSON()`, at full
+  precision, with the same result (#69).
 
 # togglr 0.3.0
 

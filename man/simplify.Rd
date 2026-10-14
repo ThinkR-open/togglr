@@ -2,13 +2,21 @@
 % Please edit documentation in R/simplify.R
 \name{simplify}
 \alias{simplify}
-\title{simplify copied from jsonlite}
+\title{Simplify a parsed JSON answer into vectors and data frames}
 \usage{
-simplify(...)
+simplify(x, ...)
 }
 \arguments{
-\item{...}{Other parameters}
+\item{x}{a list, as returned by `httr::content()`}
+
+\item{...}{passed to `jsonlite::fromJSON()` (e.g. `simplifyDataFrame`)}
+}
+\value{
+the simplified object
 }
 \description{
-simplify copied from jsonlite
+Same result as `jsonlite::fromJSON(simplifyVector = TRUE)` on a list already
+parsed with `simplifyVector = FALSE` (what `httr::content()` returns), using
+only the public API of jsonlite: the list is serialised back to JSON at full
+precision, then read with simplification.
 }
