@@ -37,16 +37,16 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
   # extract list of tags
   tags <- map(res, ~ .x$tags)
 
-  woot <- get_project_id_and_name(api_token = api_token, workspace_id = workspace_id) |> 
+  woot <- get_project_id_and_name(api_token = api_token, workspace_id = workspace_id) %>% 
     mutate(id=as.character(id))
   
-res |> map(unlist) |>  map(~ {
+res %>% map(unlist) %>%  map(~ {
   avirer <- which(grepl(names(.x), pattern = "tag"))
     if (length(avirer) > 0){
       .x <- .x[-avirer]
     }
     return(.x)
-  }) |> bind_rows() %>%
+  }) %>% bind_rows() %>%
   mutate(tags = tags) %>% 
     mutate(
       duration = as.numeric(duration),
