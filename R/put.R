@@ -32,10 +32,7 @@ toggl_start <- function(description = get_context(),
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
   }
   
- # je n'aime pas devoir faire cette bidouille
-  current_time_with_offset <- as.POSIXlt(start) - 3600
-  formatted_time <- format(current_time_with_offset, "%Y-%m-%dT%H:%M:%SZ")
-  # correct_date me semble a utiliser
+  formatted_time <- format_toggl_utc(start)
   
   
   POST(
@@ -197,10 +194,7 @@ toggl_create <- function(
   }
 
   
-  # je n'aime pas devoir faire cette bidouille
-  current_time_with_offset <- as.POSIXlt(start) - 3600
-  formatted_time <- format(current_time_with_offset, "%Y-%m-%dT%H:%M:%SZ")
-  # correct_date me semble a utiliser
+  formatted_time <- format_toggl_utc(start)
   
   
   
@@ -248,3 +242,14 @@ toggl_create <- function(
 
 
 
+
+
+#' Format an instant for the Toggl API: UTC, ISO 8601 with a `Z`
+#'
+#' The instant is converted, not relabelled: 10:00 in Paris in July is sent as
+#' 08:00Z, whatever the time zone of the R session (#44, #52).
+#' @importFrom lubridate with_tz
+#' @noRd
+format_toggl_utc <- function(x) {
+  format(with_tz(as.POSIXct(x), "UTC"), "%Y-%m-%dT%H:%M:%SZ")
+}

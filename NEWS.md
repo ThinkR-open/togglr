@@ -30,6 +30,9 @@
 * `get_toggl_api_token()` no longer deletes the stored key when the keyring
   cannot be read (e.g. locked under cron); in a non interactive session it
   fails with a clear message instead of prompting (#51).
+* `toggl_start()` and `toggl_create()` send the start time converted to UTC,
+  instead of removing one hour: entries were one hour off in summer, and more
+  outside Paris (#52, from #44 by @bradyrippon).
 
 # togglr 0.3.0
 
