@@ -17,22 +17,26 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
   qkey <- if (!is.null(api_token)) toggl_quota_key(api_token, scope)
   skey <- if (!is.null(api_token)) toggl_quota_key(api_token, scope, "spread_until")
   done <- character(0)
+  waited_for <- NULL # le quota deja attendu : consomme, sauf s'il a change entre-temps
   repeat {
     plan <- toggl_state_update(function(st) {
       now <- Sys.time()
-      reset <- if (!is.null(qkey) && !"quota" %in% done) st[[qkey]]
+      reset <- if (!is.null(qkey)) st[[qkey]]
+      if (!is.null(reset) && !is.null(waited_for) && identical(reset, waited_for)) reset <- NULL
       if (!is.null(reset) && reset > now) {
         wait <- ceiling(as.numeric(difftime(reset, now, units = "secs")))
-        return(list(state = st, value = list(hold = wait, why = "quota")))
+        return(list(state = st, value = list(hold = wait, why = "quota", reset = reset)))
       }
       spread <- if (!is.null(skey) && !"spread" %in% done) st[[skey]]
       if (!is.null(spread) && spread > now) {
         return(list(state = st, value = list(
           hold = min(as.numeric(difftime(spread, now, units = "secs")), max_wait), why = "spread")))
       }
-      # quota et etalement consommes par cet envoi
+      # quota attendu (ou echu) et etalement consommes par cet envoi ; un quota
+      # pose par un autre processus pendant l'attente n'est jamais efface ici
       if (!is.null(qkey)) {
-        st[[qkey]] <- NULL
+        current <- st[[qkey]]
+        if (is.null(current) || current <= now || identical(current, waited_for)) st[[qkey]] <- NULL
         st[[skey]] <- NULL
       }
       last <- st$last_report_call
@@ -47,12 +51,13 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
              max_wait, "s): no request sent, try again later.", call. = FALSE)
       }
       message("toggl hourly API quota exhausted, waiting ", plan$hold, "s for the reset")
+      waited_for <- plan$reset
     } else {
       message("toggl hourly API quota almost exhausted, spreading the requests: waiting ",
               ceiling(plan$hold), "s")
     }
     toggl_sleep(plan$hold)
-    done <- c(done, plan$why)
+    if (plan$why == "spread") done <- c(done, "spread")
   }
   wait <- as.numeric(difftime(plan$slot, Sys.time(), units = "secs"))
   if (wait > 0) toggl_sleep(wait)

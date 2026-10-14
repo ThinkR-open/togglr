@@ -112,3 +112,33 @@ test_that("a state file that cannot be replaced is an error, and leaves no tempo
   expect_error(suppressWarnings(toggl_state_set("x", 1)), "could not write the togglr state file")
   expect_setequal(list.files(root), c("state", "state.lock"))
 })
+
+# ---- A2 (#78) : une cle de quota posee pendant l'attente n'est pas effacee ---------------
+
+test_that("a quota recorded by another process during the wait is waited for, not erased (#78)", {
+  local_fresh_state()
+  withr::local_options(togglr.state_file = withr::local_tempfile())
+  key <- toggl_quota_key("t", "workspace")
+  t1 <- Sys.time() + 100
+  toggl_state_set(key, t1)
+  waits <- c()
+  local_mocked_bindings(toggl_sleep = function(s) {
+    waits <<- c(waits, s)
+    # pendant la 1re attente, un autre worker recoit un 402 et pose un nouveau quota
+    if (length(waits) == 1) toggl_state_set(key, t1 + 200)
+  })
+  toggl_pace(min_interval = 0, api_token = "t", scope = "workspace", max_wait = 1000)
+  expect_length(waits, 2)
+  expect_gt(waits[2], 250)
+})
+
+test_that("the new quota is not waited for beyond max_wait (#78)", {
+  local_fresh_state()
+  key <- toggl_quota_key("t", "workspace")
+  t1 <- Sys.time() + 100
+  toggl_state_set(key, t1)
+  local_mocked_bindings(toggl_sleep = function(s) toggl_state_set(key, t1 + 2000))
+  expect_error(toggl_pace(min_interval = 0, api_token = "t", scope = "workspace", max_wait = 1000),
+               "no request sent")
+  expect_false(is.null(toggl_state_get(key))) # pas effacee
+})

@@ -16,6 +16,9 @@
   The amounts of the summary items (`cur`, `sum`, `rate`) are no longer given
   (NA). Entries without a visible project are grouped with an `NA` id and name
   (Reports v2 called them "Private Project") (#76).
+* With a shared state file, an exhausted quota recorded by another process
+  while this one was waiting is no longer erased: it is waited for in turn, or
+  fails within `max_wait` (#78).
 
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the
