@@ -33,6 +33,9 @@
 * `toggl_start()` and `toggl_create()` send the start time converted to UTC,
   instead of removing one hour: entries were one hour off in summer, and more
   outside Paris (#52, from #44 by @bradyrippon).
+* `get_current_duration()` counts from the start of the running entry, not
+  from its last edit (`at`); `get_project_total()` and
+  `get_current_project_task_detail()` were affected (#53).
 
 # togglr 0.3.0
 
