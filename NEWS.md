@@ -93,6 +93,9 @@
 * `simplify()` no longer calls an internal function of jsonlite
   (`getFromNamespace()`): it uses the public `toJSON()` / `fromJSON()`, at full
   precision, with the same result (#69).
+* `globalVariables()` no longer declares function names (`case_when`,
+  `full_join`, `tribble`) nor unused names, which could hide a missing
+  import (#70).
 
 # togglr 0.3.0
 
