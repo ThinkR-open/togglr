@@ -1,3 +1,15 @@
+# togglr (development version, toward 1.0.0)
+
+* The API token is no longer printed: `create_client()` and
+  `toggl_create_project()` used `httr::verbose()`, which shows the
+  `Authorization` header (#50).
+* Every request times out after `options(togglr.timeout)` seconds (120 by
+  default), and network errors (timeout, DNS, connection reset) are retried
+  like a 5xx (#45).
+* `get_detailled_report()` returns fixed column types (e.g. `task` is always
+  text, `tid` integer), whatever the content of the page: periods over a year
+  with an empty year no longer fail to combine (#46).
+
 # togglr 0.3.0
 
 * Every read of the API goes through `toggl_GET()`: HTTP errors are no longer

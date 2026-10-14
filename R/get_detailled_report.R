@@ -36,7 +36,7 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
          page, " of ", format(since), " -> ", format(until), ".", call. = FALSE)
   }
 
-  out <- as_tibble(togglr::simplify(wp$data, simplifyDataFrame = TRUE))
+  out <- normalize_detailled_report(as_tibble(togglr::simplify(wp$data, simplifyDataFrame = TRUE)))
   attr(out, "total_count") <- wp$total_count
   attr(out, "per_page") <- wp$per_page
   out
@@ -161,16 +161,50 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
        call. = FALSE)
 }
 
+#' Column types of the detailled report
+#'
+#' Fixed whatever the content of a page: a page where no entry has a task would
+#' otherwise give a logical `task` column, that cannot be combined with a page
+#' where `task` is text.
+#' @noRd
+detailled_report_types <- function() {
+  list(id = numeric(0), pid = integer(0), tid = integer(0), uid = integer(0),
+       description = character(0), start = character(0), end = character(0),
+       updated = character(0), dur = numeric(0), user = character(0),
+       use_stop = logical(0), client = character(0), project = character(0),
+       project_color = character(0), project_hex_color = character(0),
+       task = character(0), billable = numeric(0), is_billable = logical(0),
+       cur = character(0), tags = list())
+}
+
+#' Give the known columns their fixed type (missing ones are added as NA);
+#' columns unknown to togglr are kept as they are, after the known ones.
+#' @noRd
+normalize_detailled_report <- function(x) {
+  types <- detailled_report_types()
+  n <- nrow(x)
+  known <- lapply(names(types), function(col) {
+    v <- if (col %in% names(x)) x[[col]] else rep(NA, n)
+    if (is.list(types[[col]])) {
+      if (is.list(v)) v else as.list(v)
+    } else {
+      v[vapply(v, is.null, logical(1))] <- NA
+      v <- unlist(v)
+      switch(class(types[[col]]),
+             numeric = as.numeric(v),
+             integer = as.integer(v),
+             logical = as.logical(v),
+             character = as.character(v))
+    }
+  })
+  names(known) <- names(types)
+  extra <- x[setdiff(names(x), names(types))]
+  dplyr::bind_cols(as_tibble(known), extra)
+}
+
 #' @noRd
 empty_detailled_report <- function() {
-  structure(list(id = numeric(0), pid = integer(0), tid = logical(0),
-                 uid = integer(0), description = character(0), start = character(0),
-                 end = character(0), updated = character(0), dur = integer(0),
-                 user = character(0), use_stop = logical(0), client = character(0),
-                 project = character(0), project_color = character(0), project_hex_color = character(0),
-                 task = logical(0), billable = numeric(0), is_billable = logical(0),
-                 cur = character(0), tags = list()), row.names = integer(0),
-            class = c("tbl_df", "tbl", "data.frame"))
+  as_tibble(detailled_report_types())
 }
 
 

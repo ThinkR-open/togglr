@@ -67,3 +67,43 @@ test_that("cache = TRUE stores only complete periods and reuses them", {
   expect_equal(srv$calls(), 1)
   expect_equal(first, again)
 })
+
+# ---- I2 (#46) : types de colonnes stables -----------------------------------
+
+with_task <- function(page, task = "a task", tid = 99L) {
+  page$data <- lapply(page$data, function(e) c(e, list(task = task, tid = tid)))
+  page
+}
+
+test_that("an empty period has the same column types as a filled one (#46)", {
+  e <- empty_detailled_report()
+  expect_type(e$task, "character")
+  expect_type(e$tid, "integer")
+  expect_type(e$id, "double")
+  expect_type(e$dur, "double")
+})
+
+test_that("a period over a year with an empty year can be combined (#46)", {
+  srv <- serve(
+    fake_response(200, with_task(report_page(1:3, total = 3))),  # 2016 (fetched first)
+    fake_response(200, report_page(integer(0), total = 0))      # 2015 : vide
+  )
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  out <- suppressMessages(get_detailled_report(api_token = "t", workspace_id = 1,
+                                               since = as.Date("2015-06-01"),
+                                               until = as.Date("2016-12-31")))
+  expect_equal(nrow(out), 3)
+  expect_equal(out$task, rep("a task", 3))
+})
+
+test_that("pages with and without tasks are combined with stable types (#46)", {
+  srv <- serve(
+    fake_response(200, report_page(1:50, total = 53)),              # aucune tache
+    fake_response(200, with_task(report_page(51:53, total = 53)))
+  )
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  out <- suppressMessages(report())
+  expect_type(out$task, "character")
+  expect_type(out$tid, "integer")
+  expect_equal(sum(!is.na(out$task)), 3)
+})
