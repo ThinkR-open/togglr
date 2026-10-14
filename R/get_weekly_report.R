@@ -8,9 +8,8 @@
 #'
 #' @importFrom lubridate %m-%
 #' @export
-#' @import httr
 #' @importFrom lubridate years
-#' @import dplyr
+#' @importFrom dplyr bind_rows mutate
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @importFrom glue glue

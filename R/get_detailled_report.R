@@ -1,23 +1,14 @@
-#' get detailled report
+#' One page of the detailled report (internal)
 #'
-#' get detailled report by user then projet
-#'
-#' @param api_token the toggl api token
-#' @param workspace_id the workspace id
-#' @param since begin date (inclusive)
-#' @param until stop date (inclusive)
-#' @param page page
-#' @param user_agent user_agent
-#'
-#' @return a tibble of the page entries, with attributes `total_count` and
-#'   `per_page` as returned by the API
-#' @import httr
+#' @return a tibble of the page entries, with attributes `total_count`,
+#'   `per_page` and `total_grand` as returned by the API
 #' @importFrom glue glue
 #' @importFrom lubridate years
 #' @importFrom dplyr select left_join as_tibble
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @encoding UTF-8
+#' @noRd
 get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
                                        workspace_id = get_workspace_id(api_token),
                                        since = toggl_today() %m-% lubridate::years(1),
@@ -67,7 +58,19 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
 
 
 
-#' @importFrom lubridate %m-%
+#' Detailled report: every time entry of a period
+#'
+#' Downloads the time entries of the workspace between `since` and `until`
+#' (both included) from the reports API v2, all pages included.
+#'
+#' @param api_token the toggl api token
+#' @param workspace_id the workspace id
+#' @param since begin date (included): a `Date`, a date-time or a text
+#'   "AAAA-MM-JJ"; one year ago by default
+#' @param until end date (included), same formats; today by default
+#' @param user_agent user agent sent to the reports API
+#' @return a tibble, one row per time entry, with fixed column types (see
+#'   Details); 0 rows for an empty period
 #' @export
 #' @param max_page deprecated, ignored: the number of pages is now computed
 #'   from the `total_count` returned by the API.
@@ -79,7 +82,13 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
 #'   `options("togglr.cache_dir")`, or the `reports` sub-folder of
 #'   `rappdirs::user_cache_dir("togglr")`
 #' @param memoise_cache_dir deprecated, use `cache_dir`
-#' @details All the pages of the period are fetched, then the number of
+#' @details Columns: `id`, `pid`, `tid`, `uid`, `description`, `start`, `end`,
+#'   `updated` (text, ISO 8601), `dur` (milliseconds), `user`, `use_stop`,
+#'   `client`, `project`, `project_color`, `project_hex_color`, `task`,
+#'   `billable`, `is_billable`, `cur`, `tags` (list), then any column added by
+#'   the API.
+#'
+#'   All the pages of the period are fetched, then the number of
 #'   distinct entries is checked against the `total_count` announced by the
 #'   API. If entries are added, removed or edited while paginating (detected by
 #'   a change of `total_count` or of the total duration `total_grand` returned
@@ -91,8 +100,7 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
 #'
 #'   Periods longer than a year (365 days or more between `since` and
 #'   `until`, across a new year) are split by calendar year.
-#' @rdname get_detailled_report_paged
-#' @importFrom lubridate dmy days year
+#' @importFrom lubridate dmy days year %m-%
 get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  workspace_id = get_workspace_id(api_token),
                                  since = toggl_today() %m-% lubridate::years(1),

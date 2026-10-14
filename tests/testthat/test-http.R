@@ -142,7 +142,9 @@ test_that("the state file never contains the token (#49)", {
   expect_error(toggl_GET("u", api_token = "my_secret_token_123"), "quota")
   st <- readRDS(f)
   expect_false(any(grepl("my_secret_token_123", c(names(unlist(st)), as.character(unlist(st))))))
-  brut <- readBin(gzfile(f, "rb"), "raw", 1e6)
+  con <- gzfile(f, "rb")
+  brut <- readBin(con, "raw", 1e6)
+  close(con)
   expect_false(grepl("my_secret_token_123", rawToChar(brut[brut != as.raw(0)]), fixed = TRUE, useBytes = TRUE))
 })
 

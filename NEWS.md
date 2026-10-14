@@ -103,6 +103,12 @@
 * `get_workspace_id()` fails with its message when the account has no
   workspace, instead of "subscript out of bounds". New tests cover the edge
   cases of the pagination, of the quota and of the cache (#73).
+* Package metadata and documentation: new title and description, no more
+  `LazyData` without data, targeted imports only (no more whole `dplyr`,
+  `httr`, `keyring`, `assertthat`, `getPass`), `get_detailled_report()` has
+  its own help page, the vignette installs from GitHub and no longer runs
+  `install.packages()` during `R CMD check`. `R CMD check` is clean: 0 error,
+  0 warning, 0 note (#74).
 
 # togglr 0.3.0
 

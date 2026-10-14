@@ -1,12 +1,16 @@
 Type: Package
 Package: togglr
-Title: 'Toggl.com' Api for 'Rstudio'
+Title: Client for the 'Toggl Track' API
 Version: 0.3.0.9000
 Authors@R: c(
     person("Vincent", "Guyader", , "vincent@thinkr.fr", role = c("aut", "cre")),
     person("ThinkR", role = c("cph", "fnd"))
   )
-Description: Use the <https://toggl.com> time tracker api through R.
+Description: Read and write time entries, projects and clients of the
+    'Toggl Track' time tracker <https://toggl.com> from R, and download its
+    reports. Reads never return silently truncated or empty results: HTTP
+    errors are raised, the hourly quota and rate limits are respected, and
+    paginated reports are checked for completeness.
 License: GPL-3
 URL: https://github.com/ThinkR-open/togglr
 BugReports: https://github.com/ThinkR-open/togglr/issues
@@ -40,5 +44,4 @@ VignetteBuilder:
 ByteCompile: true
 Config/testthat/edition: 3
 Encoding: UTF-8
-LazyData: TRUE
 RoxygenNote: 7.3.3

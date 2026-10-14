@@ -8,7 +8,7 @@
 #' @return a data.frame containing all time entries
 #' @export
 #' @importFrom lubridate years
-#' @importFrom dplyr select mutate case_when slice everything left_join %>% 
+#' @importFrom dplyr select mutate case_when slice everything left_join arrange desc bind_rows %>% 
 #' @importFrom stats setNames
 #' @importFrom purrr map_df
 #' @importFrom parsedate parse_iso_8601

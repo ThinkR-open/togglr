@@ -2,11 +2,12 @@
 % Please edit documentation in R/doc_package.R
 \docType{package}
 \name{togglr-package}
-\alias{togglr-package}
 \alias{togglr}
-\title{This package allow user to track time  spend on R using the toggl.com timesheet}
+\alias{togglr-package}
+\title{togglr: client for the 'Toggl Track' API}
 \description{
-toggl.com API
+Track time spent in R with the toggl.com timesheet: read and write time
+entries, projects and clients, and download reports.
 }
 \seealso{
 Useful links:

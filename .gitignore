@@ -26,3 +26,5 @@ vignettes/*.pdf
 .Rproj.user
 bidouille
 inst/doc
+vignettes/*.R
+vignettes/*.html

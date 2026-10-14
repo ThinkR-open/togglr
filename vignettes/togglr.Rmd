@@ -20,13 +20,6 @@ knitr::opts_chunk$set(
 ## Installation of `togglr`
 
 
-### From CRAN
-
-```{r}
-install.packages("togglr")
-```
-
-
 ### From Github
 ```R
 if (!requireNamespace("devtools")){install.packages("devtools")}
@@ -39,13 +32,13 @@ devtools::install_github("ThinkR-open/togglr")
 
 Go on toogl.com website : `https://toggl.com/app/profile` 
 
-```{r}
+```{r, eval = FALSE}
 togglr::open_toggl_website_profile()
 ```
 
 then select and copy your token api at the bottom of the page.
 
-```{r}
+```{r, eval = FALSE}
 library(togglr)
 set_toggl_api_token("your_token_api")
 ```
@@ -56,19 +49,19 @@ You just need to do this once.
 
 Without any parameters it will create a new project using your Rstudio project names. 
 
-```{r}
+```{r, eval = FALSE}
 toggl_start()
 ```
 
 By default the client name is "without client" you can choose (and eventualy create a client) by using :
 
-```{r}
+```{r, eval = FALSE}
 toggl_start(client = "my client")
 ```
 
 But you can also choose the task and the project
 
-```{r}
+```{r, eval = FALSE}
 toggl_start(client = "my client",
             description = "what I'm doing",
             project_name = "my project")
@@ -77,14 +70,14 @@ toggl_start(client = "my client",
 
 ## Stop the tracking system
 
-```{r}
+```{r, eval = FALSE}
 toggl_stop()
 ```
 
 
 ## Get total time passed on the current project
 
-```{r}
+```{r, eval = FALSE}
 get_current_duration()# the current track
 get_project_task_detail()# all the project (including the current track)
 
@@ -92,7 +85,7 @@ get_project_task_detail()# all the project (including the current track)
 
 ## Get all your dashboard
 
-```{r}
+```{r, eval = FALSE}
 get_dashboard()
 ```
 
@@ -104,7 +97,7 @@ This package comes with 2 Rstudio addins 'start toggl' and 'stop toggl', feel fr
 
 ## Some other useful functions are in this package
 
-```{r}
+```{r, eval = FALSE}
 ls(package:togglr)
 ```
 

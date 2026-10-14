@@ -12,7 +12,6 @@
 #' @importFrom lubridate %m-%
 #' @export
 #' @importFrom glue glue
-#' @import httr
 #' @importFrom lubridate years
 #' @importFrom  dplyr select one_of as_tibble
 #' @importFrom stats setNames

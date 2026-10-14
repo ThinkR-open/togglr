@@ -10,3 +10,6 @@ bidouille
 ^pkgdown$
 ^README\.Rmd$
 ^\.github$
+^\.git$
+^\.gitattributes$
+^vignettes/togglr\.R$

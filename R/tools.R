@@ -3,7 +3,7 @@
 #' @param ask booleen do we have to ask if missing
 #' @importFrom magrittr %>% 
 #' @importFrom  keyring key_set_with_value
-#' @import keyring
+#' @importFrom keyring key_get key_set_with_value key_delete
 #' @export
 get_toggl_api_token <- function(ask=TRUE){
   # never delete the stored key here: a locked keyring (cron) also makes
@@ -31,7 +31,7 @@ is_interactive <- function() interactive()
 #' @description  set the toggle api token
 #' @param token toggl api token
 #' @importFrom magrittr %>% 
-#' @import assertthat
+#' @importFrom assertthat assert_that is.string
 #' @export
 set_toggl_api_token <- function(token){
 
@@ -68,7 +68,6 @@ delete_toggl_api_token <- function(){
 #' ask_toggl_api_token
 #' @param msg the message
 #' @description  ask for the toggle api token
-#' @import getPass
 #' @export
 ask_toggl_api_token <- function (msg="toggl api token") 
 {

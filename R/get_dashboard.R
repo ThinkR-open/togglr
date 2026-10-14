@@ -7,7 +7,6 @@
 #'
 #' @importFrom lubridate %m-%
 #' @export
-#' @import httr
 #' @importFrom lubridate years
 #' @importFrom  dplyr select any_of
 #' @importFrom stats setNames
@@ -164,7 +163,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 #'
 
 #' @export
-#' @importFrom dplyr mutate case_when
+#' @importFrom dplyr mutate case_when full_join tribble
 #' @importFrom lubridate years
 #'
 #'
