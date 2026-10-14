@@ -2,11 +2,12 @@
 
 #' Groups of a Reports v3 summary
 #' @noRd
-toggl_report_summary <- function(workspace_id, api_token, since, until, grouping, sub_grouping) {
-  res <- toggl_report_post("/summary/time_entries", workspace_id, api_token,
-                           list(start_date = format(since, "%Y-%m-%d"),
-                                end_date = format(until, "%Y-%m-%d"),
-                                grouping = grouping, sub_grouping = sub_grouping))$content
+toggl_report_summary <- function(workspace_id, api_token, since, until, grouping, sub_grouping,
+                                 user_ids = NULL) {
+  body <- list(start_date = format(since, "%Y-%m-%d"), end_date = format(until, "%Y-%m-%d"),
+               grouping = grouping, sub_grouping = sub_grouping)
+  if (length(user_ids)) body$user_ids <- as.list(user_ids)
+  res <- toggl_report_post("/summary/time_entries", workspace_id, api_token, body)$content
   if (is.null(res$groups)) list() else res$groups
 }
 

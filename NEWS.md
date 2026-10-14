@@ -28,6 +28,10 @@
   (`default_workspace_id` of `/me`), and the first workspace only when no
   default is set; it used to be always the first one. New `get_workspaces()`
   lists every workspace, the default one flagged (#23).
+* `get_dashboard()` and `get_all_project_names()` gain `user_ids`, to keep the
+  projects some team members worked on (#12).
+* New `get_project_data()`: the data of one project from its id (#28).
+* `toggl_start(tags = )` sends its tags, now covered by a test (#16).
 
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the

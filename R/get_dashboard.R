@@ -3,6 +3,8 @@
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id
 #' @param since begin date
+#' @param user_ids optional, ids of the users whose time is counted (all by
+#'   default)
 #' @param until stop date
 #'
 #' @importFrom lubridate %m-%
@@ -15,10 +17,12 @@
 get_dashboard <- function(api_token = get_toggl_api_token(),
                           workspace_id = get_workspace_id(api_token),
                           since = toggl_today() %m-% lubridate::years(1),
-                          until = toggl_today()) {
+                          until = toggl_today(),
+                          user_ids = NULL) {
   read_toggl_period()
   groups <- toggl_report_summary(workspace_id, api_token, since, until,
-                                 grouping = "projects", sub_grouping = "time_entries")
+                                 grouping = "projects", sub_grouping = "time_entries",
+                                 user_ids = user_ids)
   names_ <- toggl_report_names(api_token, workspace_id, users = FALSE)
   ids <- vapply(groups, function(g) null_to_na(g$id, NA_integer_), integer(1))
   pos <- match(ids, names_$projects$id)
@@ -94,6 +98,7 @@ get_project_total <- function(project_name = get_context_project(),
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id
 #' @param since a date
+#' @param user_ids optional, only the projects these users worked on
 #' @param until a date
 #'
 #' @export
@@ -102,13 +107,15 @@ get_project_total <- function(project_name = get_context_project(),
 get_all_project_names <- function(api_token = get_toggl_api_token(),
                                   workspace_id = get_workspace_id(api_token),
                                   since = toggl_today() %m-% lubridate::years(1),
-                                  until = toggl_today()) {
+                                  until = toggl_today(),
+                                  user_ids = NULL) {
   dash <-
     get_dashboard(
       api_token = api_token,
       workspace_id = workspace_id,
       since = since,
-      until = until
+      until = until,
+      user_ids = user_ids
     )
   
   dash$synthese$project

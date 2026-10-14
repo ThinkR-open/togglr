@@ -116,3 +116,23 @@ get_all_projects <- function(api_token = get_toggl_api_token(),
   stop("more than ", max_pages, " pages of projects (option togglr.max_pages): stopping.",
        call. = FALSE)
 }
+
+
+#' Data of one project
+#'
+#' @param project_id the project id
+#' @param api_token the toggl api token
+#' @param workspace_id the workspace id
+#' @return a list with the fields of the project (`id`, `name`, `client_id`,
+#'   `active`, `billable`, `color`...), as returned by the API v9
+#' @export
+#' @examples
+#' \dontrun{
+#' get_project_data(get_project_id("my_project"))
+#' }
+get_project_data <- function(project_id,
+                             api_token = get_toggl_api_token(),
+                             workspace_id = get_workspace_id(api_token)) {
+  toggl_GET(paste0("https://api.track.toggl.com/api/v9/workspaces/", workspace_id,
+                   "/projects/", project_id), api_token = api_token)$content
+}

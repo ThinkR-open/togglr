@@ -93,3 +93,17 @@ test_that("get_weekly_report: one row per project, daily totals and per user det
   expect_equal(w$details[[1]]$title$user, c("Alice", "Bob"))
   expect_equal(w$details[[1]]$totals[[2]], c(NA, 600000, NA, NA, NA, NA, NA, 600000))
 })
+
+# ---- #12 : filtre par membre de l'equipe ---------------------------------------------------
+
+test_that("get_all_project_names and get_dashboard can be limited to some users (#12)", {
+  local_names()
+  seen <- local_reports(list(`/summary/time_entries` = list(groups = list(
+    list(id = 1L, sub_groups = list(entry_group("t1", 3600)))))))
+  p <- get_all_project_names(api_token = "t", workspace_id = 1, since = "2026-09-01",
+                             until = "2026-09-30", user_ids = c(10, 20))
+  expect_equal(p, "presta_a")
+  expect_equal(unlist(seen()[[1]]$body$user_ids), c(10, 20))
+  get_dashboard(api_token = "t", workspace_id = 1, since = "2026-09-01", until = "2026-09-30")
+  expect_null(seen()[[2]]$body$user_ids)
+})

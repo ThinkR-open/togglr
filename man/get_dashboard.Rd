@@ -9,7 +9,8 @@ get_dashboard(
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token),
   since = toggl_today() \%m-\% lubridate::years(1),
-  until = toggl_today()
+  until = toggl_today(),
+  user_ids = NULL
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ get_dashboard(
 \item{since}{begin date}
 
 \item{until}{stop date}
+
+\item{user_ids}{optional, ids of the users whose time is counted (all by
+default)}
 }
 \description{
 get all data from <https://toggl.com>
