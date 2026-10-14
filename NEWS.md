@@ -69,6 +69,8 @@
   `Date`, a date-time (its day in its own time zone) or a text "AAAA-MM-JJ",
   and fail with a clear message, before any request, on anything else or on
   `since` after `until` (#61).
+* Default periods ("one year ago") are computed with `%m-%`: they were `NA`
+  on February 29th (#62).
 
 # togglr 0.3.0
 

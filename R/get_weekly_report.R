@@ -6,6 +6,7 @@
 #' @param until stop date
 #' @param user_agent user_agent
 #'
+#' @importFrom lubridate %m-%
 #' @export
 #' @import httr
 #' @importFrom lubridate years
@@ -16,8 +17,8 @@
 #' @encoding UTF-8
 get_weekly_report <- function(api_token = get_toggl_api_token(),
                           workspace_id = get_workspace_id(api_token),
-                          since = Sys.Date() - lubridate::years(1),
-                          until = Sys.Date(),
+                          since = toggl_today() %m-% lubridate::years(1),
+                          until = toggl_today(),
                           user_agent="togglr") {
   
   

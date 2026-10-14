@@ -136,3 +136,7 @@ as_toggl_period <- function(since, until) {
   }
   list(since = since, until = until)
 }
+
+# wrapper, so that tests can choose the day
+#' @noRd
+toggl_today <- function() Sys.Date()

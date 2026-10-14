@@ -8,8 +8,8 @@
 get_summary_report(
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token),
-  since = Sys.Date() - lubridate::years(1),
-  until = Sys.Date(),
+  since = toggl_today() \%m-\% lubridate::years(1),
+  until = toggl_today(),
   user_agent = "togglr",
   users = get_workspace_users(api_token = api_token, workspace_id = workspace_id)
 )

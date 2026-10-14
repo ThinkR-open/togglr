@@ -49,3 +49,23 @@ test_that("get_detailled_report checks its dates too (#61)", {
   expect_error(get_detailled_report(api_token = "t", workspace_id = 1, since = "2026-13-01"), "`since`.*Date")
   expect_length(urls(), 0)
 })
+
+# ---- M4 (#62) : defauts « il y a un an » valides un 29 fevrier ----------------------
+
+test_that("the default period is valid on February 29th (#62)", {
+  local_mocked_bindings(toggl_today = function() as.Date("2028-02-29"))
+  for (f in report_functions[c("summary", "weekly", "dashboard")]) {
+    urls <- capture_url()
+    expect_error(f(), "captured")
+    expect_match(urls(), "since=2027-02-28")
+    expect_match(urls(), "until=2028-02-29")
+  }
+})
+
+test_that("get_detailled_report defaults are valid on February 29th (#62)", {
+  local_mocked_bindings(toggl_today = function() as.Date("2028-02-29"))
+  asked <- local_periods()
+  suppressMessages(get_detailled_report(api_token = "t", workspace_id = 1))
+  # 366 jours d'ecart (un jour de plus qu'un an) : decoupe au nouvel an (#58)
+  expect_equal(asked(), c("2027-02-28 2027-12-31", "2028-01-01 2028-02-29"))
+})

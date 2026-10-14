@@ -68,6 +68,7 @@ toggl_reports_pace <- function(min_interval = getOption("togglr.min_interval", 1
 
 
 
+#' @importFrom lubridate %m-%
 #' @export
 #' @param max_page deprecated, ignored: the number of pages is now computed
 #'   from the `total_count` returned by the API.
@@ -93,8 +94,8 @@ toggl_reports_pace <- function(min_interval = getOption("togglr.min_interval", 1
 #' @importFrom lubridate dmy days year
 get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  workspace_id = get_workspace_id(api_token),
-                                 since = Sys.Date() - lubridate::years(1),
-                                 until = Sys.Date(),
+                                 since = toggl_today() %m-% lubridate::years(1),
+                                 until = toggl_today(),
                                  user_agent = "togglr",
                                  max_page = NULL,
                                  cache = FALSE,

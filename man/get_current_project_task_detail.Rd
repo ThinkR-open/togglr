@@ -8,8 +8,8 @@ get_current_project_task_detail(
   project_name = get_context_project(),
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token),
-  since = Sys.Date() - lubridate::years(1),
-  until = Sys.Date(),
+  since = toggl_today() \%m-\% lubridate::years(1),
+  until = toggl_today(),
   humain = TRUE
 )
 }

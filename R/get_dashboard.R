@@ -5,6 +5,7 @@
 #' @param since begin date
 #' @param until stop date
 #'
+#' @importFrom lubridate %m-%
 #' @export
 #' @import httr
 #' @importFrom lubridate years
@@ -14,8 +15,8 @@
 #' @encoding UTF-8
 get_dashboard <- function(api_token = get_toggl_api_token(),
                           workspace_id = get_workspace_id(api_token),
-                          since = Sys.Date() - lubridate::years(1),
-                          until = Sys.Date()) {
+                          since = toggl_today() %m-% lubridate::years(1),
+                          until = toggl_today()) {
   period <- as_toggl_period(since, until)
   since <- period$since
   until <- period$until
@@ -86,8 +87,8 @@ get_project_total <- function(project_name = get_context_project(),
                               
                               api_token = get_toggl_api_token(),
                               workspace_id = get_workspace_id(api_token),
-                              since = Sys.Date() - lubridate::years(1),
-                              until = Sys.Date()) {
+                              since = toggl_today() %m-% lubridate::years(1),
+                              until = toggl_today()) {
   dash <-
     get_dashboard(
       api_token = api_token,
@@ -113,8 +114,8 @@ get_project_total <- function(project_name = get_context_project(),
 
 get_all_project_names <- function(api_token = get_toggl_api_token(),
                                   workspace_id = get_workspace_id(api_token),
-                                  since = Sys.Date() - lubridate::years(1),
-                                  until = Sys.Date()) {
+                                  since = toggl_today() %m-% lubridate::years(1),
+                                  until = toggl_today()) {
   dash <-
     get_dashboard(
       api_token = api_token,
@@ -139,8 +140,8 @@ get_all_project_names <- function(api_token = get_toggl_api_token(),
 #'
 get_all_client_names <- function(api_token = get_toggl_api_token(),
                                  workspace_id = get_workspace_id(api_token),
-                                 since = Sys.Date() - lubridate::years(1),
-                                 until = Sys.Date()) {
+                                 since = toggl_today() %m-% lubridate::years(1),
+                                 until = toggl_today()) {
   dash <-
     get_dashboard(
       api_token = api_token,
@@ -171,8 +172,8 @@ get_current_project_task_detail <-
   function(project_name = get_context_project(),
            api_token = get_toggl_api_token(),
            workspace_id = get_workspace_id(api_token),
-           since = Sys.Date() - lubridate::years(1),
-           until = Sys.Date(),
+           since = toggl_today() %m-% lubridate::years(1),
+           until = toggl_today(),
            humain = TRUE) {
     gd <-
       get_dashboard(
