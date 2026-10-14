@@ -2,18 +2,23 @@
 #'
 #' Every read of the Toggl API goes through this function. Unlike a bare
 #' `httr::GET()` + `content()`, an HTTP error is never turned into an empty
-#' result:
+#' result, and the documented limits of the API are respected
+#' (<https://engineering.toggl.com/docs/track/>):
 #'
-#' * 429 (quota or rate limit) and 5xx are retried, waiting what the API asks
-#'   for (`x-toggl-quota-resets-in` / `retry-after`), within `max_wait` seconds;
+#' * 402 means the hourly quota is exhausted. The reset time is remembered for
+#'   the session, and no request is sent before it: the call waits for the reset
+#'   if it is within `max_wait`, otherwise it fails without contacting the API.
+#' * 429 means the rate limit (about 1 request per second) is exceeded: the call
+#'   backs off (`retry-after`, or 60 s, 120 s...) within `max_wait`.
+#' * 5xx are retried with a short backoff.
 #' * any other non-200 status, or a retry budget exhausted, raises an error.
 #'
 #' @param url full url
 #' @param api_token the toggl api token
 #' @param max_tries maximum number of attempts
-#' @param max_wait maximum number of seconds to wait for a single retry. A 429
-#'   asking to wait longer (hourly quota exhausted) fails immediately instead of
-#'   blocking the session. Can be set with `options(togglr.max_wait = )`.
+#' @param max_wait maximum number of seconds to wait before a single attempt.
+#'   Longer waits (typically an exhausted hourly quota) fail immediately instead
+#'   of blocking the session. Can be set with `options(togglr.max_wait = )`.
 #'
 #' @return a list with `content` (parsed body) and `headers`
 #' @importFrom httr GET authenticate content status_code headers http_status
@@ -23,11 +28,19 @@ toggl_GET <- function(url,
                       max_tries = 5,
                       max_wait = getOption("togglr.max_wait", 60)) {
   for (try in seq_len(max_tries)) {
+    toggl_wait_quota(max_wait)
     resp <- toggl_http_get(url, api_token)
     status <- status_code(resp)
 
     if (status == 200) {
       return(list(content = content(resp), headers = headers(resp)))
+    }
+
+    if (status == 402) {
+      reset <- toggl_header_num(resp, "x-toggl-quota-resets-in")
+      .togglr_env$quota_until <- Sys.time() + (if (is.na(reset)) 3600 else max(1, reset))
+      if (try == max_tries) stop(toggl_error_message(resp, url), call. = FALSE)
+      next # toggl_wait_quota() waits for the reset, or fails, before any new request
     }
 
     if (!(status == 429 || status >= 500) || try == max_tries) {
@@ -38,11 +51,36 @@ toggl_GET <- function(url,
     if (wait > max_wait) {
       stop(toggl_error_message(resp, url),
            " The API asks to wait ", wait, "s (> max_wait = ", max_wait,
-           "s): quota exhausted, try again later.", call. = FALSE)
+           "s), try again later.", call. = FALSE)
     }
     message("toggl API returned ", status, ", retrying in ", wait, "s")
     toggl_sleep(wait)
   }
+}
+
+#' Do not contact the API while the hourly quota is known to be exhausted
+#' @noRd
+toggl_wait_quota <- function(max_wait) {
+  until <- .togglr_env$quota_until
+  if (is.null(until)) return(invisible())
+  wait <- ceiling(as.numeric(difftime(until, Sys.time(), units = "secs")))
+  if (wait <= 0) {
+    .togglr_env$quota_until <- NULL
+    return(invisible())
+  }
+  if (wait > max_wait) {
+    stop("toggl hourly API quota exhausted, resets in ", wait, "s (> max_wait = ",
+         max_wait, "s): no request sent, try again later.", call. = FALSE)
+  }
+  message("toggl hourly API quota exhausted, waiting ", wait, "s for the reset")
+  toggl_sleep(wait)
+  .togglr_env$quota_until <- NULL
+}
+
+#' @noRd
+toggl_header_num <- function(resp, name) {
+  x <- headers(resp)[[name]]
+  suppressWarnings(as.numeric(if (is.null(x)) NA else x))
 }
 
 # Thin wrappers, so that tests can replace the network and the clock
@@ -56,20 +94,12 @@ toggl_sleep <- function(seconds) {
   Sys.sleep(seconds)
 }
 
-#' Seconds to wait before retrying a failed request
+#' Seconds to wait before retrying a 429 or a 5xx
 #' @noRd
 toggl_retry_delay <- function(resp, try) {
-  h <- headers(resp)
-  num <- function(x) suppressWarnings(as.numeric(if (is.null(x)) NA else x))
-  # x-toggl-quota-resets-in is sent with every answer: only relevant when the
-  # hourly quota is actually exhausted, otherwise the 429 is a rate limit.
-  if (isTRUE(num(h[["x-toggl-quota-remaining"]]) <= 0) &&
-      !is.na(num(h[["x-toggl-quota-resets-in"]]))) {
-    return(max(1, num(h[["x-toggl-quota-resets-in"]])))
-  }
-  if (!is.na(num(h[["retry-after"]]))) {
-    return(max(1, num(h[["retry-after"]])))
-  }
+  asked <- toggl_header_num(resp, "retry-after")
+  if (!is.na(asked)) return(max(1, asked))
+  if (status_code(resp) == 429) return(60 * try) # the docs ask to back off for minutes
   min(2^try, 30)
 }
 

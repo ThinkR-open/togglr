@@ -55,7 +55,6 @@ toggl_reports_pace <- function(min_interval = getOption("togglr.min_interval", 1
   .togglr_env$last_report_call <- Sys.time()
 }
 
-.togglr_env <- new.env(parent = emptyenv())
 
 
 #' @export

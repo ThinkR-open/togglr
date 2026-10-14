@@ -10,6 +10,9 @@
 * `get_detailled_report()` no longer memoises pages. The new `cache` argument
   (default `FALSE`) stores a whole period, only once it is complete and checked;
   reserve it to closed periods. `max_page` is deprecated and ignored.
+* Quota exhaustion (HTTP 402) is remembered for the session: no request is
+  sent before the reset (waited for within `max_wait`, otherwise an error).
+  A 429 without `retry-after` backs off for a minute.
 * Calls to the reports API are spaced by at least one second, or by
   `options(togglr.min_interval)` seconds to spread a long extraction.
 
