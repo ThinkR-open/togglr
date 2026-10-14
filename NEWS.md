@@ -58,6 +58,10 @@
 * `get_detailled_report()` splits by calendar year as soon as a period spans
   365 days or more across a new year: a 367 days period (bounds included) was
   sent as is, beyond the one year limit of the reports API v2 (#58).
+* The pagination of `get_all_projects()` is bounded: it stops with an error if
+  the API returns the same page twice, or after `options(togglr.max_pages)`
+  pages (100 by default), instead of spending the quota in an endless loop
+  (#59).
 
 # togglr 0.3.0
 

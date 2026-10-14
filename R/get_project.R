@@ -90,37 +90,29 @@ get_all_projects(api_token = api_token, workspace_id = workspace_id) %>%
 
 
 get_all_projects <- function(api_token = get_toggl_api_token(),
-                             workspace_id = get_workspace_id(api_token)){
-  nb_page <- 1
+                             workspace_id = get_workspace_id(api_token),
+                             max_pages = getOption("togglr.max_pages", 100)) {
   all_projects <- list()
-  
-  
-  while (TRUE) {
-    
-    # message("page = ",nb_page)
-    project_tbl_ <-   toggl_GET(
-      paste0(
-        "https://api.track.toggl.com/api/v9/workspaces/",
-        workspace_id,
-        "/projects?page=", nb_page, "&per_page=200"
-      ),
+  previous_ids <- NULL
+  for (nb_page in seq_len(max_pages)) {
+    project_tbl_ <- toggl_GET(
+      paste0("https://api.track.toggl.com/api/v9/workspaces/", workspace_id,
+             "/projects?page=", nb_page, "&per_page=200"),
       api_token = api_token
     )$content %>% bind_rows()
-    
-    all_projects[[nb_page]] <- project_tbl_
-    
-    
-    if (nrow(project_tbl_) < 200) {
-      break  # 
-    } else {
-      nb_page <- nb_page + 1  # Passer à la page suivante
+
+    ids <- if ("id" %in% names(project_tbl_)) project_tbl_$id else NULL
+    if (length(ids) > 0 && identical(ids, previous_ids)) {
+      stop("the toggl API returned the same page of projects twice (page ", nb_page,
+           "): pagination looks ignored, stopping.", call. = FALSE)
     }
-    
-    
-    
-    
+    previous_ids <- ids
+    all_projects[[nb_page]] <- project_tbl_
+
+    if (nrow(project_tbl_) < 200) {
+      return(bind_rows(all_projects))
+    }
   }
-  
-  all_projects %>% bind_rows
-  
+  stop("more than ", max_pages, " pages of projects (option togglr.max_pages): stopping.",
+       call. = FALSE)
 }
