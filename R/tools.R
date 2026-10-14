@@ -34,18 +34,16 @@ is_interactive <- function() interactive()
 #' @importFrom assertthat assert_that is.string
 #' @export
 set_toggl_api_token <- function(token){
-
-  
   if ( missing(token) ){
-    token <- ask_toggl_api_token() 
+    token <- ask_toggl_api_token()
   }
   if (is.null(token)){return(invisible(NULL))}
-  
+  # valider avant d'effacer : un token invalide ne doit pas faire perdre l'ancien
+  assert_that(is.string(token))
   delete_toggl_api_token()
-  assert_that(is.character(token))
-    token %>% key_set_with_value(service = "toggl_api_token",password = .)
-  
-  token
+  key_set_with_value(service = "toggl_api_token", password = token)
+  # invisible : affiche, le token finirait dans la console ou les logs
+  invisible(token)
 }
 
 #' update_toggl_api_token
@@ -53,8 +51,13 @@ set_toggl_api_token <- function(token){
 #' @importFrom magrittr %>% 
 #' @export
 update_toggl_api_token <- function(){
-  delete_toggl_api_token()
-    ask_toggl_api_token() %>% key_set_with_value(service = "toggl_api_token",password = .)
+  # demander d'abord : une saisie annulee garde le token actuel
+  token <- ask_toggl_api_token()
+  if (is.null(token)) {
+    message("no token entered: the stored toggl api token is kept")
+    return(invisible(NULL))
+  }
+  set_toggl_api_token(token)
 }
 
 #' @title delete_toggl_api_token

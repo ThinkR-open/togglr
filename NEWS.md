@@ -32,6 +32,13 @@
   projects some team members worked on (#12).
 * New `get_project_data()`: the data of one project from its id (#28).
 * `toggl_start(tags = )` sends its tags, now covered by a test (#16).
+* `set_toggl_api_token()` returns the token invisibly (it was printed when
+  called at top level, e.g. in a script whose output is logged), and checks
+  the new token before deleting the stored one. `update_toggl_api_token()`
+  asks first: a cancelled input keeps the stored token (#84).
+* Tests: coverage from 85 % to 91 %, a real multi-process test of
+  `togglr.state_file`, no test depending on covr's instrumentation; new
+  workflow measuring the coverage (#84, #32, #33).
 
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the

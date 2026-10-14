@@ -35,7 +35,10 @@ Imports:
     stats,
     utils
 Suggests:
+    callr,
+    covr,
     knitr,
+    pkgload,
     rmarkdown,
     testthat (>= 3.1.7),
     withr
