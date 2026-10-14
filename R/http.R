@@ -5,9 +5,11 @@
 #' result, and the documented limits of the API are respected
 #' (<https://engineering.toggl.com/docs/track/>):
 #'
-#' * 402 means the hourly quota is exhausted. The reset time is remembered for
-#'   the session, and no request is sent before it: the call waits for the reset
-#'   if it is within `max_wait`, otherwise it fails without contacting the API.
+#' * 402 with quota headers means the hourly quota of the token is exhausted.
+#'   The reset time is remembered (per token, see `togglr.state_file`), and no
+#'   request is sent with that token before it: the call waits for the reset if
+#'   it is within `max_wait`, otherwise it fails without contacting the API. A
+#'   402 without quota headers (a feature of a paid plan) stops at once.
 #' * 429 means the rate limit (about 1 request per second) is exceeded: the call
 #'   backs off (`retry-after`, or 60 s, 120 s...) within `max_wait`.
 #' * 5xx and network errors (timeout, DNS, connection reset) are retried with a
@@ -30,7 +32,7 @@ toggl_GET <- function(url,
                       max_tries = 5,
                       max_wait = getOption("togglr.max_wait", 60)) {
   for (try in seq_len(max_tries)) {
-    toggl_wait_quota(max_wait)
+    toggl_wait_quota(max_wait, api_token)
     resp <- tryCatch(toggl_http_get(url, api_token), error = function(e) e)
 
     if (inherits(resp, "error")) {
@@ -54,7 +56,13 @@ toggl_GET <- function(url,
 
     if (status == 402) {
       reset <- toggl_header_num(resp, "x-toggl-quota-resets-in")
-      toggl_state_set("quota_until", Sys.time() + (if (is.na(reset)) 3600 else max(1, reset)))
+      remaining <- toggl_header_num(resp, "x-toggl-quota-remaining")
+      if (is.na(reset) && !identical(remaining, 0)) {
+        # pas un quota : fonctionnalite reservee a un plan payant
+        stop(toggl_error_message(resp, url), call. = FALSE)
+      }
+      toggl_state_set(toggl_quota_key(api_token),
+                      Sys.time() + (if (is.na(reset)) 3600 else max(1, reset)))
       if (try == max_tries) stop(toggl_error_message(resp, url), call. = FALSE)
       next # toggl_wait_quota() waits for the reset, or fails, before any new request
     }
@@ -76,12 +84,13 @@ toggl_GET <- function(url,
 
 #' Do not contact the API while the hourly quota is known to be exhausted
 #' @noRd
-toggl_wait_quota <- function(max_wait) {
-  until <- toggl_state_get("quota_until")
+toggl_wait_quota <- function(max_wait, api_token) {
+  key <- toggl_quota_key(api_token)
+  until <- toggl_state_get(key)
   if (is.null(until)) return(invisible())
   wait <- ceiling(as.numeric(difftime(until, Sys.time(), units = "secs")))
   if (wait <= 0) {
-    toggl_state_set("quota_until", NULL)
+    toggl_state_set(key, NULL)
     return(invisible())
   }
   if (wait > max_wait) {
@@ -90,7 +99,14 @@ toggl_wait_quota <- function(max_wait) {
   }
   message("toggl hourly API quota exhausted, waiting ", wait, "s for the reset")
   toggl_sleep(wait)
-  toggl_state_set("quota_until", NULL)
+  toggl_state_set(key, NULL)
+}
+
+#' State key of the quota of one token: a hash, the token itself is never
+#' stored (the state may live in a file)
+#' @noRd
+toggl_quota_key <- function(api_token) {
+  paste0("quota_until_", substr(as.character(openssl::sha256(as.character(api_token))), 1, 16))
 }
 
 #' @noRd

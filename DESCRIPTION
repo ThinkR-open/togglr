@@ -21,6 +21,7 @@ Imports:
     jsonlite,
     keyring,
     lubridate,
+    openssl,
     magrittr,
     parsedate,
     prettyunits,

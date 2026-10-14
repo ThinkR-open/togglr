@@ -101,3 +101,47 @@ test_that("a network error that persists fails after max_tries, with the cause (
                "network error.*Could not resolve host")
   expect_equal(calls, 3)
 })
+
+# ---- I5 (#49) : 402 sans quota, quota par token ---------------------------------
+
+test_that("a 402 without quota headers (paid feature) stops at once and blocks nothing (#49)", {
+  local_fresh_state()
+  srv <- serve(fake_response(402, list(error = "This feature requires a Premium plan")),
+               fake_response(200, list(ok = TRUE)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_error(toggl_GET("u", api_token = "t"), "402.*Premium plan")
+  expect_equal(srv$calls(), 1)
+  expect_true(toggl_GET("u2", api_token = "t")$content$ok) # pas de blocage d'une heure
+})
+
+test_that("a 402 with remaining = 0 but no reset delay is a quota, remembered one hour (#49)", {
+  local_fresh_state()
+  srv <- serve(fake_response(402, headers = list(`x-toggl-quota-remaining` = "0")))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_error(toggl_GET("u", api_token = "t"), "quota")
+  expect_error(toggl_GET("u2", api_token = "t"), "resets in 3[56][0-9]{2}s.*no request sent")
+  expect_equal(srv$calls(), 1)
+})
+
+test_that("an exhausted quota only blocks the token that received it (#49)", {
+  local_fresh_state()
+  srv <- serve(fake_response(402, headers = list(`x-toggl-quota-resets-in` = "1800")),
+               fake_response(200, list(ok = TRUE)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_error(toggl_GET("u", api_token = "token_a"), "quota")
+  expect_true(toggl_GET("u", api_token = "token_b")$content$ok)
+  expect_error(toggl_GET("u", api_token = "token_a"), "no request sent")
+})
+
+test_that("the state file never contains the token (#49)", {
+  local_fresh_state()
+  f <- withr::local_tempfile()
+  withr::local_options(togglr.state_file = f)
+  srv <- serve(fake_response(402, headers = list(`x-toggl-quota-resets-in` = "1800")))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_error(toggl_GET("u", api_token = "my_secret_token_123"), "quota")
+  st <- readRDS(f)
+  expect_false(any(grepl("my_secret_token_123", c(names(unlist(st)), as.character(unlist(st))))))
+  brut <- readBin(gzfile(f, "rb"), "raw", 1e6)
+  expect_false(grepl("my_secret_token_123", rawToChar(brut[brut != as.raw(0)]), fixed = TRUE, useBytes = TRUE))
+})

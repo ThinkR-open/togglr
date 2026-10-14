@@ -17,6 +17,10 @@
   knowledge of an exhausted quota are stored in that file, under a lock, and
   shared by every R process using it (callr / future / targets workers, cron
   jobs). Without it, the state stays private to the session (#48).
+* A 402 without quota headers (a feature of a paid plan) now stops at once with
+  the message of the API, instead of blocking every request for an hour. An
+  exhausted quota is remembered per token, as a hash: the token is never
+  stored (#49).
 
 # togglr 0.3.0
 
