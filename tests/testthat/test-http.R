@@ -261,3 +261,13 @@ test_that("plenty of remaining requests: no slowdown (#68)", {
   toggl_GET("u", api_token = "t")
   expect_length(waited, 0)
 })
+
+test_that("a network error is not retried when the backoff exceeds max_wait (revue #75)", {
+  calls <- 0
+  local_mocked_bindings(
+    toggl_http_get = function(url, api_token) { calls <<- calls + 1; stop("Timeout was reached") },
+    toggl_sleep = function(s) stop("should not wait")
+  )
+  expect_error(toggl_GET("u", api_token = "t", max_wait = 1), "max_wait = 1s")
+  expect_equal(calls, 1)
+})

@@ -127,6 +127,11 @@
     longer rewrites it.
   - In a period that includes today, the growth of `total_grand` caused by a
     running timer between two pages is no longer taken for an edit.
+  - A time entry accepted by the API but whose answer cannot be read is
+    reported as started (with a warning, id `NA`), not as `NOT STARTED`.
+  - A state file that cannot be replaced is an error instead of a silently
+    lost update, and the temporary file is removed.
+  - Network errors are no longer retried when the backoff exceeds `max_wait`.
 
 # togglr 0.3.0
 

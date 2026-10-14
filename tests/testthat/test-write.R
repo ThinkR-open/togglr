@@ -75,3 +75,21 @@ test_that("create_client returns the created client (#54)", {
   local_mocked_bindings(POST = srv$send, toggl_sleep = function(s) NULL)
   expect_equal(suppressMessages(create_client("acme", api_token = "t", workspace_id = 1))$id, 5L)
 })
+
+# ---- revue Copilot de la PR #75 -------------------------------------------------
+
+test_that("a created entry whose answer cannot be read is not reported as NOT STARTED (revue #75)", {
+  local_fresh_state()
+  notes <- c()
+  broken <- fake_response(200)
+  broken$content <- charToRaw("{not json")
+  srv <- serve_write(broken)
+  local_mocked_bindings(POST = srv$send, toggl_sleep = function(s) NULL, get_project_id = function(...) 1L,
+                        notification = function(title, msg) notes <<- c(notes, title))
+  expect_warning(expect_warning(id <- toggl_start("task", api_token = "t", workspace_id = 1),
+                                "could not be read"), "was created")
+  expect_true(is.na(id))
+  expect_match(notes, "START")
+  expect_false(any(grepl("ERROR", notes)))
+  expect_equal(srv$calls(), 1)
+})

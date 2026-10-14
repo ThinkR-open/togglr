@@ -238,13 +238,21 @@ format_toggl_utc <- function(x) {
 #' Create a time entry; on failure, notify then raise the error of the API
 #' @noRd
 toggl_post_entry <- function(body, description, api_token, workspace_id) {
-  tryCatch(
+  res <- tryCatch(
     toggl_request("POST",
                   glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries"),
-                  api_token = api_token, body = body)$content$id,
+                  api_token = api_token, body = body),
     error = function(e) {
       notification(title = paste(description, " ERROR"), msg = c("NOT STARTED", conditionMessage(e)))
       stop(e)
     }
   )
+  # l'API a accepte l'entree : un id illisible n'est pas un echec (le relancer
+  # creerait un doublon)
+  if (is.null(res$content$id)) {
+    warning("the time entry \"", description, "\" was created, but its id could not be read.",
+            call. = FALSE)
+    return(NA_real_)
+  }
+  res$content$id
 }

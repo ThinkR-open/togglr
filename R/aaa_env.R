@@ -30,7 +30,10 @@ toggl_state_update <- function(f) {
   if (!identical(res$state, state)) {
     tmp <- tempfile(tmpdir = dirname(path))
     saveRDS(res$state, tmp)
-    file.rename(tmp, path)
+    if (!file.rename(tmp, path)) {
+      unlink(tmp)
+      stop("could not write the togglr state file ", path, call. = FALSE)
+    }
   }
   res$value
 }

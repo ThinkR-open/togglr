@@ -87,6 +87,11 @@ toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait) {
              " attempts: ", cause, call. = FALSE)
       }
       wait <- min(2^try, 30)
+      if (wait > max_wait) {
+        stop("toggl API network error on ", sub("\\?.*$", "", url), ": ", cause,
+             ". Not retried: the retry would wait ", wait, "s (> max_wait = ", max_wait, "s).",
+             call. = FALSE)
+      }
       message("toggl API network error (", cause, "), retrying in ", wait, "s")
       toggl_sleep(wait)
       next

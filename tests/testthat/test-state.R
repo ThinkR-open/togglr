@@ -101,3 +101,14 @@ test_that("writes are spaced too (#64)", {
   expect_length(waited, 1)
   expect_gt(waited, 9)
 })
+
+test_that("a state file that cannot be replaced is an error, and leaves no temporary file (revue #75)", {
+  local_fresh_state()
+  root <- withr::local_tempdir()
+  path <- file.path(root, "state")
+  dir.create(path)
+  writeLines("x", file.path(path, "keep")) # un dossier non vide : file.rename echoue
+  withr::local_options(togglr.state_file = path)
+  expect_error(suppressWarnings(toggl_state_set("x", 1)), "could not write the togglr state file")
+  expect_setequal(list.files(root), c("state", "state.lock"))
+})
