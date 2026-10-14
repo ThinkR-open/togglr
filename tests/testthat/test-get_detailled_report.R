@@ -37,9 +37,9 @@ test_that("entries moving during pagination trigger a second full fetch", {
   expect_false(anyDuplicated(out$id) > 0)
 })
 
-test_that("a period still incomplete after the retry raises an error", {
+test_that("a period still incomplete after the retries raises an error", {
   short <- fake_response(200, report_page(1:40, total = 45))
-  srv <- serve(short, short)
+  srv <- serve(short, short, short)
   local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
   expect_error(report(), "incomplete toggl detailled report")
 })
@@ -183,4 +183,34 @@ test_that("no warning without max_page (#60)", {
   srv <- serve(fake_response(200, report_page(1:3, total = 3)))
   local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
   expect_no_warning(suppressMessages(report()))
+})
+
+# ---- M7 (#65) : nombre de lectures parametrable ------------------------------------
+
+moving_then_stable <- function(n_moves) {
+  pages <- list()
+  for (k in seq_len(n_moves)) {
+    pages <- c(pages, list(fake_response(200, report_page(1:50, total = 60 + k - 1)),
+                           fake_response(200, report_page(51:60, total = 60 + k))))
+  }
+  total <- 60 + n_moves
+  c(pages, list(fake_response(200, report_page(1:50, total = total)),
+                fake_response(200, report_page(51:total, total = total))))
+}
+
+test_that("by default a period is read up to 3 times when it keeps moving (#65)", {
+  local_fresh_state()
+  srv <- do.call(serve, moving_then_stable(2))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_equal(nrow(suppressMessages(report())), 62)
+  expect_equal(srv$calls(), 6)
+})
+
+test_that("togglr.report_attempts sets the number of reads (#65)", {
+  local_fresh_state()
+  withr::local_options(togglr.report_attempts = 1)
+  srv <- do.call(serve, moving_then_stable(1))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_error(suppressMessages(report()), "incomplete")
+  expect_equal(srv$calls(), 2)
 })

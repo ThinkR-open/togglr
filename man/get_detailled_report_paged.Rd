@@ -10,8 +10,8 @@
 get_detailled_report_paged(
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token),
-  since = Sys.Date() - lubridate::years(3),
-  until = Sys.Date() + lubridate::days(1),
+  since = toggl_today() \%m-\% lubridate::years(1),
+  until = toggl_today(),
   page = 1,
   user_agent = "togglr"
 )
@@ -70,8 +70,9 @@ All the pages of the period are fetched, then the number of
   distinct entries is checked against the `total_count` announced by the
   API. If entries are added, removed or edited while paginating (detected by
   a change of `total_count` or of the total duration `total_grand` returned
-  with each page), the period is fetched again once; if the result is still
-  incomplete, an error is raised.
+  with each page), the period is fetched again, up to
+  `options(togglr.report_attempts)` reads in all (3 by default); if the
+  result is still incomplete, an error is raised.
   An HTTP error (quota, server error, authentication) raises an error too:
   the function never returns a silently truncated period.
 

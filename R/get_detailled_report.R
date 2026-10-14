@@ -82,8 +82,9 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
 #'   distinct entries is checked against the `total_count` announced by the
 #'   API. If entries are added, removed or edited while paginating (detected by
 #'   a change of `total_count` or of the total duration `total_grand` returned
-#'   with each page), the period is fetched again once; if the result is still
-#'   incomplete, an error is raised.
+#'   with each page), the period is fetched again, up to
+#'   `options(togglr.report_attempts)` reads in all (3 by default); if the
+#'   result is still incomplete, an error is raised.
 #'   An HTTP error (quota, server error, authentication) raises an error too:
 #'   the function never returns a silently truncated period.
 #'
@@ -148,7 +149,8 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
 #' Fetch every page of one period and check it is complete
 #' @noRd
 fetch_detailled_period <- function(api_token, workspace_id, since, until,
-                                   user_agent, attempts = 2) {
+                                   user_agent,
+                                   attempts = getOption("togglr.report_attempts", 3)) {
   for (attempt in seq_len(attempts)) {
     first <- get_detailled_report_paged(api_token = api_token, workspace_id = workspace_id,
                                         since = since, until = until,

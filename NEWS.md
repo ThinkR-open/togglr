@@ -77,6 +77,8 @@
 * `options(togglr.min_interval)` (1 s by default) now spaces every request,
   reads and writes, retries included, not only the pages of the detailled
   report (#64).
+* A period that keeps moving during the pagination is read up to
+  `options(togglr.report_attempts)` times (3 by default, 2 before) (#65).
 
 # togglr 0.3.0
 
