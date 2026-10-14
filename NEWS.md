@@ -44,6 +44,10 @@
   `toggl_stop()` only notifies STOP once the API accepted it. `create_client()`
   now returns the created client (a list) instead of the raw httr response
   (#54).
+* `toggl_create_project()` works again: no crash without client, an existing
+  client is reused instead of being created again, its `client_id` is sent,
+  and the body follows the v9 format (`private`, `color`, `active` are no
+  longer ignored) (#55).
 
 # togglr 0.3.0
 

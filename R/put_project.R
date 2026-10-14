@@ -3,14 +3,15 @@
 #' @param project_name project name
 #'
 #' @param workspace_id workspace_id
-#' @param client client name
-#' @param api_token the toggl api token#'
+#' @param client client name: an existing client is reused, an unknown one is
+#'   created; `NULL` or `""` for no client
+#' @param api_token the toggl api token
 #' @param private whether project is accessible for only project users or for all workspace users (boolean, default false)
-#' @param color id of the color selected for the project
+#' @param color color of the project, as a hex code (e.g. "#06aaf5")
 #' @param active boolean set project as active, TRUE by default
 #'
 #' @description  create a project
-#' @importFrom httr POST authenticate
+#' @return the id of the project (created, or already existing)
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
@@ -35,33 +36,22 @@ toggl_create_project <- function(
     
   }else{
     
-    # gestion du client
-    if (!is.null(client)) {
-      create_client(name = client,
-                    api_token = api_token,
-                    workspace_id = workspace_id)
-      try(client_id <-
-            client_name_to_id(name = client, api_token = api_token, workspace_id = workspace_id))
-    } else{
-      client_id <- NULL
+    # client : existant -> son id ; inconnu -> cree une seule fois ; NULL / "" -> aucun
+    client_id <- NULL
+    if (!is.null(client) && nzchar(client)) {
+      client_id <- client_name_to_id(name = client, api_token = api_token, workspace_id = workspace_id)
+      if (length(client_id) == 0) {
+        client_id <- create_client(name = client, api_token = api_token,
+                                   workspace_id = workspace_id)$id
+      }
+      client_id <- client_id[1]
     }
-    
-    
-    info <- list(active=active,
-                 name = project_name ,
-                 # client_name = "client",
-                 is_private = FALSE, 
-                 project =
-                   list(color = color,
-                        active = active
-                   )
-    )
-    
-    
-    if (client != "" & !is.null(client)){
-      info$client <- client
-          }
-    
+
+    # corps au format v9 (champs a plat)
+    info <- list(name = project_name, active = active, is_private = private,
+                 color = color, client_id = client_id)
+    info <- info[!vapply(info, is.null, logical(1))]
+
     id <- toggl_request("POST",
                         glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects"),
                         api_token = api_token,

@@ -17,17 +17,21 @@ toggl_create_project(
 \arguments{
 \item{project_name}{project name}
 
-\item{api_token}{the toggl api token#'}
+\item{api_token}{the toggl api token}
 
 \item{workspace_id}{workspace_id}
 
-\item{client}{client name}
+\item{client}{client name: an existing client is reused, an unknown one is
+created; `NULL` or `""` for no client}
 
 \item{private}{whether project is accessible for only project users or for all workspace users (boolean, default false)}
 
-\item{color}{id of the color selected for the project}
+\item{color}{color of the project, as a hex code (e.g. "#06aaf5")}
 
 \item{active}{boolean set project as active, TRUE by default}
+}
+\value{
+the id of the project (created, or already existing)
 }
 \description{
 create a project
