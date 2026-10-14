@@ -35,15 +35,7 @@ toggl_start <- function(description = get_context(),
   formatted_time <- format_toggl_utc(start)
   
   
-  POST(
-    
-    glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries"),
-    # verbose(),
-    authenticate(api_token, "api_token")
-    ,
-    encode = "json"
-    ,
-    body = toJSON(list(
+  body <- toJSON(list(
       duration=-1,
         start = formatted_time,
         created_with = "togglr",
@@ -62,8 +54,7 @@ toggl_start <- function(description = get_context(),
       # )
     ),
     auto_unbox = TRUE)
-  )->ll 
-  ll %>% content()  %>% .$id -> id
+  id <- toggl_post_entry(body, description, api_token, workspace_id)
   
 
   if (!is.null(id)){
@@ -114,17 +105,16 @@ toggl_stop <- function(current=get_current(api_token = api_token),
     stop("i can't find any task to stop...")
     
   }
-  PATCH(
-   glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries/{current$id}/stop"),
-       # verbose(),
-       authenticate(api_token,"api_token"),
-       encode="json")
+  res <- toggl_request("PATCH",
+                       glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries/{current$id}/stop"),
+                       api_token = api_token)
   notification(
     title = paste(current$description," STOP")
     ,msg = c("duration :",
             pretty_dt(now() - ymd_hms(current$start))
     )
   )
+  invisible(res$content)
 
   
   
@@ -198,15 +188,7 @@ toggl_create <- function(
   
   
   
-  POST(
-    
-    glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries"),
-    # verbose(),
-    authenticate(api_token, "api_token")
-    ,
-    encode = "json"
-    ,
-    body = toJSON(list(
+  body <- toJSON(list(
       duration=duration,
       start = formatted_time,
       created_with = "togglr",
@@ -219,8 +201,7 @@ toggl_create <- function(
       # )
     ),
     auto_unbox = TRUE)
-  )->ll 
-  ll %>% content()  %>% .$id -> id
+  id <- toggl_post_entry(body, description, api_token, workspace_id)
   
   
   if (!is.null(id)){
@@ -252,4 +233,18 @@ toggl_create <- function(
 #' @noRd
 format_toggl_utc <- function(x) {
   format(with_tz(as.POSIXct(x), "UTC"), "%Y-%m-%dT%H:%M:%SZ")
+}
+
+#' Create a time entry; on failure, notify then raise the error of the API
+#' @noRd
+toggl_post_entry <- function(body, description, api_token, workspace_id) {
+  tryCatch(
+    toggl_request("POST",
+                  glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries"),
+                  api_token = api_token, body = body)$content$id,
+    error = function(e) {
+      notification(title = paste(description, " ERROR"), msg = c("NOT STARTED", conditionMessage(e)))
+      stop(e)
+    }
+  )
 }

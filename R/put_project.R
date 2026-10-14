@@ -62,18 +62,10 @@ toggl_create_project <- function(
       info$client <- client
           }
     
-    POST(
-      
-      glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects"),
-         authenticate(api_token,"api_token"),
-         encode="json",
-         body=toJSON(
-           info
-           
-           ,auto_unbox = TRUE)
-    ) ->ll
-    
-  ll  %>%  content()%>% .$id -> id
+    id <- toggl_request("POST",
+                        glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects"),
+                        api_token = api_token,
+                        body = toJSON(info, auto_unbox = TRUE))$content$id
 
   }
   

@@ -50,3 +50,19 @@ local_fresh_state <- function(env = parent.frame()) {
 
 # Simule un autre processus R : la memoire de session est perdue
 forget_session <- function() rm(list = ls(.togglr_env, all.names = TRUE), envir = .togglr_env)
+
+# File de reponses pour les ecritures (POST / PUT / PATCH / DELETE mockes)
+serve_write <- function(...) {
+  queue <- list(...)
+  calls <- 0
+  list(
+    send = function(url, ...) {
+      calls <<- calls + 1
+      if (calls > length(queue)) stop("unexpected extra call: ", url)
+      r <- queue[[calls]]
+      if (inherits(r, "error")) stop(r)
+      r
+    },
+    calls = function() calls
+  )
+}

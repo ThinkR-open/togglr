@@ -64,14 +64,10 @@ toggl_update_entries <- function(
   # Remove the null elements of the time_entry
   time_entry <- time_entry[!unlist(lapply(time_entry, is.null))]
 
- aa<- PUT(
-  glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries/{time_entry_ids}"),
-       authenticate(api_token,"api_token"),
-       encode="json",
-  body = toJSON(time_entry,
-  auto_unbox = TRUE)
-  )
- content(aa)
+  toggl_request("PUT",
+                glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries/{time_entry_ids}"),
+                api_token = api_token,
+                body = toJSON(time_entry, auto_unbox = TRUE))$content
  
 
 }

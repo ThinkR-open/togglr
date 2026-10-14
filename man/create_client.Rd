@@ -17,6 +17,9 @@ create_client(
 
 \item{workspace_id}{workspace id}
 }
+\value{
+the created client, as returned by the API (a list with its `id`)
+}
 \description{
 create a client
 }

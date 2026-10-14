@@ -36,6 +36,14 @@
 * `get_current_duration()` counts from the start of the running entry, not
   from its last edit (`at`); `get_project_total()` and
   `get_current_project_task_detail()` were affected (#53).
+* Every write (POST, PUT, PATCH) goes through `toggl_request()`, with the
+  policy of the reads: an error of the API is raised with its message (no more
+  "$ operator is invalid for atomic vectors"), the quota and 429 are respected.
+  A POST is never retried after a 5xx or a network error, as it may have been
+  processed. `toggl_start()` / `toggl_create()` notify then raise the error;
+  `toggl_stop()` only notifies STOP once the API accepted it. `create_client()`
+  now returns the created client (a list) instead of the raw httr response
+  (#54).
 
 # togglr 0.3.0
 

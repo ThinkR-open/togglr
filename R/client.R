@@ -5,8 +5,8 @@
 #' @param workspace_id workspace id
 #' @param api_token the toggl api token
 #'
+#' @return the created client, as returned by the API (a list with its `id`)
 #' @importFrom glue glue
-#' @importFrom httr POST authenticate
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON
 #' @examples 
@@ -21,18 +21,9 @@ create_client <- function(name = "wihtout client",
                           ){
 
 message(glue("we create the client : {name}"))
-POST(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),
-     authenticate(api_token,"api_token"),
-     encode="json",
-     body=toJSON(
-       list(
-         # client = list(
-         name = name,
-         wid = workspace_id
-       # )
-       ),
-       auto_unbox = TRUE)
-)  
+toggl_request("POST", glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),
+              api_token = api_token,
+              body = toJSON(list(name = name, wid = workspace_id), auto_unbox = TRUE))$content
 }
 
 

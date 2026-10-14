@@ -25,19 +25,56 @@
 #'   of blocking the session. Can be set with `options(togglr.max_wait = )`.
 #'
 #' @return a list with `content` (parsed body) and `headers`
-#' @importFrom httr GET authenticate content status_code headers http_status timeout
+#' @importFrom httr GET POST PUT PATCH DELETE authenticate content status_code headers http_status timeout
 #' @noRd
 toggl_GET <- function(url,
                       api_token = get_toggl_api_token(),
                       max_tries = 5,
                       max_wait = getOption("togglr.max_wait", 60)) {
+  toggl_call("GET", url, api_token = api_token, max_tries = max_tries, max_wait = max_wait)
+}
+
+#' Perform a write request (POST, PUT, PATCH, DELETE) on the Toggl API
+#'
+#' Same policy as [toggl_GET()] (quota, 429, errors raised with the message of
+#' the API), with one difference: a POST is not idempotent, so it is never
+#' retried after a 5xx or a network error, as it may have been processed. A 429
+#' is always retried: the request was refused, not processed.
+#'
+#' @param verb "POST", "PUT", "PATCH" or "DELETE"
+#' @param body request body (a JSON string)
+#' @inheritParams toggl_GET
+#' @return a list with `content` (parsed body, `NULL` for an empty answer) and
+#'   `headers`
+#' @noRd
+toggl_request <- function(verb, url,
+                          api_token = get_toggl_api_token(),
+                          body = NULL,
+                          max_tries = 5,
+                          max_wait = getOption("togglr.max_wait", 60)) {
+  verb <- match.arg(verb, c("POST", "PUT", "PATCH", "DELETE"))
+  toggl_call(verb, url, api_token = api_token, body = body,
+             max_tries = max_tries, max_wait = max_wait)
+}
+
+#' @noRd
+toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait) {
+  idempotent <- verb != "POST"
   for (try in seq_len(max_tries)) {
     toggl_wait_quota(max_wait, api_token)
-    resp <- tryCatch(toggl_http_get(url, api_token), error = function(e) e)
+    resp <- tryCatch(
+      if (verb == "GET") toggl_http_get(url, api_token) else toggl_http_send(verb, url, api_token, body),
+      error = function(e) e
+    )
 
     if (inherits(resp, "error")) {
       # timeout, DNS, connexion coupee... : traite comme un 5xx
       cause <- conditionMessage(resp)
+      if (!idempotent) {
+        stop("toggl API network error on ", verb, " ", sub("\\?.*$", "", url), ": ", cause,
+             ". Not retried: the request may have been processed, check before sending it again.",
+             call. = FALSE)
+      }
       if (try == max_tries) {
         stop("toggl API network error on ", sub("\\?.*$", "", url), " after ", max_tries,
              " attempts: ", cause, call. = FALSE)
@@ -50,8 +87,9 @@ toggl_GET <- function(url,
 
     status <- status_code(resp)
 
-    if (status == 200) {
-      return(list(content = content(resp), headers = headers(resp)))
+    if (status >= 200 && status < 300) {
+      return(list(content = if (status == 204 || !length(resp$content)) NULL else content(resp),
+                  headers = headers(resp)))
     }
 
     if (status == 402) {
@@ -67,7 +105,8 @@ toggl_GET <- function(url,
       next # toggl_wait_quota() waits for the reset, or fails, before any new request
     }
 
-    if (!(status == 429 || status >= 500) || try == max_tries) {
+    retryable <- status == 429 || (status >= 500 && idempotent)
+    if (!retryable || try == max_tries) {
       stop(toggl_error_message(resp, url), call. = FALSE)
     }
 
@@ -120,6 +159,13 @@ toggl_header_num <- function(resp, name) {
 toggl_http_get <- function(url, api_token) {
   GET(url, authenticate(api_token, "api_token"), timeout(getOption("togglr.timeout", 120)),
       encode = "json")
+}
+
+#' @noRd
+toggl_http_send <- function(verb, url, api_token, body) {
+  send <- switch(verb, POST = POST, PUT = PUT, PATCH = PATCH, DELETE = DELETE)
+  send(url, authenticate(api_token, "api_token"), timeout(getOption("togglr.timeout", 120)),
+       encode = "json", body = body)
 }
 
 #' @noRd
