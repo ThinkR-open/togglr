@@ -23,6 +23,9 @@ get_all_project_names(
 
 \item{user_ids}{optional, only the projects these users worked on}
 }
+\value{
+a character vector of the project names
+}
 \description{
 Get all project's names
 }

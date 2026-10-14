@@ -6,6 +6,9 @@
 \usage{
 open_toggl_website_app()
 }
+\value{
+invisibly, the result of [utils::browseURL()]
+}
 \description{
 open toggle.com website on timesheet page
 }

@@ -7,6 +7,7 @@
 #' @param user_agent user_agent
 #'
 #' @importFrom lubridate %m-%
+#' @return a tibble, one row per project: `pid`, `title` (`project`, `client`, `color`, `hex_color`), `totals` (8 values in ms: the 7 days, then the week; `NA` for 0) and `details` (the same per user)
 #' @export
 #' @importFrom lubridate years
 #' @importFrom dplyr bind_rows mutate

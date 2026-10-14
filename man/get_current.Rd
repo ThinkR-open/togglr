@@ -9,6 +9,9 @@ get_current(api_token = get_toggl_api_token())
 \arguments{
 \item{api_token}{the toggl api token}
 }
+\value{
+a list describing the running time entry (`id`, `description`, `start`, `project_id`...), or `NULL` when nothing is running
+}
 \description{
 retrieve current projet id
 }

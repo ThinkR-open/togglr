@@ -23,6 +23,9 @@ get_project_total(
 
 \item{until}{a date}
 }
+\value{
+the total time spent on the project, as text (e.g. "12:30:00"), the running entry included
+}
 \description{
 get project total time
 }

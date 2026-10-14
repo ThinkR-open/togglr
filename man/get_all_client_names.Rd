@@ -20,6 +20,9 @@ get_all_client_names(
 
 \item{until}{a date}
 }
+\value{
+a character vector of the client names, without duplicates
+}
 \description{
 get all client's name
 }

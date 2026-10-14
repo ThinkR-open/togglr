@@ -1,5 +1,6 @@
 #' open toggle.com website on profile page
 #'
+#' @return invisibly, the result of [utils::browseURL()]
 #' @export
 #' @importFrom utils browseURL
 #'
@@ -11,6 +12,7 @@ open_toggl_website_profile <- function(){
 
 #' open toggle.com website on timesheet page
 #'
+#' @return invisibly, the result of [utils::browseURL()]
 #' @export
 #' @importFrom utils browseURL
 #'

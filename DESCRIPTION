@@ -12,19 +12,21 @@ Description: Read and write time entries, projects and clients of the
     errors are raised, the hourly quota and rate limits are respected, and
     paginated reports are checked for completeness.
 License: GPL-3
+Depends:
+    R (>= 4.1.0)
 URL: https://github.com/ThinkR-open/togglr
 BugReports: https://github.com/ThinkR-open/togglr/issues
 Imports: 
     assertthat,
-    cachem,
-    dplyr,
-    filelock,
+    cachem (>= 1.0.0),
+    dplyr (>= 1.0.0),
+    filelock (>= 1.0.2),
     getPass,
     glue,
-    httr,
-    jsonlite,
+    httr (>= 1.4.0),
+    jsonlite (>= 1.7.0),
     keyring,
-    lubridate,
+    lubridate (>= 1.7.0),
     openssl,
     magrittr,
     parsedate,
@@ -41,7 +43,7 @@ Suggests:
     pkgload,
     rmarkdown,
     testthat (>= 3.1.7),
-    withr
+    withr (>= 2.5.0)
 VignetteBuilder: 
     knitr
 ByteCompile: true

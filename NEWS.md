@@ -1,5 +1,32 @@
 # togglr (development version, toward 1.0.0)
 
+## Breaking changes
+
+* Reports come from the Reports API v3 (#76): `get_summary_report()` items no
+  longer give `cur`, `sum` and `rate` (`NA`); entries without a visible project
+  are grouped under an `NA` id and name instead of "Private Project";
+  `get_detailled_report(user_agent = )` is ignored. The columns and types of
+  `get_detailled_report()` are unchanged.
+* `get_workspace_id()` returns the default workspace of the account, no longer
+  always the first one (#23).
+* `get_time_entries()` fails before any request for a period starting more
+  than 3 months ago (the API refused it anyway) (#13).
+* `create_client()` returns the created client (a list), no longer the httr
+  response (#54); `toggl_update_entries()` sends one PUT per entry and returns
+  the updated entry, or a list of them (#56).
+* A write refused by the API raises an error (#54); `toggl_start()` and
+  `toggl_create()` return `NA`, with a warning, when the API accepted the
+  entry but its answer could not be read.
+* `get_toggl_api_token()` fails, outside an interactive session, instead of
+  prompting, and never deletes the stored key (#51).
+* `set_toggl_api_token()` returns the token invisibly (#84).
+* `simplify()` is rewritten on the public API of jsonlite (#69).
+* `get_detailled_report()`: `cache = FALSE` by default, `max_page` and
+  `memoise_cache_dir` deprecated (#60, #67); a 7th positional argument now
+  goes to `cache`.
+
+## Other changes
+
 * `get_detailled_report()` reads Reports API v3 (`/search/time_entries`,
   enriched with the names of users, projects, clients and tags) instead of
   Reports v2, with the same columns and types. Pages of 1000 entries
@@ -39,6 +66,8 @@
 * Tests: coverage from 85 % to 91 %, a real multi-process test of
   `togglr.state_file`, no test depending on covr's instrumentation; new
   workflow measuring the coverage (#84, #32, #33).
+* DESCRIPTION declares `R (>= 4.1.0)` and the minimal versions of its
+  dependencies; the obsolete `inst/dependencies.R` is no longer shipped (#83).
 
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the
@@ -49,10 +78,6 @@
 * `get_detailled_report()` returns fixed column types (e.g. `task` is always
   text, `tid` integer), whatever the content of the page: periods over a year
   with an empty year no longer fail to combine (#46).
-* `get_detailled_report()` also compares the total duration (`total_grand`)
-  returned with each page: a deletion followed by an insertion during the
-  pagination, which leaves `total_count` unchanged, now triggers a new fetch
-  instead of returning a stale entry and missing another (#47).
 * New option `togglr.state_file`: the pacing of the reports calls and the
   knowledge of an exhausted quota are stored in that file, under a lock, and
   shared by every R process using it (callr / future / targets workers, cron
@@ -111,9 +136,6 @@
   `since` after `until` (#61).
 * Default periods ("one year ago") are computed with `%m-%`: they were `NA`
   on February 29th (#62).
-* `get_detailled_report_paged()` has the same default period as
-  `get_detailled_report()` (the last year, until today): it was three years,
-  beyond the one year limit of the reports API v2, until tomorrow (#63).
 * `options(togglr.min_interval)` (1 s by default) now spaces every request,
   reads and writes, retries included, not only the pages of the detailled
   report (#64).
@@ -149,29 +171,26 @@
   its own help page, the vignette installs from GitHub and no longer runs
   `install.packages()` during `R CMD check`. `R CMD check` is clean: 0 error,
   0 warning, 0 note (#74).
-* Fixes from the review of #75:
-  - `toggl_create_project()` (and so `toggl_start()` on a new project) works
-    again in a workspace without any client: `get_all_client_info()` returns
-    the `id` and `name` columns, even with no rows.
-  - The reports cache is kept per token (as a hash): a period fetched with one
-    token is no longer returned to another token of the same workspace.
-  - The spreading of the last requests of the quota waits at most `max_wait`,
-    with a message, and only slows down the token that is short of quota.
-  - The quota is remembered per token and per scope (the workspace or
-    organization of the url, or the user for `/me` and `/workspaces`): an
-    exhausted workspace no longer blocks `/me` or another workspace.
-  - A request processed by the API is returned even if its quota cannot be
-    recorded in the state file (warning): a time entry is no longer reported
-    as not started, then created twice.
-  - One pass on the state file per request instead of three, and a read no
-    longer rewrites it.
-  - In a period that includes today, the growth of `total_grand` caused by a
-    running timer between two pages is no longer taken for an edit.
-  - A time entry accepted by the API but whose answer cannot be read is
-    reported as started (with a warning, id `NA`), not as `NOT STARTED`.
-  - A state file that cannot be replaced is an error instead of a silently
-    lost update, and the temporary file is removed.
-  - Network errors are no longer retried when the backoff exceeds `max_wait`.
+* `toggl_create_project()` (and so `toggl_start()` on a new project) works
+  again in a workspace without any client: `get_all_client_info()` returns
+  the `id` and `name` columns, even with no rows (review of #75).
+* The reports cache is kept per token (as a hash): a period fetched with one
+  token is no longer returned to another token of the same workspace (review of #75).
+* The spreading of the last requests of the quota waits at most `max_wait`,
+  with a message, and only slows down the token that is short of quota (review of #75).
+* The quota is remembered per token and per scope (the workspace or
+  organization of the url, or the user for `/me` and `/workspaces`): an
+  exhausted workspace no longer blocks `/me` or another workspace (review of #75).
+* A request processed by the API is returned even if its quota cannot be
+  recorded in the state file (warning): a time entry is no longer reported
+  as not started, then created twice (review of #75).
+* One pass on the state file per request instead of three, and a read no
+  longer rewrites it (review of #75).
+* A time entry accepted by the API but whose answer cannot be read is
+  reported as started (with a warning, id `NA`), not as `NOT STARTED` (review of #75).
+* A state file that cannot be replaced is an error instead of a silently
+  lost update, and the temporary file is removed (review of #75).
+* Network errors are no longer retried when the backoff exceeds `max_wait` (review of #75).
 
 # togglr 0.3.0
 

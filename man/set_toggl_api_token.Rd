@@ -9,6 +9,9 @@ set_toggl_api_token(token)
 \arguments{
 \item{token}{toggl api token}
 }
+\value{
+invisibly, the token stored (or `NULL` when nothing was typed)
+}
 \description{
 set the toggle api token
 }

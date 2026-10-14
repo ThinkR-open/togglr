@@ -12,6 +12,9 @@ clean_memoise_cache(
 \arguments{
 \item{memoise_cache_dir}{folder to remove}
 }
+\value{
+invisibly, the result of [unlink()] (0 for success)
+}
 \description{
 Deprecated: togglr no longer memoises. Removes the cache folder of togglr
 0.2.x (and the reports cache it contains). Use [clean_cache()].

@@ -27,6 +27,9 @@ get_summary_report(
 
 \item{users}{users}
 }
+\value{
+a tibble, one row per user: `id`, `user` (full name), `time` (ms) and `items` (a data frame of the user's time entries: `title`, `time` in ms, `local_start`; `cur`, `sum` and `rate` are `NA` since Reports v3)
+}
 \description{
 by user then projet
 }

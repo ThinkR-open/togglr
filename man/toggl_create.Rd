@@ -32,12 +32,15 @@ toggl_create(
 
 \item{workspace_id}{workspace id}
 }
+\value{
+invisibly, the id of the created time entry (`NA`, with a warning, when the API accepted it but its answer could not be read)
+}
 \description{
 create a time entry
 }
 \examples{
 \dontrun{
-options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
+set_toggl_api_token() # once, stores your token in the keyring
 toggl_create(duration=1200)
 
 toggl_create( description="description",

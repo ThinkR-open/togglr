@@ -14,6 +14,9 @@ get_project_id_and_name(
 
 \item{workspace_id}{workspace id}
 }
+\value{
+a tibble with `id`, `project_name` and `active`
+}
 \description{
 retrieve project id and name
 }

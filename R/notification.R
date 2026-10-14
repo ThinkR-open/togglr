@@ -4,6 +4,7 @@
 #' @param title title of the notificatin
 #' @param msg content of the notification
 #'
+#' @return invisibly, `NULL`; called for its message
 #' @export
 #'
 notification <- function(title,msg){

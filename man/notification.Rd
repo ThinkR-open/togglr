@@ -11,6 +11,9 @@ notification(title, msg)
 
 \item{msg}{content of the notification}
 }
+\value{
+invisibly, `NULL`; called for its message
+}
 \description{
 show notification using message
 }

@@ -3,10 +3,10 @@
 # Noms des utilisateurs, projets et clients (recherches v9 simulees)
 local_names <- function(env = parent.frame()) {
   local_mocked_bindings(
-    get_workspace_users = function(...) tibble::tibble(id = c(10L, 20L), fullname = c("Alice", "Bob")),
-    get_all_projects = function(...) tibble::tibble(id = c(1L, 2L), name = c("presta_a", "presta_b"),
+    get_workspace_users = function(...) dplyr::tibble(id = c(10L, 20L), fullname = c("Alice", "Bob")),
+    get_all_projects = function(...) dplyr::tibble(id = c(1L, 2L), name = c("presta_a", "presta_b"),
                                                     client_id = c(5L, NA), color = c("#06aaf5", "#d94182")),
-    get_all_client_info = function(...) tibble::tibble(id = 5L, name = "acme"),
+    get_all_client_info = function(...) dplyr::tibble(id = 5L, name = "acme"),
     .env = env
   )
 }

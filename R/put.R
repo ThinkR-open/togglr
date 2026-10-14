@@ -20,6 +20,7 @@
 #' get_toggl_api_token()# set your api token here
 #' toggl_start()
 #' }
+#' @return invisibly, the id of the started time entry (`NA`, with a warning, when the API accepted it but its answer could not be read)
 #' @export
 toggl_start <- function(description = get_context(),
                         client = "without client",
@@ -87,10 +88,11 @@ toggl_start <- function(description = get_context(),
 #' @importFrom prettyunits pretty_dt
 #' @examples 
 #' \dontrun{
-#' options(toggl_api_token = "XXXXXXXX")# set your api token here
+#' set_toggl_api_token() # once, stores your token in the keyring
 #' toggl_start()
 #' toggl_stop()
 #' }
+#' @return invisibly, the stopped time entry, as returned by the API
 #' @export
 toggl_stop <- function(current=get_current(api_token = api_token),
                        api_token=get_toggl_api_token(),
@@ -140,7 +142,7 @@ toggl_stop <- function(current=get_current(api_token = api_token),
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
-#' options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
+#' set_toggl_api_token() # once, stores your token in the keyring
 #' toggl_create(duration=1200)
 #' 
 #'toggl_create( description="description",
@@ -154,6 +156,7 @@ toggl_stop <- function(current=get_current(api_token = api_token),
 #' 
 #' 
 #' }
+#' @return invisibly, the id of the created time entry (`NA`, with a warning, when the API accepted it but its answer could not be read)
 #' @export
 toggl_create <- function(
   description=get_context(),

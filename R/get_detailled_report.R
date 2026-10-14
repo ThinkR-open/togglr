@@ -364,6 +364,7 @@ toggl_cache_dir <- function() {
 #' Removes the periods stored by `get_detailled_report(cache = TRUE)`.
 #'
 #' @param cache_dir folder of the cache
+#' @return invisibly, the result of [unlink()] (0 for success)
 #' @export
 #' @examples
 #' \dontrun{
@@ -379,6 +380,7 @@ clean_cache <- function(cache_dir = toggl_cache_dir()) {
 #' 0.2.x (and the reports cache it contains). Use [clean_cache()].
 #'
 #' @param memoise_cache_dir folder to remove
+#' @return invisibly, the result of [unlink()] (0 for success)
 #' @export
 #' @examples
 #' \dontrun{

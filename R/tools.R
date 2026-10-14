@@ -4,6 +4,7 @@
 #' @importFrom magrittr %>% 
 #' @importFrom  keyring key_set_with_value
 #' @importFrom keyring key_get key_set_with_value key_delete
+#' @return the token (a character string), or `NULL` when there is none and `ask = FALSE`
 #' @export
 get_toggl_api_token <- function(ask=TRUE){
   # never delete the stored key here: a locked keyring (cron) also makes
@@ -32,6 +33,7 @@ is_interactive <- function() interactive()
 #' @param token toggl api token
 #' @importFrom magrittr %>% 
 #' @importFrom assertthat assert_that is.string
+#' @return invisibly, the token stored (or `NULL` when nothing was typed)
 #' @export
 set_toggl_api_token <- function(token){
   if ( missing(token) ){
@@ -49,6 +51,7 @@ set_toggl_api_token <- function(token){
 #' update_toggl_api_token
 #' @description  update the toggle api token
 #' @importFrom magrittr %>% 
+#' @return invisibly, the new token, or `NULL` when the input was cancelled (the stored token is then kept)
 #' @export
 update_toggl_api_token <- function(){
   # demander d'abord : une saisie annulee garde le token actuel
@@ -62,6 +65,7 @@ update_toggl_api_token <- function(){
 
 #' @title delete_toggl_api_token
 #' @description  delete the toggle api token
+#' @return invisibly, `NULL` or the error caught when there was no key
 #' @export
 delete_toggl_api_token <- function(){
   try(key_delete("toggl_api_token"),silent=TRUE)
@@ -71,6 +75,7 @@ delete_toggl_api_token <- function(){
 #' ask_toggl_api_token
 #' @param msg the message
 #' @description  ask for the toggle api token
+#' @return the token typed by the user, or `NULL` when nothing was typed
 #' @export
 ask_toggl_api_token <- function (msg="toggl api token") 
 {
@@ -92,6 +97,7 @@ ask_toggl_api_token <- function (msg="toggl api token")
 #' @return time in iso 8601
 #'
 #' @param time a POSIXt
+#' @noRd
 correct_date <- function(time){
   if (! is.null(time)) {
     tm <- strftime(time, "%Y-%m-%dT%H:%M:%S")

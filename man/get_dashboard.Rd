@@ -25,6 +25,9 @@ get_dashboard(
 \item{user_ids}{optional, ids of the users whose time is counted (all by
 default)}
 }
+\value{
+an object of class `toggl`: a list with `synthese` (one row per project: `id`, `project`, `client`, `time` in ms) and `tache` (per project, a data frame of its time entries: `title`, `time` in ms, `local_start`)
+}
 \description{
 get all data from <https://toggl.com>
 }

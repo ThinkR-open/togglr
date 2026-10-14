@@ -9,6 +9,9 @@ clean_cache(cache_dir = toggl_cache_dir())
 \arguments{
 \item{cache_dir}{folder of the cache}
 }
+\value{
+invisibly, the result of [unlink()] (0 for success)
+}
 \description{
 Removes the periods stored by `get_detailled_report(cache = TRUE)`.
 }

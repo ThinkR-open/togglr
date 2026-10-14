@@ -16,7 +16,7 @@
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
-#' options(toggl_api_token = "XXXXXXXX")# set your toggl api token here
+#' set_toggl_api_token() # once, stores your token in the keyring
 #' time_entry_id <- toggl_create(duration=1200)
 #' 
 #' toggl_update_entries( time_entry_id,

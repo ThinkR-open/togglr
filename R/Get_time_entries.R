@@ -9,7 +9,7 @@
 #'   `client_name`. The endpoint goes back at most 3 months: for an older
 #'   period, use [get_detailled_report()] with `user_ids`.
 #' @export
-#' @importFrom lubridate years months %m-%
+#' @importFrom lubridate years %m-%
 #' @importFrom dplyr select mutate case_when slice everything left_join arrange desc bind_rows %>% 
 #' @importFrom stats setNames
 #' @importFrom purrr map_df
@@ -25,7 +25,7 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
                              until = Sys.time(),
                              workspace_id = get_workspace_id(api_token)) {
   # l'API v9 refuse un debut a plus de 3 mois : le dire avant toute requete
-  limit <- toggl_today() %m-% months(3)
+  limit <- toggl_today() %m-% lubridate::period(3, "months")
   if (as.Date(format(since, "%Y-%m-%d")) < limit) {
     stop("get_time_entries() reads /me/time_entries, which does not go back more than 3 months ",
          "(not before ", format(limit), "). For an older period, use ",

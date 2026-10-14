@@ -8,6 +8,7 @@
 #' @param until stop date
 #'
 #' @importFrom lubridate %m-%
+#' @return an object of class `toggl`: a list with `synthese` (one row per project: `id`, `project`, `client`, `time` in ms) and `tache` (per project, a data frame of its time entries: `title`, `time` in ms, `local_start`)
 #' @export
 #' @importFrom lubridate years
 #' @importFrom  dplyr select any_of
@@ -72,6 +73,7 @@ n_to_tps <- function(n) {
 #' @param until a date
 #' @importFrom dplyr pull
 #'
+#' @return the total time spent on the project, as text (e.g. "12:30:00"), the running entry included
 #' @export
 #'
 get_project_total <- function(project_name = get_context_project(),
@@ -101,6 +103,7 @@ get_project_total <- function(project_name = get_context_project(),
 #' @param user_ids optional, only the projects these users worked on
 #' @param until a date
 #'
+#' @return a character vector of the project names
 #' @export
 #'
 
@@ -130,6 +133,7 @@ get_all_project_names <- function(api_token = get_toggl_api_token(),
 #' @param until a date
 #'
 
+#' @return a character vector of the client names, without duplicates
 #' @export
 #'
 get_all_client_names <- function(api_token = get_toggl_api_token(),
@@ -157,6 +161,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 #' @param humain boolean humain readable time
 #'
 
+#' @return a data frame of the tasks of the project (`title`, `time`...), the running entry included
 #' @export
 #' @importFrom dplyr mutate case_when full_join tribble
 #' @importFrom lubridate years
@@ -233,6 +238,7 @@ get_current_project_task_detail <-
 #'
 #' @param df a data.frame
 #'
+#' @return the data frame, with `time` as a readable duration
 #' @export
 to_humain <- function(df){
   df %>% mutate(time = n_to_tps(time))

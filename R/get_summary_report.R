@@ -10,6 +10,7 @@
 #' @param users users
 #'
 #' @importFrom lubridate %m-%
+#' @return a tibble, one row per user: `id`, `user` (full name), `time` (ms) and `items` (a data frame of the user's time entries: `title`, `time` in ms, `local_start`; `cur`, `sum` and `rate` are `NA` since Reports v3)
 #' @export
 #' @importFrom glue glue
 #' @importFrom lubridate years

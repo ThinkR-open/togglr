@@ -24,6 +24,9 @@ get_weekly_report(
 
 \item{user_agent}{user_agent}
 }
+\value{
+a tibble, one row per project: `pid`, `title` (`project`, `client`, `color`, `hex_color`), `totals` (8 values in ms: the 7 days, then the week; `NA` for 0) and `details` (the same per user)
+}
 \description{
 get weekly report
 }

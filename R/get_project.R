@@ -10,6 +10,7 @@
 #'
 #' @importFrom httr GET authenticate content
 #' @importFrom dplyr bind_rows filter
+#' @return the id of the project, or `NULL` when it does not exist (and is not created)
 #' @export
 get_project_id <- function(project_name = get_context_project(),
          api_token = get_toggl_api_token(),
@@ -70,6 +71,7 @@ get_project_id <- function(project_name = get_context_project(),
 #'
 #' @importFrom httr GET authenticate content
 #' @importFrom dplyr bind_rows filter rename select
+#' @return a tibble with `id`, `project_name` and `active`
 #' @export
 get_project_id_and_name <- function(
                            api_token = get_toggl_api_token(),

@@ -26,6 +26,9 @@ get_current_project_task_detail(
 
 \item{humain}{boolean humain readable time}
 }
+\value{
+a data frame of the tasks of the project (`title`, `time`...), the running entry included
+}
 \description{
 get all task from a project
 }
