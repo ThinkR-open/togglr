@@ -177,3 +177,21 @@ test_that("several years give one chunk per calendar year, none longer than a ye
   expect_equal(asked(), c("2015-06-01 2015-12-31", "2016-01-01 2016-12-31", "2017-01-01 2017-12-31"))
   expect_equal(nrow(out), 3)
 })
+
+# ---- M2 (#60) : max_page deprecie -------------------------------------------------
+
+test_that("max_page warns that it is ignored, and is ignored (#60)", {
+  local_fresh_state()
+  srv <- serve(fake_response(200, report_page(1:50, total = 60)),
+               fake_response(200, report_page(51:60, total = 60)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_warning(out <- suppressMessages(report(max_page = 1)), "max_page.*deprecated")
+  expect_equal(nrow(out), 60)
+})
+
+test_that("no warning without max_page (#60)", {
+  local_fresh_state()
+  srv <- serve(fake_response(200, report_page(1:3, total = 3)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_no_warning(suppressMessages(report()))
+})

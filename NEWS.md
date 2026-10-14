@@ -62,6 +62,8 @@
   the API returns the same page twice, or after `options(togglr.max_pages)`
   pages (100 by default), instead of spending the quota in an endless loop
   (#59).
+* `get_detailled_report(max_page = )` now warns that the argument is
+  deprecated and ignored (#60).
 
 # togglr 0.3.0
 

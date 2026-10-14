@@ -96,6 +96,11 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  max_page = NULL,
                                  cache = FALSE,
                                  memoise_cache_dir = getOption("togglr_memoise_dir", default = rappdirs::user_cache_dir("togglr"))) {
+  if (!is.null(max_page)) {
+    warning("`max_page` is deprecated and ignored: the number of pages comes from ",
+            "the total_count returned by the API.", call. = FALSE)
+  }
+
   # Reports v2 refuse plus d'un an : au-dela de 365 jours d'ecart, decoupage par
   # annee civile (une annee civile, meme bissextile, part en une fois)
   if (year(since) != year(until) && difftime(until, since, units = "days") >= 365) {
