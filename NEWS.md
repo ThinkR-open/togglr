@@ -1,5 +1,16 @@
 # togglr (development version, toward 1.0.0)
 
+* `get_detailled_report()` reads Reports API v3 (`/search/time_entries`,
+  enriched with the names of users, projects, clients and tags) instead of
+  Reports v2, with the same columns and types. Pages of 1000 entries
+  (`options(togglr.page_size)`) instead of 50: a month of a team of 20 is read
+  in one or two requests. The period is checked against the total duration of
+  `/search/time_entries/totals`, equal before and after the pagination and,
+  up to the rounding of the API (1 s per entry), to the sum of the entries.
+  This replaces the `total_grand` tolerance for running timers, which could
+  hide a deletion followed by an insertion (#76, #77). New argument
+  `user_ids`. `user_agent` is ignored.
+
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the
   `Authorization` header (#50).

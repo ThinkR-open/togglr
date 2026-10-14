@@ -13,7 +13,8 @@ get_detailled_report(
   max_page = NULL,
   cache = FALSE,
   cache_dir = toggl_cache_dir(),
-  memoise_cache_dir = NULL
+  memoise_cache_dir = NULL,
+  user_ids = NULL
 )
 }
 \arguments{
@@ -26,10 +27,10 @@ get_detailled_report(
 
 \item{until}{end date (included), same formats; today by default}
 
-\item{user_agent}{user agent sent to the reports API}
+\item{user_agent}{ignored since the move to Reports v3 (the user agent is
+sent in the header of every request)}
 
-\item{max_page}{deprecated, ignored: the number of pages is now computed
-from the `total_count` returned by the API.}
+\item{max_page}{deprecated, ignored: every page is read.}
 
 \item{cache}{logical. If `TRUE`, a period fully fetched and checked is
 stored on disk and returned as is by later calls with the same `since` /
@@ -41,6 +42,9 @@ Toggl will not be seen. Failures are never cached. Default `FALSE`.}
 `rappdirs::user_cache_dir("togglr")`}
 
 \item{memoise_cache_dir}{deprecated, use `cache_dir`}
+
+\item{user_ids}{optional, ids of the users whose entries are wanted (all
+the users of the workspace by default)}
 }
 \value{
 a tibble, one row per time entry, with fixed column types (see
@@ -48,7 +52,7 @@ a tibble, one row per time entry, with fixed column types (see
 }
 \description{
 Downloads the time entries of the workspace between `since` and `until`
-(both included) from the reports API v2, all pages included.
+(both included) from the reports API v3, all pages included.
 }
 \details{
 Columns: `id`, `pid`, `tid`, `uid`, `description`, `start`, `end`,
@@ -57,15 +61,16 @@ Columns: `id`, `pid`, `tid`, `uid`, `description`, `start`, `end`,
   `billable`, `is_billable`, `cur`, `tags` (list), then any column added by
   the API.
 
-  All the pages of the period are fetched, then the number of
-  distinct entries is checked against the `total_count` announced by the
-  API. If entries are added, removed or edited while paginating (detected by
-  a change of `total_count` or of the total duration `total_grand` returned
-  with each page), the period is fetched again, up to
-  `options(togglr.report_attempts)` reads in all (3 by default); if the
-  result is still incomplete, an error is raised.
-  An HTTP error (quota, server error, authentication) raises an error too:
-  the function never returns a silently truncated period.
+  The entries come from Reports v3 (`/search/time_entries`, enriched with
+  the names of users, projects, clients and tags), with large pages
+  (`options(togglr.page_size)`, 1000 by default).
+  The period is checked against the total duration announced by the API
+  before and after the pagination; if entries were added, removed or
+  edited meanwhile, the period is fetched again, up to
+  `options(togglr.report_attempts)` reads in all (3 by default), then an
+  error is raised. A running entry is left out. An HTTP error (quota, server
+  error, authentication) raises an error too: the function never returns a
+  silently truncated period.
 
   Periods longer than a year (365 days or more between `since` and
   `until`, across a new year) are split by calendar year.

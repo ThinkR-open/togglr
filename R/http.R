@@ -47,6 +47,9 @@ toggl_GET <- function(url,
 #'
 #' @param verb "POST", "PUT", "PATCH" or "DELETE"
 #' @param body request body (a JSON string)
+#' @param idempotent `TRUE` for a request that can safely be sent twice (PUT,
+#'   PATCH, DELETE, and the read-only searches of the reports API): it is then
+#'   retried after a 5xx or a network error
 #' @inheritParams toggl_GET
 #' @return a list with `content` (parsed body, `NULL` for an empty answer) and
 #'   `headers`
@@ -55,15 +58,16 @@ toggl_request <- function(verb, url,
                           api_token = get_toggl_api_token(),
                           body = NULL,
                           max_tries = 5,
-                          max_wait = getOption("togglr.max_wait", 60)) {
+                          max_wait = getOption("togglr.max_wait", 60),
+                          idempotent = verb != "POST") {
   verb <- match.arg(verb, c("POST", "PUT", "PATCH", "DELETE"))
   toggl_call(verb, url, api_token = api_token, body = body,
-             max_tries = max_tries, max_wait = max_wait)
+             max_tries = max_tries, max_wait = max_wait, idempotent = idempotent)
 }
 
 #' @noRd
-toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait) {
-  idempotent <- verb != "POST"
+toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait,
+                       idempotent = verb != "POST") {
   scope <- toggl_quota_scope(url)
   for (try in seq_len(max_tries)) {
     # quota connu, etalement et espacement : chaque envoi, relances comprises,

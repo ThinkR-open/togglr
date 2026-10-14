@@ -1,39 +1,3 @@
-#' One page of the detailled report (internal)
-#'
-#' @return a tibble of the page entries, with attributes `total_count`,
-#'   `per_page` and `total_grand` as returned by the API
-#' @importFrom glue glue
-#' @importFrom lubridate years
-#' @importFrom dplyr select left_join as_tibble
-#' @importFrom stats setNames
-#' @importFrom purrr map
-#' @encoding UTF-8
-#' @noRd
-get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
-                                       workspace_id = get_workspace_id(api_token),
-                                       since = toggl_today() %m-% lubridate::years(1),
-                                       until = toggl_today(),
-                                       page = 1,
-                                       user_agent = toggl_user_agent()) {
-  # since / until : des Date deja validees par get_detailled_report()
-  url <- glue("https://api.track.toggl.com/reports/api/v2/details?workspace_id={workspace_id}&since={since}&until={until}&user_agent={utils::URLencode(user_agent, reserved = TRUE)}&grouping=users&page={page}",
-              since = format(since, "%Y-%m-%dT00:00:00"),
-              until = format(until, "%Y-%m-%dT00:00:00")
-  )
-  wp <- toggl_GET(url, api_token = api_token)$content
-
-  if (is.null(wp$total_count) || is.null(wp$per_page)) {
-    stop("unexpected answer from the toggl reports API (no total_count/per_page) for page ",
-         page, " of ", format(since), " -> ", format(until), ".", call. = FALSE)
-  }
-
-  out <- normalize_detailled_report(as_tibble(togglr::simplify(wp$data, simplifyDataFrame = TRUE)))
-  attr(out, "total_count") <- wp$total_count
-  attr(out, "per_page") <- wp$per_page
-  attr(out, "total_grand") <- wp$total_grand # somme des durees de la periode, NULL si absente
-  out
-}
-
 #' Wait so that two requests to the API (reads, writes, retries) are at least
 #' `min_interval` seconds apart (1 s is the documented rate limit; a larger
 #' value spreads a long extraction to spare the hourly quota).
@@ -99,19 +63,21 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
 #' Detailled report: every time entry of a period
 #'
 #' Downloads the time entries of the workspace between `since` and `until`
-#' (both included) from the reports API v2, all pages included.
+#' (both included) from the reports API v3, all pages included.
 #'
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id
 #' @param since begin date (included): a `Date`, a date-time or a text
 #'   "AAAA-MM-JJ"; one year ago by default
 #' @param until end date (included), same formats; today by default
-#' @param user_agent user agent sent to the reports API
+#' @param user_agent ignored since the move to Reports v3 (the user agent is
+#'   sent in the header of every request)
+#' @param user_ids optional, ids of the users whose entries are wanted (all
+#'   the users of the workspace by default)
 #' @return a tibble, one row per time entry, with fixed column types (see
 #'   Details); 0 rows for an empty period
 #' @export
-#' @param max_page deprecated, ignored: the number of pages is now computed
-#'   from the `total_count` returned by the API.
+#' @param max_page deprecated, ignored: every page is read.
 #' @param cache logical. If `TRUE`, a period fully fetched and checked is
 #'   stored on disk and returned as is by later calls with the same `since` /
 #'   `until`. Only use it for closed periods: entries created or edited later in
@@ -126,15 +92,16 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
 #'   `billable`, `is_billable`, `cur`, `tags` (list), then any column added by
 #'   the API.
 #'
-#'   All the pages of the period are fetched, then the number of
-#'   distinct entries is checked against the `total_count` announced by the
-#'   API. If entries are added, removed or edited while paginating (detected by
-#'   a change of `total_count` or of the total duration `total_grand` returned
-#'   with each page), the period is fetched again, up to
-#'   `options(togglr.report_attempts)` reads in all (3 by default); if the
-#'   result is still incomplete, an error is raised.
-#'   An HTTP error (quota, server error, authentication) raises an error too:
-#'   the function never returns a silently truncated period.
+#'   The entries come from Reports v3 (`/search/time_entries`, enriched with
+#'   the names of users, projects, clients and tags), with large pages
+#'   (`options(togglr.page_size)`, 1000 by default).
+#'   The period is checked against the total duration announced by the API
+#'   before and after the pagination; if entries were added, removed or
+#'   edited meanwhile, the period is fetched again, up to
+#'   `options(togglr.report_attempts)` reads in all (3 by default), then an
+#'   error is raised. A running entry is left out. An HTTP error (quota, server
+#'   error, authentication) raises an error too: the function never returns a
+#'   silently truncated period.
 #'
 #'   Periods longer than a year (365 days or more between `since` and
 #'   `until`, across a new year) are split by calendar year.
@@ -147,37 +114,38 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  max_page = NULL,
                                  cache = FALSE,
                                  cache_dir = toggl_cache_dir(),
-                                 memoise_cache_dir = NULL) {
+                                 memoise_cache_dir = NULL,
+                                 user_ids = NULL) {
   if (!is.null(memoise_cache_dir)) {
     warning("`memoise_cache_dir` is deprecated, use `cache_dir`.", call. = FALSE)
     cache_dir <- memoise_cache_dir
   }
   read_toggl_period()
   if (!is.null(max_page)) {
-    warning("`max_page` is deprecated and ignored: the number of pages comes from ",
-            "the total_count returned by the API.", call. = FALSE)
+    warning("`max_page` is deprecated and ignored: every page is read.", call. = FALSE)
   }
 
-  # Reports v2 refuse plus d'un an : au-dela de 365 jours d'ecart, decoupage par
+  # Reports v3 refuse plus de 366 jours : au-dela de 365 jours d'ecart, decoupage par
   # annee civile (une annee civile, meme bissextile, part en une fois)
   if (year(since) != year(until) && difftime(until, since, units = "days") >= 365) {
     return(bind_rows(
       get_detailled_report(api_token = api_token, workspace_id = workspace_id,
                            since = dmy(glue("0101{year(until)}")), until = until,
                            user_agent = user_agent, cache = cache,
-                           cache_dir = cache_dir),
+                           cache_dir = cache_dir, user_ids = user_ids),
       get_detailled_report(api_token = api_token, workspace_id = workspace_id,
                            since = since, until = dmy(glue("0101{year(until)}")) - days(1),
                            user_agent = user_agent, cache = cache,
-                           cache_dir = cache_dir)
+                           cache_dir = cache_dir, user_ids = user_ids)
     ))
   }
 
   if (isTRUE(cache)) {
     cd <- cachem::cache_disk(dir = cache_dir)
     # par token : deux tokens d'un workspace ne voient pas forcement les memes entrees
-    key <- paste("detailled", toggl_token_hash(api_token), workspace_id,
-                 format(since, "%Y%m%d"), format(until, "%Y%m%d"), sep = "_")
+    key <- paste("detailled_v3", toggl_token_hash(api_token), workspace_id,
+                 format(since, "%Y%m%d"), format(until, "%Y%m%d"),
+                 paste(sort(user_ids), collapse = "-"), sep = "_")
     cached <- cd$get(key)
     if (!cachem::is.key_missing(cached)) {
       return(cached)
@@ -186,7 +154,7 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
 
   message("toggl detailled report ", format(since), " -> ", format(until))
   out <- fetch_detailled_period(api_token = api_token, workspace_id = workspace_id,
-                                since = since, until = until, user_agent = user_agent)
+                                since = since, until = until, user_ids = user_ids)
 
   if (nrow(out) == 0) {
     out <- empty_detailled_report()
@@ -197,51 +165,63 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
   out
 }
 
-#' Fetch every page of one period and check it is complete
+#' Fetch one period from Reports v3 and check it is complete
+#'
+#' `/search/time_entries` is paginated with `X-Next-Row-Number` (sent back as
+#' `first_row_number`). The period is complete when the total duration announced by
+#' `/search/time_entries/totals` is the same before and after the pagination
+#' and equals the sum of the entries received. A running entry (no `stop`) is
+#' left out, as in Reports v2; its growth between the two totals is tolerated,
+#' and only its.
 #' @noRd
 fetch_detailled_period <- function(api_token, workspace_id, since, until,
-                                   user_agent,
+                                   user_agent = NULL, user_ids = NULL,
                                    attempts = getOption("togglr.report_attempts", 3)) {
-  # un timer en cours fait grandir total_grand d'une page a l'autre si la
-  # periode contient aujourd'hui : tolerer cette hausse, pas plus
-  open <- until >= toggl_today()
+  base <- list(start_date = format(since, "%Y-%m-%d"), end_date = format(until, "%Y-%m-%d"))
+  if (length(user_ids)) base$user_ids <- as.list(user_ids)
+  max_pages <- getOption("togglr.max_pages", 100)
+
   for (attempt in seq_len(attempts)) {
     started <- Sys.time()
-    first <- get_detailled_report_paged(api_token = api_token, workspace_id = workspace_id,
-                                        since = since, until = until,
-                                        user_agent = user_agent, page = 1)
-    total <- attr(first, "total_count")
-    # Signature de la periode, renvoyee avec chaque page : une suppression suivie
-    # d'une insertion laisse total_count inchange mais modifie la somme des durees
-    grand <- attr(first, "total_grand")
-    n_users <- max(1, length(unique(first$uid)))
-    n_pages <- max(1, ceiling(total / attr(first, "per_page")))
-
-    res <- list(first)
-    moved <- FALSE
-    for (page in seq_len(n_pages)[-1]) {
-      res[[page]] <- get_detailled_report_paged(api_token = api_token, workspace_id = workspace_id,
-                                                since = since, until = until,
-                                                user_agent = user_agent, page = page)
-      elapsed_ms <- 1000 * as.numeric(difftime(Sys.time(), started, units = "secs"))
-      if (!identical(attr(res[[page]], "total_count"), total) ||
-          !same_total_grand(attr(res[[page]], "total_grand"), grand,
-                            growth_ms = if (open) (elapsed_ms + 1000) * n_users else 0)) {
-        moved <- TRUE
-        break
+    before <- toggl_report_totals(workspace_id, api_token, base)
+    rows <- list()
+    cursor <- list()
+    for (page in seq_len(max_pages + 1)) {
+      if (page > max_pages) {
+        stop("more than ", max_pages, " pages in the toggl detailled report for ", format(since),
+             " -> ", format(until), " (option togglr.max_pages): stopping.", call. = FALSE)
       }
+      body <- c(base, list(page_size = as.integer(getOption("togglr.page_size", 1000)),
+                           enrich_response = TRUE), cursor)
+      resp <- toggl_report_post("/search/time_entries", workspace_id, api_token, body)
+      rows <- c(rows, resp$content)
+      # page suivante par son numero de ligne : avec first_id / first_timestamp,
+      # l'API renvoie une page vide (constate le 14/10/2026) ; un mouvement pendant
+      # la pagination est detecte par les totaux
+      next_row <- resp$headers[["x-next-row-number"]]
+      if (is.null(next_row) || !nzchar(next_row)) break
+      cursor <- list(first_row_number = as.numeric(next_row))
     }
+    after <- toggl_report_totals(workspace_id, api_token, base)
 
-    out <- bind_rows(res)
-    if (nrow(out) > 0) {
-      # une entree vue deux fois (modifiee entre deux pages) : garder la version
-      # la plus recente ; l'ordre d'origine est conserve sinon
-      updated <- suppressWarnings(lubridate::ymd_hms(out$updated, quiet = TRUE))
-      recent <- order(updated, decreasing = TRUE, method = "radix", na.last = TRUE)
-      keep <- sort(recent[!duplicated(out$id[recent])])
-      out <- out[keep, ]
-    }
-    if (!moved && nrow(out) == total) {
+    entries <- v3_rows_to_entries(rows)
+    running <- is.na(entries$end)
+    out <- entries[!running, ]
+    received <- sum(out$dur) / 1000
+    running_s <- sum(entries$dur[running]) / 1000
+    elapsed <- as.numeric(difftime(Sys.time(), started, units = "secs"))
+    # un timer en cours grandit avec l'horloge : tolerer sa seule croissance
+    growth <- if (any(running)) (elapsed + 1) * sum(running) else 0
+    stable <- after >= before && after - before <= growth
+    # les totaux arrondissent la somme exacte (ms), la recherche arrondit chaque
+    # entree : jusqu'a 1 s d'ecart par entree recue (une entree ou une page
+    # manquante pese bien plus) ; un mouvement pendant la lecture est detecte par
+    # l'egalite stricte des totaux avant / apres
+    rounding <- nrow(entries)
+    # totaux avec ou sans le temps des entrees en cours : les deux sont acceptes
+    complete <- abs(after - received - running_s) <= growth + rounding ||
+      (any(running) && abs(after - received) <= growth + rounding)
+    if (stable && complete) {
       return(out)
     }
     if (attempt < attempts) {
@@ -250,19 +230,71 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
     }
   }
   stop("incomplete toggl detailled report for ", format(since), " -> ", format(until),
-       ": ", nrow(out), " distinct entries fetched, ", total, " announced by the API.",
-       call. = FALSE)
+       ": ", received, " s of entries fetched, ", after, " s announced by the API",
+       " (", before, " s before the pagination).", call. = FALSE)
 }
 
-#' Has the total duration of the period stayed the same between two pages?
-#'
-#' `growth_ms` is the increase allowed for running timers (their duration
-#' grows with the clock); any decrease, or a larger increase, is an edit.
+#' URL of a Reports v3 endpoint of a workspace
 #' @noRd
-same_total_grand <- function(now, before, growth_ms = 0) {
-  if (is.null(now) || is.null(before)) return(is.null(now) && is.null(before))
-  delta <- as.numeric(now) - as.numeric(before)
-  delta >= 0 && delta <= growth_ms
+toggl_reports_v3_url <- function(workspace_id, path) {
+  paste0("https://api.track.toggl.com/reports/api/v3/workspace/", workspace_id, path)
+}
+
+#' POST a read-only search to Reports v3 (retried like a GET)
+#' @noRd
+toggl_report_post <- function(path, workspace_id, api_token, body) {
+  toggl_request("POST", toggl_reports_v3_url(workspace_id, path), api_token = api_token,
+                body = toJSON(body, auto_unbox = TRUE, digits = NA), idempotent = TRUE)
+}
+
+#' Total duration (seconds) of a period, from Reports v3
+#' @noRd
+toggl_report_totals <- function(workspace_id, api_token, base) {
+  res <- toggl_report_post("/search/time_entries/totals", workspace_id, api_token, base)$content
+  if (is.null(res$seconds)) {
+    stop("unexpected answer from the toggl reports API: no total duration for ",
+         base$start_date, " -> ", base$end_date, ".", call. = FALSE)
+  }
+  as.numeric(res$seconds)
+}
+
+#' Rows of /search/time_entries (enriched) to the columns of the detailled report
+#'
+#' One output row per time entry; an entry seen twice keeps its most recently
+#' updated version, in the original order otherwise.
+#' @noRd
+v3_rows_to_entries <- function(rows) {
+  null_na <- function(x, na = NA) if (is.null(x)) na else x
+  entries <- lapply(rows, function(r) {
+    lapply(r$time_entries, function(te) {
+      list(id = te$id, pid = null_na(r$project_id), tid = null_na(r$task_id),
+           uid = null_na(r$user_id), description = null_na(r$description, NA_character_),
+           start = null_na(te$start, NA_character_), end = null_na(te$stop, NA_character_),
+           updated = null_na(te$at_tz, null_na(te$at, NA_character_)),
+           dur = as.numeric(null_na(te$seconds, NA)) * 1000,
+           user = null_na(r$username, NA_character_), use_stop = FALSE,
+           client = null_na(r$client_name, NA_character_),
+           project = null_na(r$project_name, NA_character_),
+           project_color = null_na(r$project_color, "0"), # "0" sans projet, comme en v2
+           project_hex_color = null_na(r$project_hex, NA_character_),
+           task = null_na(r$task_name, NA_character_),
+           billable = if (is.null(r$billable_amount_in_cents)) 0 else r$billable_amount_in_cents / 100,
+           is_billable = null_na(r$billable), cur = null_na(r$currency, NA_character_),
+           tags = list(as.character(unlist(r$tag_names))))
+    })
+  })
+  entries <- unlist(entries, recursive = FALSE)
+  if (!length(entries)) return(empty_detailled_report())
+  cols <- names(detailled_report_types())
+  out <- lapply(cols, function(cn) {
+    v <- lapply(entries, `[[`, cn)
+    if (cn == "tags") lapply(v, `[[`, 1) else unlist(v)
+  })
+  names(out) <- cols
+  out <- normalize_detailled_report(as_tibble(out))
+  updated <- suppressWarnings(lubridate::ymd_hms(out$updated, quiet = TRUE))
+  recent <- order(updated, decreasing = TRUE, method = "radix", na.last = TRUE)
+  out[sort(recent[!duplicated(out$id[recent])]), ]
 }
 
 #' Column types of the detailled report

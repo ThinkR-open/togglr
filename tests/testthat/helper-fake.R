@@ -26,21 +26,6 @@ serve <- function(...) {
   )
 }
 
-# One page of the reports API v2 /details
-report_page <- function(ids, total, per_page = 50, total_grand = NULL) {
-  list(
-    total_count = total,
-    total_grand = total_grand,
-    per_page = per_page,
-    data = lapply(ids, function(i) list(
-      id = i, pid = 1L, uid = 2L, description = paste("entry", i),
-      start = "2026-10-12T09:00:00+02:00", end = "2026-10-12T10:00:00+02:00",
-      updated = "2026-10-12T10:00:00+02:00", dur = 3600000L, user = "Someone",
-      project = "presta_x_"
-    ))
-  )
-}
-
 # Etat de session vierge pour un test (espacement, quota), et sans fichier d'etat
 local_fresh_state <- function(env = parent.frame()) {
   withr::local_options(togglr.state_file = NULL, .local_envir = env)
@@ -71,7 +56,7 @@ serve_write <- function(...) {
 local_periods <- function(env = parent.frame()) {
   asked <- character(0)
   local_mocked_bindings(
-    fetch_detailled_period = function(api_token, workspace_id, since, until, user_agent) {
+    fetch_detailled_period = function(api_token, workspace_id, since, until, ...) {
       asked <<- c(asked, paste(format(since), format(until)))
       normalize_detailled_report(dplyr::tibble(id = length(asked)))
     },
@@ -85,3 +70,51 @@ report <- function(...) {
   get_detailled_report(api_token = "t", workspace_id = 1,
                        since = as.Date("2026-10-01"), until = as.Date("2026-10-31"), ...)
 }
+
+# ---- Reports v3 ------------------------------------------------------------------
+
+# Une ligne de /search/time_entries (enrich_response = TRUE), une entree par ligne
+v3_row <- function(id, seconds = 3600, user_id = 2L, project = "presta_x", client = "acme",
+                   start = "2026-10-12T09:00:00+02:00", stop = "2026-10-12T10:00:00+02:00",
+                   at_tz = "2026-10-12T10:00:00+02:00", tags = list(), task_id = NULL,
+                   billable_cents = NULL, billable = FALSE, description = paste("entry", id)) {
+  list(user_id = user_id, username = paste0("user", user_id), project_id = 1L,
+       project_name = project, project_color = "0", project_hex = "#06aaf5",
+       client_name = client, task_id = task_id, billable = billable, description = description,
+       tag_ids = list(), tag_names = tags, billable_amount_in_cents = billable_cents,
+       hourly_rate_in_cents = NULL, currency = "EUR",
+       time_entries = list(list(id = id, seconds = seconds, start = start, stop = stop,
+                                at = at_tz, at_tz = at_tz)),
+       row_number = id)
+}
+
+# Faux Reports v3 : `pages` = liste de listes de lignes, servies dans l'ordre ;
+# `totals` = secondes renvoyees par les appels successifs a /totals (la derniere
+# valeur est repetee). Enregistre le corps de chaque requete.
+serve_v3 <- function(pages, totals) {
+  bodies <- list(); n_search <- 0; n_totals <- 0
+  send <- function(url, ..., body = NULL) {
+    b <- if (is.null(body)) list() else jsonlite::fromJSON(body, simplifyVector = FALSE)
+    bodies[[length(bodies) + 1]] <<- c(list(.url = url), b)
+    if (grepl("/totals$", url)) {
+      n_totals <<- n_totals + 1
+      return(fake_response(200, list(seconds = totals[min(n_totals, length(totals))], rates = list())))
+    }
+    n_search <<- n_search + 1
+    if (n_search > length(pages)) stop("unexpected extra call: ", url)
+    page <- pages[[n_search]]
+    nxt <- list()
+    if (isTRUE(attr(page, "more"))) last <- page[[length(page)]]
+    if (isTRUE(attr(page, "more"))) nxt <- list(
+      `x-next-id` = as.character(last$time_entries[[1]]$id + 1),
+      `x-next-row-number` = as.character(last$row_number + 1),
+      `x-next-timestamp` = "1760000000")
+    fake_response(200, page, headers = nxt)
+  }
+  list(send = send, bodies = function() bodies,
+       searches = function() Filter(function(b) grepl("/search/time_entries$", b$.url), bodies),
+       n_search = function() n_search, n_totals = function() n_totals)
+}
+
+# page de lignes v3 ; more = TRUE annonce une page suivante (en-tetes x-next-*)
+v3_page <- function(ids, more = FALSE, ...) structure(lapply(ids, v3_row, ...), more = more)
