@@ -45,15 +45,22 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
 
 #' Wait so that two calls to the reports API are at least `min_interval`
 #' seconds apart (1 s is the documented rate limit of the reports API v2; a
-#' larger value spreads a long extraction to spare the hourly quota)
+#' larger value spreads a long extraction to spare the hourly quota).
+#'
+#' Each call reserves the next free slot under the state lock, then sleeps until
+#' it: with a shared state file (`togglr.state_file`), concurrent processes are
+#' spaced too.
 #' @noRd
 toggl_reports_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
-  last <- .togglr_env$last_report_call
-  if (!is.null(last)) {
-    elapsed <- as.numeric(difftime(Sys.time(), last, units = "secs"))
-    if (elapsed < min_interval) toggl_sleep(min_interval - elapsed)
-  }
-  .togglr_env$last_report_call <- Sys.time()
+  slot <- toggl_state_update(function(st) {
+    now <- Sys.time()
+    last <- st$last_report_call
+    slot <- if (is.null(last)) now else max(now, last + min_interval)
+    st$last_report_call <- slot
+    list(state = st, value = slot)
+  })
+  wait <- as.numeric(difftime(slot, Sys.time(), units = "secs"))
+  if (wait > 0) toggl_sleep(wait)
 }
 
 

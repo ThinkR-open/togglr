@@ -40,3 +40,13 @@ report_page <- function(ids, total, per_page = 50, total_grand = NULL) {
     ))
   )
 }
+
+# Etat de session vierge pour un test (espacement, quota), et sans fichier d'etat
+local_fresh_state <- function(env = parent.frame()) {
+  withr::local_options(togglr.state_file = NULL, .local_envir = env)
+  rm(list = ls(.togglr_env, all.names = TRUE), envir = .togglr_env)
+  withr::defer(rm(list = ls(.togglr_env, all.names = TRUE), envir = .togglr_env), envir = env)
+}
+
+# Simule un autre processus R : la memoire de session est perdue
+forget_session <- function() rm(list = ls(.togglr_env, all.names = TRUE), envir = .togglr_env)

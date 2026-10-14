@@ -24,8 +24,7 @@ test_that("a rate-limit 429 is retried after the asked delay", {
 })
 
 test_that("a 402 (hourly quota) fails fast and no request is sent before the reset", {
-  .togglr_env$quota_until <- NULL
-  withr::defer(.togglr_env$quota_until <- NULL)
+  local_fresh_state()
   srv <- serve(fake_response(402, headers = list(`x-toggl-quota-remaining` = "0",
                                                  `x-toggl-quota-resets-in` = "1800")))
   local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
@@ -35,8 +34,7 @@ test_that("a 402 (hourly quota) fails fast and no request is sent before the res
 })
 
 test_that("a 402 waits for the quota reset when max_wait allows it", {
-  .togglr_env$quota_until <- NULL
-  withr::defer(.togglr_env$quota_until <- NULL)
+  local_fresh_state()
   waited <- c()
   srv <- serve(fake_response(402, headers = list(`x-toggl-quota-resets-in` = "1800")),
                fake_response(200, list(ok = TRUE)))

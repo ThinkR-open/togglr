@@ -13,6 +13,10 @@
   returned with each page: a deletion followed by an insertion during the
   pagination, which leaves `total_count` unchanged, now triggers a new fetch
   instead of returning a stale entry and missing another (#47).
+* New option `togglr.state_file`: the pacing of the reports calls and the
+  knowledge of an exhausted quota are stored in that file, under a lock, and
+  shared by every R process using it (callr / future / targets workers, cron
+  jobs). Without it, the state stays private to the session (#48).
 
 # togglr 0.3.0
 
