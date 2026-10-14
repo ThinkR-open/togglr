@@ -89,6 +89,7 @@ toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait) {
     status <- status_code(resp)
 
     if (status >= 200 && status < 300) {
+      toggl_note_quota(resp, api_token)
       return(list(content = if (status == 204 || !length(resp$content)) NULL else content(resp),
                   headers = headers(resp)))
     }
@@ -193,4 +194,30 @@ toggl_error_message <- function(resp, url) {
     if (nzchar(body)) paste0(": ", substr(body, 1, 200)) else "",
     "."
   )
+}
+
+#' Use the quota announced by a successful answer
+#'
+#' With `x-toggl-quota-remaining` and `x-toggl-quota-resets-in`: no request
+#' left means no request before the reset (instead of a wasted 402); a few
+#' requests left (fewer than `options(togglr.quota_spread)`, 10 by default) are
+#' spread evenly until the reset.
+#' @noRd
+toggl_note_quota <- function(resp, api_token) {
+  remaining <- toggl_header_num(resp, "x-toggl-quota-remaining")
+  reset <- toggl_header_num(resp, "x-toggl-quota-resets-in")
+  if (is.na(remaining) || is.na(reset)) return(invisible())
+  if (remaining <= 0) {
+    toggl_state_set(toggl_quota_key(api_token), Sys.time() + max(1, reset))
+  } else if (remaining < getOption("togglr.quota_spread", 10)) {
+    gap <- reset / remaining
+    min_interval <- getOption("togglr.min_interval", 1)
+    toggl_state_update(function(st) {
+      # toggl_pace() prend le creneau last + min_interval : le repousser a now + gap
+      push <- Sys.time() + gap - min_interval
+      st$last_report_call <- if (is.null(st$last_report_call)) push else max(st$last_report_call, push)
+      list(state = st, value = NULL)
+    })
+  }
+  invisible()
 }

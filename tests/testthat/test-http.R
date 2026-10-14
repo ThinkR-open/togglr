@@ -145,3 +145,41 @@ test_that("the state file never contains the token (#49)", {
   brut <- readBin(gzfile(f, "rb"), "raw", 1e6)
   expect_false(grepl("my_secret_token_123", rawToChar(brut[brut != as.raw(0)]), fixed = TRUE, useBytes = TRUE))
 })
+
+# ---- M10 (#68) : x-toggl-quota-remaining exploite -------------------------------------
+
+quota_ok <- function(remaining, resets = 1800, body = list(ok = TRUE)) {
+  fake_response(200, body, headers = list(`x-toggl-quota-remaining` = as.character(remaining),
+                                          `x-toggl-quota-resets-in` = as.character(resets)))
+}
+
+test_that("a 200 announcing 0 remaining requests: the next one is not sent before the reset (#68)", {
+  local_fresh_state()
+  srv <- serve(quota_ok(0), quota_ok(239))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_true(toggl_GET("u", api_token = "t")$content$ok)
+  expect_error(toggl_GET("u", api_token = "t", max_wait = 60), "no request sent")
+  expect_equal(srv$calls(), 1)
+})
+
+test_that("few remaining requests are spread until the reset (#68)", {
+  local_fresh_state()
+  waited <- c()
+  srv <- serve(quota_ok(4, resets = 400), quota_ok(3, resets = 300))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) waited <<- c(waited, s))
+  toggl_GET("u", api_token = "t")
+  toggl_GET("u", api_token = "t")
+  expect_length(waited, 1)
+  expect_gt(waited, 95)
+  expect_lte(waited, 100)
+})
+
+test_that("plenty of remaining requests: no slowdown (#68)", {
+  local_fresh_state()
+  waited <- c()
+  srv <- serve(quota_ok(200), quota_ok(199))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) waited <<- c(waited, s))
+  toggl_GET("u", api_token = "t")
+  toggl_GET("u", api_token = "t")
+  expect_length(waited, 0)
+})

@@ -86,6 +86,10 @@
   `options(togglr.cache_dir)`, apart from the memoise files of 0.2.x. New
   argument `cache_dir` and function `clean_cache()`; `memoise_cache_dir` and
   `clean_memoise_cache()` are deprecated (#67).
+* The quota announced by every answer (`x-toggl-quota-remaining`) is used: at
+  0, the next request waits for the reset (or fails within `max_wait`) instead
+  of receiving a 402; with fewer than `options(togglr.quota_spread)` (10)
+  requests left, they are spread until the reset (#68).
 
 # togglr 0.3.0
 
