@@ -9,6 +9,13 @@ get_workspace_id(api_token = get_toggl_api_token())
 \arguments{
 \item{api_token}{the toggl api token}
 }
+\value{
+the workspace id (an integer)
+}
 \description{
-Return the workspace id
+Return the id of the default workspace of the account (as set
+  in Toggl), or of its first workspace when no default is set.
+}
+\seealso{
+[get_workspaces()] to list every workspace
 }

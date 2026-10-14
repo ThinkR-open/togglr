@@ -51,7 +51,7 @@ test_that("the error message never shows the query string of the url (#73)", {
 
 test_that("get_workspace_id fails clearly when the account has no workspace (#73)", {
   local_fresh_state()
-  srv <- serve(fake_response(200, list()))
+  srv <- serve(fake_response(200, list(id = 1L, default_workspace_id = NULL)), fake_response(200, list()))
   local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
   expect_error(get_workspace_id(api_token = "t"), "cant find workspace id")
 })
