@@ -52,6 +52,9 @@
   id per PUT), sends `stop` (it was accepted then dropped), sends the project as
   `project_id`, and no longer sends the read-only `at`. It returns the updated
   entry, or a list of them for several ids (#56).
+* `get_time_entries()` sends its dates in UTC (`...Z`): the `+` of a time zone
+  offset was sent unencoded in the url, and read as a space by the server
+  (#57). Entries with several tags are covered by a test (#30).
 
 # togglr 0.3.0
 

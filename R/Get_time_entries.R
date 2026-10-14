@@ -11,7 +11,7 @@
 #' @importFrom dplyr select mutate case_when slice everything left_join %>% 
 #' @importFrom stats setNames
 #' @importFrom purrr map_df
-#' @importFrom parsedate format_iso_8601 parse_iso_8601
+#' @importFrom parsedate parse_iso_8601
 #' @encoding UTF-8
 #' @importFrom glue glue
 #' @examples
@@ -22,7 +22,8 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
                              since = Sys.time() - lubridate::weeks(1),
                              until = Sys.time(),
                              workspace_id = get_workspace_id(api_token)) {
-  url <- glue::glue("https://api.track.toggl.com/api/v9/me/time_entries?start_date={format_iso_8601(since)}&end_date={format_iso_8601(until)}")
+  # RFC 3339 en UTC (`Z`) : un `+01:00` non encode serait lu comme une espace
+  url <- glue::glue("https://api.track.toggl.com/api/v9/me/time_entries?start_date={format_toggl_utc(since)}&end_date={format_toggl_utc(until)}")
   res <- toggl_GET(url, api_token = api_token)$content
 
   if (length(res) == 0) {
