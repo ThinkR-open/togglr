@@ -31,7 +31,6 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
               since = format(since, "%Y-%m-%dT00:00:00"),
               until = format(until, "%Y-%m-%dT00:00:00")
   )
-  toggl_reports_pace()
   wp <- toggl_GET(url, api_token = api_token)$content
 
   if (is.null(wp$total_count) || is.null(wp$per_page)) {
@@ -46,15 +45,15 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
   out
 }
 
-#' Wait so that two calls to the reports API are at least `min_interval`
-#' seconds apart (1 s is the documented rate limit of the reports API v2; a
-#' larger value spreads a long extraction to spare the hourly quota).
+#' Wait so that two requests to the API (reads, writes, retries) are at least
+#' `min_interval` seconds apart (1 s is the documented rate limit; a larger
+#' value spreads a long extraction to spare the hourly quota).
 #'
 #' Each call reserves the next free slot under the state lock, then sleeps until
 #' it: with a shared state file (`togglr.state_file`), concurrent processes are
 #' spaced too.
 #' @noRd
-toggl_reports_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
+toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
   slot <- toggl_state_update(function(st) {
     now <- Sys.time()
     last <- st$last_report_call

@@ -62,6 +62,7 @@ toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait) {
   idempotent <- verb != "POST"
   for (try in seq_len(max_tries)) {
     toggl_wait_quota(max_wait, api_token)
+    toggl_pace() # chaque envoi, relances comprises, prend un creneau
     resp <- tryCatch(
       if (verb == "GET") toggl_http_get(url, api_token) else toggl_http_send(verb, url, api_token, body),
       error = function(e) e

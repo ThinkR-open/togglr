@@ -74,6 +74,9 @@
 * `get_detailled_report_paged()` has the same default period as
   `get_detailled_report()` (the last year, until today): it was three years,
   beyond the one year limit of the reports API v2, until tomorrow (#63).
+* `options(togglr.min_interval)` (1 s by default) now spaces every request,
+  reads and writes, retries included, not only the pages of the detailled
+  report (#64).
 
 # togglr 0.3.0
 
