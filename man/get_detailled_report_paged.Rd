@@ -75,7 +75,8 @@ All the pages of the period are fetched, then the number of
   An HTTP error (quota, server error, authentication) raises an error too:
   the function never returns a silently truncated period.
 
-  Periods longer than 366 days are split by calendar year.
+  Periods longer than a year (365 days or more between `since` and
+  `until`, across a new year) are split by calendar year.
 }
 \examples{
 \dontrun{

@@ -134,3 +134,46 @@ test_that("without total_grand in the answer, total_count alone is still checked
   expect_equal(nrow(suppressMessages(report())), 60)
   expect_equal(srv$calls(), 2)
 })
+
+# ---- I14 (#58) : decoupage au-dela d'un an ----------------------------------------
+
+local_periods <- function(env = parent.frame()) {
+  asked <- character(0)
+  local_mocked_bindings(
+    fetch_detailled_period = function(api_token, workspace_id, since, until, user_agent) {
+      asked <<- c(asked, paste(format(since), format(until)))
+      normalize_detailled_report(tibble::tibble(id = length(asked)))
+    },
+    .env = env
+  )
+  function() sort(asked)
+}
+
+test_that("367 days (bounds included) are split at the new year (#58)", {
+  asked <- local_periods()
+  suppressMessages(get_detailled_report(api_token = "t", workspace_id = 1,
+                                        since = as.Date("2016-01-01"), until = as.Date("2017-01-01")))
+  expect_equal(asked(), c("2016-01-01 2016-12-31", "2017-01-01 2017-01-01"))
+})
+
+test_that("a full calendar year, even a leap one, is fetched in one go (#58)", {
+  asked <- local_periods()
+  suppressMessages(get_detailled_report(api_token = "t", workspace_id = 1,
+                                        since = as.Date("2016-01-01"), until = as.Date("2016-12-31")))
+  expect_equal(asked(), "2016-01-01 2016-12-31")
+})
+
+test_that("less than a year across a new year is fetched in one go (#58)", {
+  asked <- local_periods()
+  suppressMessages(get_detailled_report(api_token = "t", workspace_id = 1,
+                                        since = as.Date("2016-03-01"), until = as.Date("2017-02-28")))
+  expect_equal(asked(), "2016-03-01 2017-02-28")
+})
+
+test_that("several years give one chunk per calendar year, none longer than a year (#58)", {
+  asked <- local_periods()
+  out <- suppressMessages(get_detailled_report(api_token = "t", workspace_id = 1,
+                                               since = as.Date("2015-06-01"), until = as.Date("2017-12-31")))
+  expect_equal(asked(), c("2015-06-01 2015-12-31", "2016-01-01 2016-12-31", "2017-01-01 2017-12-31"))
+  expect_equal(nrow(out), 3)
+})

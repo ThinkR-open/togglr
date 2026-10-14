@@ -55,6 +55,9 @@
 * `get_time_entries()` sends its dates in UTC (`...Z`): the `+` of a time zone
   offset was sent unencoded in the url, and read as a space by the server
   (#57). Entries with several tags are covered by a test (#30).
+* `get_detailled_report()` splits by calendar year as soon as a period spans
+  365 days or more across a new year: a 367 days period (bounds included) was
+  sent as is, beyond the one year limit of the reports API v2 (#58).
 
 # togglr 0.3.0
 

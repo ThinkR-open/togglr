@@ -84,7 +84,8 @@ toggl_reports_pace <- function(min_interval = getOption("togglr.min_interval", 1
 #'   An HTTP error (quota, server error, authentication) raises an error too:
 #'   the function never returns a silently truncated period.
 #'
-#'   Periods longer than 366 days are split by calendar year.
+#'   Periods longer than a year (365 days or more between `since` and
+#'   `until`, across a new year) are split by calendar year.
 #' @rdname get_detailled_report_paged
 #' @importFrom lubridate dmy days year
 get_detailled_report <- function(api_token = get_toggl_api_token(),
@@ -95,7 +96,9 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  max_page = NULL,
                                  cache = FALSE,
                                  memoise_cache_dir = getOption("togglr_memoise_dir", default = rappdirs::user_cache_dir("togglr"))) {
-  if (difftime(until, since, units = "days") > 366) {
+  # Reports v2 refuse plus d'un an : au-dela de 365 jours d'ecart, decoupage par
+  # annee civile (une annee civile, meme bissextile, part en une fois)
+  if (year(since) != year(until) && difftime(until, since, units = "days") >= 365) {
     return(bind_rows(
       get_detailled_report(api_token = api_token, workspace_id = workspace_id,
                            since = dmy(glue("0101{year(until)}")), until = until,
