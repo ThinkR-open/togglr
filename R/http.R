@@ -10,7 +10,9 @@
 #'   if it is within `max_wait`, otherwise it fails without contacting the API.
 #' * 429 means the rate limit (about 1 request per second) is exceeded: the call
 #'   backs off (`retry-after`, or 60 s, 120 s...) within `max_wait`.
-#' * 5xx are retried with a short backoff.
+#' * 5xx and network errors (timeout, DNS, connection reset) are retried with a
+#'   short backoff. Every request times out after `getOption("togglr.timeout",
+#'   120)` seconds, so that a stalled connection cannot block the session.
 #' * any other non-200 status, or a retry budget exhausted, raises an error.
 #'
 #' @param url full url
@@ -21,7 +23,7 @@
 #'   of blocking the session. Can be set with `options(togglr.max_wait = )`.
 #'
 #' @return a list with `content` (parsed body) and `headers`
-#' @importFrom httr GET authenticate content status_code headers http_status
+#' @importFrom httr GET authenticate content status_code headers http_status timeout
 #' @noRd
 toggl_GET <- function(url,
                       api_token = get_toggl_api_token(),
@@ -29,7 +31,21 @@ toggl_GET <- function(url,
                       max_wait = getOption("togglr.max_wait", 60)) {
   for (try in seq_len(max_tries)) {
     toggl_wait_quota(max_wait)
-    resp <- toggl_http_get(url, api_token)
+    resp <- tryCatch(toggl_http_get(url, api_token), error = function(e) e)
+
+    if (inherits(resp, "error")) {
+      # timeout, DNS, connexion coupee... : traite comme un 5xx
+      cause <- conditionMessage(resp)
+      if (try == max_tries) {
+        stop("toggl API network error on ", sub("\\?.*$", "", url), " after ", max_tries,
+             " attempts: ", cause, call. = FALSE)
+      }
+      wait <- min(2^try, 30)
+      message("toggl API network error (", cause, "), retrying in ", wait, "s")
+      toggl_sleep(wait)
+      next
+    }
+
     status <- status_code(resp)
 
     if (status == 200) {
@@ -86,7 +102,8 @@ toggl_header_num <- function(resp, name) {
 # Thin wrappers, so that tests can replace the network and the clock
 #' @noRd
 toggl_http_get <- function(url, api_token) {
-  GET(url, authenticate(api_token, "api_token"), encode = "json")
+  GET(url, authenticate(api_token, "api_token"), timeout(getOption("togglr.timeout", 120)),
+      encode = "json")
 }
 
 #' @noRd
