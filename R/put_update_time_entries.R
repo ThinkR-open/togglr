@@ -1,16 +1,18 @@
 #' @title toggl_update_entries
 #' @description  update time entries
-#' @param time_entry_ids id(s) of time entries to update . 
+#' @param time_entry_ids id(s) of time entries to update: one PUT request is
+#'   sent per entry
 #' @param start time in POSIXt
 #' @param stop time in POSIXt
 #' @param duration in seconds
 #' @param description the task you did
 #' @param api_token the toggl api token
 #' @param workspace_id workspace id
-#' @param pid pid
+#' @param pid project id
 #' @param tags tags
 #' @importFrom lubridate now
-#' @importFrom httr POST authenticate
+#' @return the updated entry, as returned by the API, or a list of them when
+#'   several ids are given
 #' @importFrom jsonlite toJSON
 #' @examples 
 #' \dontrun{
@@ -45,29 +47,30 @@ toggl_update_entries <- function(
     stop("you need to supply a time_entry_ids ('id' field in entry data)")
   }
   
-  time_entry_ids <- paste0(unlist(time_entry_ids),collapse=",")
+  ids <- unlist(time_entry_ids)
 
-  if ( !missing(tags) && !is.list(tags)){
+  if (!is.null(tags) && !is.list(tags)) {
     tags <- as.list(tags)
   }
 
   time_entry <- list(
     description = description,
-    pid = pid,
+    project_id = pid,
     tags = tags,
     created_with = "togglr",
-    duration=duration,
+    duration = duration,
     start = correct_date(start),
-    at = correct_date(now())
+    stop = correct_date(stop)
   )
-
   # Remove the null elements of the time_entry
-  time_entry <- time_entry[!unlist(lapply(time_entry, is.null))]
+  time_entry <- time_entry[!vapply(time_entry, is.null, logical(1))]
+  body <- toJSON(time_entry, auto_unbox = TRUE)
 
-  toggl_request("PUT",
-                glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries/{time_entry_ids}"),
-                api_token = api_token,
-                body = toJSON(time_entry, auto_unbox = TRUE))$content
- 
-
+  # v9 : un PUT par entree (idempotent, donc relancable sans risque)
+  res <- lapply(ids, function(id) {
+    toggl_request("PUT",
+                  glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/time_entries/{id}"),
+                  api_token = api_token, body = body)$content
+  })
+  if (length(ids) == 1) res[[1]] else res
 }

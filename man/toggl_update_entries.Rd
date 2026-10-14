@@ -17,13 +17,14 @@ toggl_update_entries(
 )
 }
 \arguments{
-\item{time_entry_ids}{id(s) of time entries to update .}
+\item{time_entry_ids}{id(s) of time entries to update: one PUT request is
+sent per entry}
 
 \item{description}{the task you did}
 
 \item{start}{time in POSIXt}
 
-\item{pid}{pid}
+\item{pid}{project id}
 
 \item{stop}{time in POSIXt}
 
@@ -34,6 +35,10 @@ toggl_update_entries(
 \item{api_token}{the toggl api token}
 
 \item{workspace_id}{workspace id}
+}
+\value{
+the updated entry, as returned by the API, or a list of them when
+  several ids are given
 }
 \description{
 update time entries

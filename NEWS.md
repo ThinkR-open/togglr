@@ -48,6 +48,10 @@
   client is reused instead of being created again, its `client_id` is sent,
   and the body follows the v9 format (`private`, `color`, `active` are no
   longer ignored) (#55).
+* `toggl_update_entries()` sends one PUT per entry (the v9 API takes a single
+  id per PUT), sends `stop` (it was accepted then dropped), sends the project as
+  `project_id`, and no longer sends the read-only `at`. It returns the updated
+  entry, or a list of them for several ids (#56).
 
 # togglr 0.3.0
 
