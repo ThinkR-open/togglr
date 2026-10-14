@@ -64,6 +64,11 @@
   (#59).
 * `get_detailled_report(max_page = )` now warns that the argument is
   deprecated and ignored (#60).
+* The reports functions (`get_detailled_report()`, `get_summary_report()`,
+  `get_weekly_report()`, `get_dashboard()`) accept `since` / `until` as a
+  `Date`, a date-time (its day in its own time zone) or a text "AAAA-MM-JJ",
+  and fail with a clear message, before any request, on anything else or on
+  `since` after `until` (#61).
 
 # togglr 0.3.0
 

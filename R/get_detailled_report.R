@@ -24,6 +24,9 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
                                        until = Sys.Date() + lubridate::days(1),
                                        page = 1,
                                        user_agent = "togglr") {
+  period <- as_toggl_period(since, until)
+  since <- period$since
+  until <- period$until
   url <- glue("https://api.track.toggl.com/reports/api/v2/details?workspace_id={workspace_id}&since={since}&until={until}&user_agent={user_agent}&grouping=users&page={page}",
               since = format(since, "%Y-%m-%dT00:00:00"),
               until = format(until, "%Y-%m-%dT00:00:00")
@@ -96,6 +99,9 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  max_page = NULL,
                                  cache = FALSE,
                                  memoise_cache_dir = getOption("togglr_memoise_dir", default = rappdirs::user_cache_dir("togglr"))) {
+  period <- as_toggl_period(since, until)
+  since <- period$since
+  until <- period$until
   if (!is.null(max_page)) {
     warning("`max_page` is deprecated and ignored: the number of pages comes from ",
             "the total_count returned by the API.", call. = FALSE)

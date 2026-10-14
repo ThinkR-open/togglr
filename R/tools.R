@@ -105,3 +105,34 @@ correct_date <- function(time){
     return(NULL)
   }
 }
+
+#' Read a date argument: a `Date`, a date-time (taken as its day in its own time
+#' zone) or a text "AAAA-MM-JJ"; anything else fails with a clear message
+#' @noRd
+as_toggl_date <- function(x, arg = deparse(substitute(x))) {
+  out <- if (inherits(x, "Date")) {
+    x
+  } else if (inherits(x, "POSIXt")) {
+    as.Date(format(x, "%Y-%m-%d"))
+  } else if (is.character(x) && grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", x[1])) {
+    tryCatch(as.Date(x, format = "%Y-%m-%d"), error = function(e) as.Date(NA))
+  } else {
+    as.Date(NA)
+  }
+  if (length(out) != 1 || is.na(out)) {
+    stop("`", arg, "` must be a Date, a date-time or a text \"AAAA-MM-JJ\", not ",
+         paste(format(x), collapse = ", "), ".", call. = FALSE)
+  }
+  out
+}
+
+#' Read and check a period: `since` <= `until`
+#' @noRd
+as_toggl_period <- function(since, until) {
+  since <- as_toggl_date(since, "since")
+  until <- as_toggl_date(until, "until")
+  if (since > until) {
+    stop("`since` (", format(since), ") is after `until` (", format(until), ").", call. = FALSE)
+  }
+  list(since = since, until = until)
+}
