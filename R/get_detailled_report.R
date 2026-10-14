@@ -42,10 +42,11 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
   out
 }
 
-#' Wait so that two calls to the reports API are at least one second apart
-#' (documented rate limit of the reports API v2)
+#' Wait so that two calls to the reports API are at least `min_interval`
+#' seconds apart (1 s is the documented rate limit of the reports API v2; a
+#' larger value spreads a long extraction to spare the hourly quota)
 #' @noRd
-toggl_reports_pace <- function(min_interval = 1) {
+toggl_reports_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
   last <- .togglr_env$last_report_call
   if (!is.null(last)) {
     elapsed <- as.numeric(difftime(Sys.time(), last, units = "secs"))

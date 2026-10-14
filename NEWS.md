@@ -10,7 +10,8 @@
 * `get_detailled_report()` no longer memoises pages. The new `cache` argument
   (default `FALSE`) stores a whole period, only once it is complete and checked;
   reserve it to closed periods. `max_page` is deprecated and ignored.
-* Calls to the reports API are spaced by at least one second.
+* Calls to the reports API are spaced by at least one second, or by
+  `options(togglr.min_interval)` seconds to spread a long extraction.
 
 # togglr 0.1.99.9002
 
