@@ -100,6 +100,9 @@
   `user_agent` parameter of the reports API, now url-encoded); `get_dashboard()`
   no longer sends a hardcoded `api_test`, and uses `any_of()` instead of the
   superseded `one_of()`, which warned when the API returned no color (#71).
+* `get_workspace_id()` fails with its message when the account has no
+  workspace, instead of "subscript out of bounds". New tests cover the edge
+  cases of the pagination, of the quota and of the cache (#73).
 
 # togglr 0.3.0
 

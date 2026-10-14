@@ -79,3 +79,9 @@ local_periods <- function(env = parent.frame()) {
   )
   function() sort(asked)
 }
+
+# Rapport detaille d'octobre 2026 (workspace 1)
+report <- function(...) {
+  get_detailled_report(api_token = "t", workspace_id = 1,
+                       since = as.Date("2026-10-01"), until = as.Date("2026-10-31"), ...)
+}

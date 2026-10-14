@@ -1,8 +1,3 @@
-report <- function(...) {
-  get_detailled_report(api_token = "t", workspace_id = 1,
-                       since = as.Date("2026-10-01"), until = as.Date("2026-10-31"), ...)
-}
-
 test_that("all the pages announced by total_count are fetched", {
   srv <- serve(
     fake_response(200, report_page(1:50, total = 120)),
