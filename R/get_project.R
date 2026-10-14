@@ -97,17 +97,14 @@ get_all_projects <- function(api_token = get_toggl_api_token(),
   while (TRUE) {
     
     # message("page = ",nb_page)
-    project_tbl_ <-   content(GET(
+    project_tbl_ <-   toggl_GET(
       paste0(
         "https://api.track.toggl.com/api/v9/workspaces/",
         workspace_id,
-        "/projects"
+        "/projects?page=", nb_page, "&per_page=200"
       ),
-      # verbose(),
-      authenticate(api_token, "api_token"),
-      encode = "json",query = list(page = nb_page, per_page = 200)
-      
-    )) %>% bind_rows()
+      api_token = api_token
+    )$content %>% bind_rows()
     
     all_projects[[nb_page]] <- project_tbl_
     

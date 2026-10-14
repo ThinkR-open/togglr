@@ -50,7 +50,8 @@ POST(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/cl
 #' }
 #' @export
 get_all_client_info <- function(api_token=get_toggl_api_token(),workspace_id = get_workspace_id(api_token) ){
-  GET(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),authenticate(api_token,"api_token")) %>% content() %>% bind_rows()
+  toggl_GET(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),
+            api_token = api_token)$content %>% bind_rows()
 }
 
 

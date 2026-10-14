@@ -1,3 +1,17 @@
+# togglr 0.3.0
+
+* Every read of the API goes through `toggl_GET()`: HTTP errors are no longer
+  turned into empty results. 429 and 5xx are retried, waiting what the API asks
+  (within `options(togglr.max_wait)`, 60 s by default), any other error stops.
+* `get_detailled_report()` no longer returns silently truncated periods: the
+  number of pages comes from `total_count`, entries are de-duplicated by `id`,
+  the period is fetched again if entries move during pagination, and an error is
+  raised if the result is still incomplete.
+* `get_detailled_report()` no longer memoises pages. The new `cache` argument
+  (default `FALSE`) stores a whole period, only once it is complete and checked;
+  reserve it to closed periods. `max_page` is deprecated and ignored.
+* Calls to the reports API are spaced by at least one second.
+
 # togglr 0.1.99.9002
 
 * from api V8 to V9

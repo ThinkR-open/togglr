@@ -11,10 +11,8 @@ get_workspace_id <- function(
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
 
   }
- ppp <- content(GET("https://api.track.toggl.com/api/v9/workspaces",
-              # verbose(),
-              authenticate(api_token,"api_token"),
-              encode="json")) 
+ ppp <- toggl_GET("https://api.track.toggl.com/api/v9/workspaces",
+                  api_token = api_token)$content
   
  ppp[[1]]$id -> id # si plusieurs workspace , il faudra adapter
   if (length(id) == 0){

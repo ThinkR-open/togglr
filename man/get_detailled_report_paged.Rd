@@ -22,7 +22,8 @@ get_detailled_report(
   since = Sys.Date() - lubridate::years(1),
   until = Sys.Date(),
   user_agent = "togglr",
-  max_page = 10,
+  max_page = NULL,
+  cache = FALSE,
   memoise_cache_dir = getOption("togglr_memoise_dir", default =
     rappdirs::user_cache_dir("togglr"))
 )
@@ -37,20 +38,42 @@ clean_memoise_cache(
 
 \item{workspace_id}{the workspace id}
 
-\item{since}{begin date}
+\item{since}{begin date (inclusive)}
 
-\item{until}{stop date}
+\item{until}{stop date (inclusive)}
 
 \item{page}{page}
 
 \item{user_agent}{user_agent}
 
-\item{max_page}{max_page}
+\item{max_page}{deprecated, ignored: the number of pages is now computed
+from the `total_count` returned by the API.}
 
-\item{memoise_cache_dir}{cache folder for memoise function, can be edited with `options('togglr_memoise_dir')` or `rappdirs::user_cache_dir("togglr")` by default}
+\item{cache}{logical. If `TRUE`, a period fully fetched and checked is
+stored on disk and returned as is by later calls with the same `since` /
+`until`. Only use it for closed periods: entries created or edited later in
+Toggl will not be seen. Failures are never cached. Default `FALSE`.}
+
+\item{memoise_cache_dir}{cache folder used when `cache = TRUE`, can be edited
+with `options('togglr_memoise_dir')` or `rappdirs::user_cache_dir("togglr")`
+by default}
+}
+\value{
+a tibble of the page entries, with attributes `total_count` and
+  `per_page` as returned by the API
 }
 \description{
 get detailled report by user then projet
+}
+\details{
+All the pages of the period are fetched, then the number of
+  distinct entries is checked against the `total_count` announced by the
+  API. If entries are added or removed while paginating, the period is
+  fetched again once; if the result is still incomplete, an error is raised.
+  An HTTP error (quota, server error, authentication) raises an error too:
+  the function never returns a silently truncated period.
+
+  Periods longer than 366 days are split by calendar year.
 }
 \examples{
 \dontrun{

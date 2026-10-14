@@ -24,10 +24,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
       format(until, "%Y-%m-%d")
       
     )
-  wp <- content(GET(url,
-                    # verbose(),
-                    authenticate(api_token, "api_token"),
-                    encode = "json"))
+  wp <- toggl_GET(url, api_token = api_token)$content
   
   
   # jsonlite:::simplify(wp$data, simplifyDataFrame = TRUE) -> out

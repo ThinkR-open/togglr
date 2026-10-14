@@ -33,10 +33,7 @@ get_summary_report <- function(api_token = get_toggl_api_token(),
   )
   
   
-  wp <- content(GET(url,
-                    # verbose(),
-                    authenticate(api_token, "api_token"),
-                    encode = "json"))
+  wp <- toggl_GET(url, api_token = api_token)$content
   
   
   togglr::simplify(wp$data, simplifyDataFrame = TRUE) -> out

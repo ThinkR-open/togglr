@@ -8,6 +8,14 @@
 \description{
 toggl.com API
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ThinkR-open/togglr}
+  \item Report bugs at \url{https://github.com/ThinkR-open/togglr/issues}
+}
+
+}
 \author{
 vincent <vincent@thinkr.fr>
 }
