@@ -214,3 +214,18 @@ test_that("togglr.report_attempts sets the number of reads (#65)", {
   expect_error(suppressMessages(report()), "incomplete")
   expect_equal(srv$calls(), 2)
 })
+
+# ---- M8 (#66) : le doublon garde la version la plus recente -------------------------
+
+test_that("an entry seen twice keeps its most recently updated version (#66)", {
+  local_fresh_state()
+  p2 <- report_page(50:60, total = 60)
+  p2$data[[1]]$description <- "edited"
+  p2$data[[1]]$updated <- "2026-10-12T09:00:00Z" # 11:00 a Paris : plus recent que 10:00+02:00
+
+  srv <- serve(fake_response(200, report_page(1:50, total = 60)), fake_response(200, p2))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  out <- suppressMessages(report())
+  expect_equal(nrow(out), 60)
+  expect_equal(out$description[out$id == 50], "edited")
+})

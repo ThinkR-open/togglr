@@ -176,7 +176,12 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
 
     out <- bind_rows(res)
     if (nrow(out) > 0) {
-      out <- out[!duplicated(out$id), ]
+      # une entree vue deux fois (modifiee entre deux pages) : garder la version
+      # la plus recente ; l'ordre d'origine est conserve sinon
+      updated <- suppressWarnings(lubridate::ymd_hms(out$updated, quiet = TRUE))
+      recent <- order(updated, decreasing = TRUE, method = "radix", na.last = TRUE)
+      keep <- sort(recent[!duplicated(out$id[recent])])
+      out <- out[keep, ]
     }
     if (!moved && nrow(out) == total) {
       return(out)

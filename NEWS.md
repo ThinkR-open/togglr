@@ -79,6 +79,8 @@
   report (#64).
 * A period that keeps moving during the pagination is read up to
   `options(togglr.report_attempts)` times (3 by default, 2 before) (#65).
+* An entry seen twice during the pagination keeps its most recently updated
+  version, not the first one read (#66).
 
 # togglr 0.3.0
 
