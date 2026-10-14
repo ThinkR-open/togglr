@@ -81,6 +81,11 @@
   `options(togglr.report_attempts)` times (3 by default, 2 before) (#65).
 * An entry seen twice during the pagination keeps its most recently updated
   version, not the first one read (#66).
+* The reports cache (`cache = TRUE`) lives in its own folder, the `reports`
+  sub-folder of `rappdirs::user_cache_dir("togglr")` or
+  `options(togglr.cache_dir)`, apart from the memoise files of 0.2.x. New
+  argument `cache_dir` and function `clean_cache()`; `memoise_cache_dir` and
+  `clean_memoise_cache()` are deprecated (#67).
 
 # togglr 0.3.0
 

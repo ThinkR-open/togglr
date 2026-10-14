@@ -75,9 +75,10 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
 #'   stored on disk and returned as is by later calls with the same `since` /
 #'   `until`. Only use it for closed periods: entries created or edited later in
 #'   Toggl will not be seen. Failures are never cached. Default `FALSE`.
-#' @param memoise_cache_dir cache folder used when `cache = TRUE`, can be edited
-#'   with `options('togglr_memoise_dir')` or `rappdirs::user_cache_dir("togglr")`
-#'   by default
+#' @param cache_dir folder of the cache used when `cache = TRUE`: by default
+#'   `options("togglr.cache_dir")`, or the `reports` sub-folder of
+#'   `rappdirs::user_cache_dir("togglr")`
+#' @param memoise_cache_dir deprecated, use `cache_dir`
 #' @details All the pages of the period are fetched, then the number of
 #'   distinct entries is checked against the `total_count` announced by the
 #'   API. If entries are added, removed or edited while paginating (detected by
@@ -99,7 +100,12 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  user_agent = "togglr",
                                  max_page = NULL,
                                  cache = FALSE,
-                                 memoise_cache_dir = getOption("togglr_memoise_dir", default = rappdirs::user_cache_dir("togglr"))) {
+                                 cache_dir = toggl_cache_dir(),
+                                 memoise_cache_dir = NULL) {
+  if (!is.null(memoise_cache_dir)) {
+    warning("`memoise_cache_dir` is deprecated, use `cache_dir`.", call. = FALSE)
+    cache_dir <- memoise_cache_dir
+  }
   period <- as_toggl_period(since, until)
   since <- period$since
   until <- period$until
@@ -115,16 +121,16 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
       get_detailled_report(api_token = api_token, workspace_id = workspace_id,
                            since = dmy(glue("0101{year(until)}")), until = until,
                            user_agent = user_agent, cache = cache,
-                           memoise_cache_dir = memoise_cache_dir),
+                           cache_dir = cache_dir),
       get_detailled_report(api_token = api_token, workspace_id = workspace_id,
                            since = since, until = dmy(glue("0101{year(until)}")) - days(1),
                            user_agent = user_agent, cache = cache,
-                           memoise_cache_dir = memoise_cache_dir)
+                           cache_dir = cache_dir)
     ))
   }
 
   if (isTRUE(cache)) {
-    cd <- cachem::cache_disk(dir = memoise_cache_dir)
+    cd <- cachem::cache_disk(dir = cache_dir)
     key <- paste("detailled", workspace_id, format(since, "%Y%m%d"),
                  format(until, "%Y%m%d"), sep = "_")
     cached <- cd$get(key)
@@ -243,16 +249,43 @@ empty_detailled_report <- function() {
 }
 
 
-#' clean memoise cache
+#' Folder of the reports cache
 #'
-#' @rdname get_detailled_report_paged
+#' `options("togglr.cache_dir")`, or the `reports` sub-folder of
+#' `rappdirs::user_cache_dir("togglr")` (kept apart from the files of the
+#' memoise cache of togglr 0.2.x).
+#' @noRd
+toggl_cache_dir <- function() {
+  getOption("togglr.cache_dir", file.path(rappdirs::user_cache_dir("togglr"), "reports"))
+}
+
+#' Empty the cache of the reports
 #'
+#' Removes the periods stored by `get_detailled_report(cache = TRUE)`.
+#'
+#' @param cache_dir folder of the cache
 #' @export
+#' @examples
+#' \dontrun{
+#' clean_cache()
+#' }
+clean_cache <- function(cache_dir = toggl_cache_dir()) {
+  unlink(cache_dir, recursive = TRUE, force = TRUE)
+}
+
+#' clean memoise cache (deprecated)
 #'
+#' Deprecated: togglr no longer memoises. Removes the cache folder of togglr
+#' 0.2.x (and the reports cache it contains). Use [clean_cache()].
+#'
+#' @param memoise_cache_dir folder to remove
+#' @export
 #' @examples
 #' \dontrun{
 #' clean_memoise_cache()
 #' }
 clean_memoise_cache <- function(memoise_cache_dir = getOption("togglr_memoise_dir", default = rappdirs::user_cache_dir("togglr"))) {
+  warning("clean_memoise_cache() is deprecated: togglr no longer memoises, use clean_cache().",
+          call. = FALSE)
   unlink(memoise_cache_dir, recursive = TRUE, force = TRUE)
 }

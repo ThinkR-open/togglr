@@ -54,16 +54,16 @@ test_that("an empty period returns the empty structure", {
 
 test_that("cache = TRUE stores only complete periods and reuses them", {
   dir <- withr::local_tempdir()
-  srv <- serve(fake_response(200, report_page(1:3, total = 4)),
-               fake_response(200, report_page(1:3, total = 4)))
+  short <- fake_response(200, report_page(1:3, total = 4))
+  srv <- serve(short, short, short)
   local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
-  expect_error(report(cache = TRUE, memoise_cache_dir = dir))
+  expect_error(report(cache = TRUE, cache_dir = dir))
   expect_length(list.files(dir), 0)
 
   srv <- serve(fake_response(200, report_page(1:4, total = 4)))
   local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
-  first <- report(cache = TRUE, memoise_cache_dir = dir)
-  again <- report(cache = TRUE, memoise_cache_dir = dir)
+  first <- report(cache = TRUE, cache_dir = dir)
+  again <- report(cache = TRUE, cache_dir = dir)
   expect_equal(srv$calls(), 1)
   expect_equal(first, again)
 })
@@ -228,4 +228,36 @@ test_that("an entry seen twice keeps its most recently updated version (#66)", {
   out <- suppressMessages(report())
   expect_equal(nrow(out), 60)
   expect_equal(out$description[out$id == 50], "edited")
+})
+
+# ---- M9 (#67) : cache dedie, noms sans memoise --------------------------------------
+
+test_that("the default cache folder is a dedicated sub-folder, settable by option (#67)", {
+  withr::local_options(togglr.cache_dir = NULL)
+  expect_equal(toggl_cache_dir(), file.path(rappdirs::user_cache_dir("togglr"), "reports"))
+  dir <- withr::local_tempdir()
+  withr::local_options(togglr.cache_dir = dir)
+  local_fresh_state()
+  srv <- serve(fake_response(200, report_page(1:4, total = 4)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  suppressMessages(report(cache = TRUE))
+  expect_gt(length(list.files(dir)), 0)
+})
+
+test_that("memoise_cache_dir still works, with a deprecation warning (#67)", {
+  dir <- withr::local_tempdir()
+  local_fresh_state()
+  srv <- serve(fake_response(200, report_page(1:4, total = 4)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_warning(suppressMessages(report(cache = TRUE, memoise_cache_dir = dir)), "memoise_cache_dir.*deprecated")
+  expect_gt(length(list.files(dir)), 0)
+})
+
+test_that("clean_cache() empties the reports cache; clean_memoise_cache() is deprecated (#67)", {
+  dir <- withr::local_tempdir()
+  writeLines("x", file.path(dir, "a"))
+  clean_cache(cache_dir = dir)
+  expect_false(dir.exists(dir))
+  old <- withr::local_tempdir()
+  expect_warning(clean_memoise_cache(memoise_cache_dir = old), "deprecated.*clean_cache")
 })

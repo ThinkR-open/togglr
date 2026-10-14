@@ -4,7 +4,6 @@
 \name{get_detailled_report_paged}
 \alias{get_detailled_report_paged}
 \alias{get_detailled_report}
-\alias{clean_memoise_cache}
 \title{get detailled report}
 \usage{
 get_detailled_report_paged(
@@ -24,13 +23,8 @@ get_detailled_report(
   user_agent = "togglr",
   max_page = NULL,
   cache = FALSE,
-  memoise_cache_dir = getOption("togglr_memoise_dir", default =
-    rappdirs::user_cache_dir("togglr"))
-)
-
-clean_memoise_cache(
-  memoise_cache_dir = getOption("togglr_memoise_dir", default =
-    rappdirs::user_cache_dir("togglr"))
+  cache_dir = toggl_cache_dir(),
+  memoise_cache_dir = NULL
 )
 }
 \arguments{
@@ -54,9 +48,11 @@ stored on disk and returned as is by later calls with the same `since` /
 `until`. Only use it for closed periods: entries created or edited later in
 Toggl will not be seen. Failures are never cached. Default `FALSE`.}
 
-\item{memoise_cache_dir}{cache folder used when `cache = TRUE`, can be edited
-with `options('togglr_memoise_dir')` or `rappdirs::user_cache_dir("togglr")`
-by default}
+\item{cache_dir}{folder of the cache used when `cache = TRUE`: by default
+`options("togglr.cache_dir")`, or the `reports` sub-folder of
+`rappdirs::user_cache_dir("togglr")`}
+
+\item{memoise_cache_dir}{deprecated, use `cache_dir`}
 }
 \value{
 a tibble of the page entries, with attributes `total_count` and
@@ -78,9 +74,4 @@ All the pages of the period are fetched, then the number of
 
   Periods longer than a year (365 days or more between `since` and
   `until`, across a new year) are split by calendar year.
-}
-\examples{
-\dontrun{
-clean_memoise_cache()
-}
 }
