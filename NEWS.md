@@ -19,6 +19,11 @@
 * With a shared state file, an exhausted quota recorded by another process
   while this one was waiting is no longer erased: it is waited for in turn, or
   fails within `max_wait` (#78).
+* `get_time_entries()` is never truncated: `/me/time_entries` returns at most
+  1000 entries, so a full answer splits the period in two, recursively. A
+  period starting more than 3 months ago (the limit of the API) fails before
+  any request, pointing to `get_detailled_report(user_ids = )` (#13). Its
+  output gains a `client_name` column (#14).
 
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the
