@@ -9,6 +9,10 @@
 * `get_detailled_report()` returns fixed column types (e.g. `task` is always
   text, `tid` integer), whatever the content of the page: periods over a year
   with an empty year no longer fail to combine (#46).
+* `get_detailled_report()` also compares the total duration (`total_grand`)
+  returned with each page: a deletion followed by an insertion during the
+  pagination, which leaves `total_count` unchanged, now triggers a new fetch
+  instead of returning a stale entry and missing another (#47).
 
 # togglr 0.3.0
 

@@ -27,9 +27,10 @@ serve <- function(...) {
 }
 
 # One page of the reports API v2 /details
-report_page <- function(ids, total, per_page = 50) {
+report_page <- function(ids, total, per_page = 50, total_grand = NULL) {
   list(
     total_count = total,
+    total_grand = total_grand,
     per_page = per_page,
     data = lapply(ids, function(i) list(
       id = i, pid = 1L, uid = 2L, description = paste("entry", i),

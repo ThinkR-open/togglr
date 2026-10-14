@@ -39,6 +39,7 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
   out <- normalize_detailled_report(as_tibble(togglr::simplify(wp$data, simplifyDataFrame = TRUE)))
   attr(out, "total_count") <- wp$total_count
   attr(out, "per_page") <- wp$per_page
+  attr(out, "total_grand") <- wp$total_grand # somme des durees de la periode, NULL si absente
   out
 }
 
@@ -69,8 +70,10 @@ toggl_reports_pace <- function(min_interval = getOption("togglr.min_interval", 1
 #'   by default
 #' @details All the pages of the period are fetched, then the number of
 #'   distinct entries is checked against the `total_count` announced by the
-#'   API. If entries are added or removed while paginating, the period is
-#'   fetched again once; if the result is still incomplete, an error is raised.
+#'   API. If entries are added, removed or edited while paginating (detected by
+#'   a change of `total_count` or of the total duration `total_grand` returned
+#'   with each page), the period is fetched again once; if the result is still
+#'   incomplete, an error is raised.
 #'   An HTTP error (quota, server error, authentication) raises an error too:
 #'   the function never returns a silently truncated period.
 #'
@@ -130,6 +133,9 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
                                         since = since, until = until,
                                         user_agent = user_agent, page = 1)
     total <- attr(first, "total_count")
+    # Signature de la periode, renvoyee avec chaque page : une suppression suivie
+    # d'une insertion laisse total_count inchange mais modifie la somme des durees
+    signature <- list(total, attr(first, "total_grand"))
     n_pages <- max(1, ceiling(total / attr(first, "per_page")))
 
     res <- list(first)
@@ -138,7 +144,8 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
       res[[page]] <- get_detailled_report_paged(api_token = api_token, workspace_id = workspace_id,
                                                 since = since, until = until,
                                                 user_agent = user_agent, page = page)
-      if (!identical(attr(res[[page]], "total_count"), total)) {
+      if (!identical(list(attr(res[[page]], "total_count"), attr(res[[page]], "total_grand")),
+                     signature)) {
         moved <- TRUE
         break
       }

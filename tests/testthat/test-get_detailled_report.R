@@ -107,3 +107,30 @@ test_that("pages with and without tasks are combined with stable types (#46)", {
   expect_type(out$tid, "integer")
   expect_equal(sum(!is.na(out$task)), 3)
 })
+
+# ---- I3 (#47) : mouvement a total_count constant ------------------------------
+
+test_that("a deletion + an insertion during pagination (same total_count) triggers a new fetch (#47)", {
+  srv <- serve(
+    fake_response(200, report_page(1:50, total = 60, total_grand = 216000000)),
+    # entre les deux pages, l'entree 3 est supprimee et l'entree 61 inseree :
+    # meme total_count, mais la somme des durees a change
+    fake_response(200, report_page(52:61, total = 60, total_grand = 215000000)),
+    fake_response(200, report_page(c(1:2, 4:51), total = 60, total_grand = 215000000)),
+    fake_response(200, report_page(52:61, total = 60, total_grand = 215000000))
+  )
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  out <- suppressMessages(report())
+  expect_equal(srv$calls(), 4)
+  expect_setequal(out$id, c(1:2, 4:61))
+})
+
+test_that("without total_grand in the answer, total_count alone is still checked (#47)", {
+  srv <- serve(
+    fake_response(200, report_page(1:50, total = 60)),
+    fake_response(200, report_page(51:60, total = 60))
+  )
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_equal(nrow(suppressMessages(report())), 60)
+  expect_equal(srv$calls(), 2)
+})

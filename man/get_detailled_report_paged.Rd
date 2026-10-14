@@ -68,8 +68,10 @@ get detailled report by user then projet
 \details{
 All the pages of the period are fetched, then the number of
   distinct entries is checked against the `total_count` announced by the
-  API. If entries are added or removed while paginating, the period is
-  fetched again once; if the result is still incomplete, an error is raised.
+  API. If entries are added, removed or edited while paginating (detected by
+  a change of `total_count` or of the total duration `total_grand` returned
+  with each page), the period is fetched again once; if the result is still
+  incomplete, an error is raised.
   An HTTP error (quota, server error, authentication) raises an error too:
   the function never returns a silently truncated period.
 
