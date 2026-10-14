@@ -12,7 +12,7 @@ get_detailled_report_paged(
   since = toggl_today() \%m-\% lubridate::years(1),
   until = toggl_today(),
   page = 1,
-  user_agent = "togglr"
+  user_agent = toggl_user_agent()
 )
 
 get_detailled_report(
@@ -20,7 +20,7 @@ get_detailled_report(
   workspace_id = get_workspace_id(api_token),
   since = toggl_today() \%m-\% lubridate::years(1),
   until = toggl_today(),
-  user_agent = "togglr",
+  user_agent = toggl_user_agent(),
   max_page = NULL,
   cache = FALSE,
   cache_dir = toggl_cache_dir(),

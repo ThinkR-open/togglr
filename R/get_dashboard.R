@@ -9,7 +9,7 @@
 #' @export
 #' @import httr
 #' @importFrom lubridate years
-#' @importFrom  dplyr select one_of
+#' @importFrom  dplyr select any_of
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @encoding UTF-8
@@ -22,11 +22,11 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
   until <- period$until
   url <-
     sprintf(
-      "https://api.track.toggl.com/reports/api/v2/summary?workspace_id=%s&since=%s&until=%s&user_agent=api_test",
+      "https://api.track.toggl.com/reports/api/v2/summary?workspace_id=%s&since=%s&until=%s&user_agent=%s",
       workspace_id,
       format(since, "%Y-%m-%d"),
-      format(until, "%Y-%m-%d")
-      
+      format(until, "%Y-%m-%d"),
+      utils::URLencode(toggl_user_agent(), reserved = TRUE)
     )
   wp <- toggl_GET(url, api_token = api_token)$content
   
@@ -37,7 +37,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
   
   synthese <-
     data.frame(id = out$id, out$title, time = out$time) %>%
-    select(-one_of(c("color","hex_color")))
+    select(-any_of(c("color","hex_color")))
   
   tache <- out$items %>%
     setNames(synthese$project) %>%

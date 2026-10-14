@@ -140,3 +140,7 @@ as_toggl_period <- function(since, until) {
 # wrapper, so that tests can choose the day
 #' @noRd
 toggl_today <- function() Sys.Date()
+
+#' User agent of the requests: "togglr/<version>"
+#' @noRd
+toggl_user_agent <- function() paste0("togglr/", utils::packageVersion("togglr"))

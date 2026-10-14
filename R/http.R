@@ -25,7 +25,7 @@
 #'   of blocking the session. Can be set with `options(togglr.max_wait = )`.
 #'
 #' @return a list with `content` (parsed body) and `headers`
-#' @importFrom httr GET POST PUT PATCH DELETE authenticate content status_code headers http_status timeout
+#' @importFrom httr GET POST PUT PATCH DELETE authenticate content status_code headers http_status timeout user_agent
 #' @noRd
 toggl_GET <- function(url,
                       api_token = get_toggl_api_token(),
@@ -160,14 +160,14 @@ toggl_header_num <- function(resp, name) {
 #' @noRd
 toggl_http_get <- function(url, api_token) {
   GET(url, authenticate(api_token, "api_token"), timeout(getOption("togglr.timeout", 120)),
-      encode = "json")
+      user_agent(toggl_user_agent()), encode = "json")
 }
 
 #' @noRd
 toggl_http_send <- function(verb, url, api_token, body) {
   send <- switch(verb, POST = POST, PUT = PUT, PATCH = PATCH, DELETE = DELETE)
   send(url, authenticate(api_token, "api_token"), timeout(getOption("togglr.timeout", 120)),
-       encode = "json", body = body)
+       user_agent(toggl_user_agent()), encode = "json", body = body)
 }
 
 #' @noRd

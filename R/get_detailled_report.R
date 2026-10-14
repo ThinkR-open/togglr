@@ -23,11 +23,11 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
                                        since = toggl_today() %m-% lubridate::years(1),
                                        until = toggl_today(),
                                        page = 1,
-                                       user_agent = "togglr") {
+                                       user_agent = toggl_user_agent()) {
   period <- as_toggl_period(since, until)
   since <- period$since
   until <- period$until
-  url <- glue("https://api.track.toggl.com/reports/api/v2/details?workspace_id={workspace_id}&since={since}&until={until}&user_agent={user_agent}&grouping=users&page={page}",
+  url <- glue("https://api.track.toggl.com/reports/api/v2/details?workspace_id={workspace_id}&since={since}&until={until}&user_agent={utils::URLencode(user_agent, reserved = TRUE)}&grouping=users&page={page}",
               since = format(since, "%Y-%m-%dT00:00:00"),
               until = format(until, "%Y-%m-%dT00:00:00")
   )
@@ -97,7 +97,7 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  workspace_id = get_workspace_id(api_token),
                                  since = toggl_today() %m-% lubridate::years(1),
                                  until = toggl_today(),
-                                 user_agent = "togglr",
+                                 user_agent = toggl_user_agent(),
                                  max_page = NULL,
                                  cache = FALSE,
                                  cache_dir = toggl_cache_dir(),

@@ -96,6 +96,10 @@
 * `globalVariables()` no longer declares function names (`case_when`,
   `full_join`, `tribble`) nor unused names, which could hide a missing
   import (#70).
+* Every request sends the user agent `togglr/<version>` (header, and the
+  `user_agent` parameter of the reports API, now url-encoded); `get_dashboard()`
+  no longer sends a hardcoded `api_test`, and uses `any_of()` instead of the
+  superseded `one_of()`, which warned when the API returned no color (#71).
 
 # togglr 0.3.0
 
