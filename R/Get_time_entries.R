@@ -3,6 +3,7 @@
 #' @param since begin date (One week ago by default)
 #' @param until stop date (Now by defaut)
 #' @param api_token the toggl api token
+#' @param workspace_id the workspace id (to name the projects)
 #'
 #' @return a data.frame containing all time entries
 #' @export
@@ -19,7 +20,8 @@
 #' }
 get_time_entries <- function(api_token = get_toggl_api_token(),
                              since = Sys.time() - lubridate::weeks(1),
-                             until = Sys.time()) {
+                             until = Sys.time(),
+                             workspace_id = get_workspace_id(api_token)) {
   url <- glue::glue("https://api.track.toggl.com/api/v9/me/time_entries?start_date={format_iso_8601(since)}&end_date={format_iso_8601(until)}")
   res <- toggl_GET(url, api_token = api_token)$content
 
@@ -34,7 +36,7 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
   # extract list of tags
   tags <- map(res, ~ .x$tags)
 
-  woot <- get_project_id_and_name() |> 
+  woot <- get_project_id_and_name(api_token = api_token, workspace_id = workspace_id) |> 
     mutate(id=as.character(id))
   
 res |> map(unlist) |>  map(~ {

@@ -4,12 +4,18 @@
 \alias{client_id_to_name}
 \title{client_id_to_name}
 \usage{
-client_id_to_name(id, api_token = get_toggl_api_token())
+client_id_to_name(
+  id,
+  api_token = get_toggl_api_token(),
+  workspace_id = get_workspace_id(api_token)
+)
 }
 \arguments{
 \item{id}{client id}
 
 \item{api_token}{the toggl api token}
+
+\item{workspace_id}{workspace id}
 }
 \value{
 the client name

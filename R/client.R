@@ -60,14 +60,16 @@ get_all_client_info <- function(api_token=get_toggl_api_token(),workspace_id = g
 #' return client id from client name
 #' @param name client name
 #' @param api_token the toggl api token
+#' @param workspace_id workspace id
 #' @import assertthat
 #' @importFrom dplyr filter pull
 #' @return the client id
 #' @export
 #'
-client_name_to_id <- function(name, api_token = get_toggl_api_token()) {
+client_name_to_id <- function(name, api_token = get_toggl_api_token(),
+                              workspace_id = get_workspace_id(api_token)) {
   assertthat::assert_that(is.string(name))
-  get_all_client_info(api_token = api_token) %>%
+  get_all_client_info(api_token = api_token, workspace_id = workspace_id) %>%
     filter(name == !!name) %>%
     pull("id")
 }
@@ -77,13 +79,15 @@ client_name_to_id <- function(name, api_token = get_toggl_api_token()) {
 #'
 #' @param id client id
 #' @param api_token the toggl api token
+#' @param workspace_id workspace id
 #' @import assertthat
 #' @importFrom dplyr filter pull
 #' @return the client name
 #' @export
 #'
-client_id_to_name <- function(id, api_token = get_toggl_api_token()) {
-  get_all_client_info(api_token = api_token) %>%
+client_id_to_name <- function(id, api_token = get_toggl_api_token(),
+                              workspace_id = get_workspace_id(api_token)) {
+  get_all_client_info(api_token = api_token, workspace_id = workspace_id) %>%
     filter(id == !!id) %>%
     pull("name")
 }
@@ -101,7 +105,7 @@ client_id_to_name <- function(id, api_token = get_toggl_api_token()) {
 #'
 get_client_project <- function(id,api_token=get_toggl_api_token(),workspace_id = get_workspace_id(api_token)){
   
-  get_all_projects() %>%
+  get_all_projects(api_token = api_token, workspace_id = workspace_id) %>%
     dplyr::filter(client_id == !! id)
 
 }

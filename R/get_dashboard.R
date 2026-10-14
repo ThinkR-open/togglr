@@ -94,7 +94,7 @@ get_project_total <- function(project_name = get_context_project(),
     )
   dash$synthese  %>% filter(project == project_name) %>% pull("time") ->tmps
   
-  (get_current_duration() + tmps)  %>% as.numeric() %>% n_to_tps
+  (get_current_duration(api_token = api_token) + tmps)  %>% as.numeric() %>% n_to_tps
   
 }
 
@@ -135,7 +135,7 @@ get_all_project_names <- function(api_token = get_toggl_api_token(),
 #' @export
 #'
 get_all_client_names <- function(api_token = get_toggl_api_token(),
-                                 workspace_id = get_workspace_id(),
+                                 workspace_id = get_workspace_id(api_token),
                                  since = Sys.Date() - lubridate::years(1),
                                  until = Sys.Date()) {
   dash <-
@@ -167,7 +167,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 get_current_project_task_detail <-
   function(project_name = get_context_project(),
            api_token = get_toggl_api_token(),
-           workspace_id = get_workspace_id(),
+           workspace_id = get_workspace_id(api_token),
            since = Sys.Date() - lubridate::years(1),
            until = Sys.Date(),
            humain = TRUE) {

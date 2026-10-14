@@ -6,19 +6,25 @@
 #' @import keyring
 #' @export
 get_toggl_api_token <- function(ask=TRUE){
-  token <-NULL
-  
-  try(token<-key_get(service = "toggl_api_token"),silent=TRUE)
-  
-  
-  if ( is.null(token) & ask){
-    delete_toggl_api_token()
-    token <- ask_toggl_api_token() 
-    token %>% key_set_with_value(service = "toggl_api_token",password = .)
-    
+  # never delete the stored key here: a locked keyring (cron) also makes
+  # key_get() fail, and the token would be lost
+  token <- tryCatch(key_get(service = "toggl_api_token"), error = function(e) NULL)
+
+  if (is.null(token) && ask) {
+    if (!is_interactive()) {
+      stop("no toggl API token: none could be read from the keyring (service ",
+           "\"toggl_api_token\"). Pass `api_token` explicitly, or set it with ",
+           "set_toggl_api_token().", call. = FALSE)
+    }
+    token <- ask_toggl_api_token()
+    if (!is.null(token)) key_set_with_value(service = "toggl_api_token", password = token)
   }
   token
 }
+
+# wrapper, so that tests can simulate a non interactive session
+#' @noRd
+is_interactive <- function() interactive()
 
 
 #' set_toggl_api_token

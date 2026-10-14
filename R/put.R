@@ -57,7 +57,9 @@ toggl_start <- function(description = get_context(),
         pid = get_project_id(
           project_name = project_name,
           create = TRUE,
-          client = client
+          client = client,
+          api_token = api_token,
+          workspace_id = workspace_id
         ),
         duronly = FALSE 
       # )
@@ -102,7 +104,7 @@ toggl_start <- function(description = get_context(),
 #' toggl_stop()
 #' }
 #' @export
-toggl_stop <- function(current=get_current(),
+toggl_stop <- function(current=get_current(api_token = api_token),
                        api_token=get_toggl_api_token(),
                        workspace_id = get_workspace_id(api_token)){
   if (is.null(api_token)){
@@ -169,7 +171,7 @@ toggl_stop <- function(current=get_current(),
 toggl_create <- function(
   description=get_context(),
   start=now(),
-  pid = get_project_id(),
+  pid = get_project_id(api_token = api_token, workspace_id = workspace_id),
   stop,
   duration,
   tags=NULL,

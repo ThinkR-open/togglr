@@ -26,7 +26,7 @@ get_project_id <- function(project_name = get_context_project(),
   
   
 
-  project_tbl <- get_all_projects()
+  project_tbl <- get_all_projects(api_token = api_token, workspace_id = workspace_id)
     
     
   if (ncol(project_tbl) == 0) {
@@ -50,6 +50,7 @@ get_project_id <- function(project_name = get_context_project(),
     message(" we create the project")
     id <-  toggl_create_project(project_name = project_name,
                                 api_token = api_token,
+                                workspace_id = workspace_id,
                                 client = client,color = color)
   }
   
@@ -81,7 +82,7 @@ get_project_id_and_name <- function(
   
   # active: possible values true/false/both. By default true. If false, only archived projects are returned.
   
-get_all_projects() %>% 
+get_all_projects(api_token = api_token, workspace_id = workspace_id) %>% 
     select(id,name,'active') %>% 
     rename(project_name = name)
 

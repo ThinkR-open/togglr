@@ -6,7 +6,7 @@
 \usage{
 get_all_client_names(
   api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(),
+  workspace_id = get_workspace_id(api_token),
   since = Sys.Date() - lubridate::years(1),
   until = Sys.Date()
 )

@@ -21,6 +21,15 @@
   the message of the API, instead of blocking every request for an hour. An
   exhausted quota is remembered per token, as a hash: the token is never
   stored (#49).
+* The `api_token` and `workspace_id` given to a function are now used by every
+  call it makes: project, client and dashboard helpers, `get_time_entries()`
+  (new `workspace_id` argument), `toggl_start()`, `toggl_stop()`,
+  `toggl_create()`, `toggl_create_project()` no longer fall back to the keyring
+  token nor to an extra `/workspaces` request. `client_name_to_id()` and
+  `client_id_to_name()` gain a `workspace_id` argument (#51).
+* `get_toggl_api_token()` no longer deletes the stored key when the keyring
+  cannot be read (e.g. locked under cron); in a non interactive session it
+  fails with a clear message instead of prompting (#51).
 
 # togglr 0.3.0
 

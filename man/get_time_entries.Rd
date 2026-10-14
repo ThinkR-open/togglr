@@ -8,7 +8,8 @@
 get_time_entries(
   api_token = get_toggl_api_token(),
   since = Sys.time() - lubridate::weeks(1),
-  until = Sys.time()
+  until = Sys.time(),
+  workspace_id = get_workspace_id(api_token)
 )
 }
 \arguments{
@@ -17,6 +18,8 @@ get_time_entries(
 \item{since}{begin date (One week ago by default)}
 
 \item{until}{stop date (Now by defaut)}
+
+\item{workspace_id}{the workspace id (to name the projects)}
 }
 \value{
 a data.frame containing all time entries

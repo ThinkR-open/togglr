@@ -5,7 +5,7 @@
 \title{toggl_stop}
 \usage{
 toggl_stop(
-  current = get_current(),
+  current = get_current(api_token = api_token),
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token)
 )

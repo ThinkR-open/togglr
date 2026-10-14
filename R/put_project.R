@@ -30,7 +30,7 @@ toggl_create_project <- function(
     
   }
   
-  if (!is.null(id<-suppressWarnings(get_project_id(project_name = project_name)))){
+  if (!is.null(id<-suppressWarnings(get_project_id(project_name = project_name, api_token = api_token, workspace_id = workspace_id)))){
     warning("the project " ,project_name," already exist")
     
   }else{
@@ -41,7 +41,7 @@ toggl_create_project <- function(
                     api_token = api_token,
                     workspace_id = workspace_id)
       try(client_id <-
-            client_name_to_id(name = client, api_token = api_token))
+            client_name_to_id(name = client, api_token = api_token, workspace_id = workspace_id))
     } else{
       client_id <- NULL
     }

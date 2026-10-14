@@ -7,7 +7,7 @@
 toggl_create(
   description = get_context(),
   start = now(),
-  pid = get_project_id(),
+  pid = get_project_id(api_token = api_token, workspace_id = workspace_id),
   stop,
   duration,
   tags = NULL,
