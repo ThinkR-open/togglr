@@ -136,6 +136,16 @@ as_toggl_period <- function(since, until) {
   list(since = since, until = until)
 }
 
+#' Check the period of the calling function and replace its `since` and
+#' `until` by the `Date`s read by [as_toggl_period()]
+#' @noRd
+read_toggl_period <- function(env = parent.frame()) {
+  period <- as_toggl_period(env$since, env$until)
+  assign("since", period$since, envir = env)
+  assign("until", period$until, envir = env)
+  invisible(period)
+}
+
 # wrapper, so that tests can choose the day
 #' @noRd
 toggl_today <- function() Sys.Date()

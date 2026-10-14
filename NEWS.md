@@ -109,6 +109,24 @@
   its own help page, the vignette installs from GitHub and no longer runs
   `install.packages()` during `R CMD check`. `R CMD check` is clean: 0 error,
   0 warning, 0 note (#74).
+* Fixes from the review of #75:
+  - `toggl_create_project()` (and so `toggl_start()` on a new project) works
+    again in a workspace without any client: `get_all_client_info()` returns
+    the `id` and `name` columns, even with no rows.
+  - The reports cache is kept per token (as a hash): a period fetched with one
+    token is no longer returned to another token of the same workspace.
+  - The spreading of the last requests of the quota waits at most `max_wait`,
+    with a message, and only slows down the token that is short of quota.
+  - The quota is remembered per token and per scope (the workspace or
+    organization of the url, or the user for `/me` and `/workspaces`): an
+    exhausted workspace no longer blocks `/me` or another workspace.
+  - A request processed by the API is returned even if its quota cannot be
+    recorded in the state file (warning): a time entry is no longer reported
+    as not started, then created twice.
+  - One pass on the state file per request instead of three, and a read no
+    longer rewrites it.
+  - In a period that includes today, the growth of `total_grand` caused by a
+    running timer between two pages is no longer taken for an edit.
 
 # togglr 0.3.0
 

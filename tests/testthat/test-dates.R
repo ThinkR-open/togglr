@@ -10,7 +10,7 @@ capture_url <- function(env = parent.frame()) {
 }
 
 report_functions <- list(
-  detailled = function(...) get_detailled_report_paged(api_token = "t", workspace_id = 1, ...),
+  detailled = function(...) suppressMessages(get_detailled_report(api_token = "t", workspace_id = 1, ...)),
   summary   = function(...) get_summary_report(api_token = "t", workspace_id = 1, ...),
   weekly    = function(...) get_weekly_report(api_token = "t", workspace_id = 1, ...),
   dashboard = function(...) get_dashboard(api_token = "t", workspace_id = 1, ...)

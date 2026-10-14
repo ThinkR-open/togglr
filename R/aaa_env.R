@@ -11,7 +11,8 @@
 #' update runs under a file lock (`<path>.lock`): every R process using the same
 #' file (callr / future / targets workers, cron jobs) shares the pacing of the
 #' requests and the knowledge of an exhausted quota. Without the option, the
-#' state is private to the R session.
+#' state is private to the R session. The file is rewritten only when `f`
+#' changes the state (a read does not write).
 #' @noRd
 toggl_state_update <- function(f) {
   path <- getOption("togglr.state_file")
@@ -26,9 +27,11 @@ toggl_state_update <- function(f) {
   state <- if (file.exists(path)) tryCatch(readRDS(path), error = function(e) list()) else list()
   if (!is.list(state)) state <- list()
   res <- f(state)
-  tmp <- tempfile(tmpdir = dirname(path))
-  saveRDS(res$state, tmp)
-  file.rename(tmp, path)
+  if (!identical(res$state, state)) {
+    tmp <- tempfile(tmpdir = dirname(path))
+    saveRDS(res$state, tmp)
+    file.rename(tmp, path)
+  }
   res$value
 }
 

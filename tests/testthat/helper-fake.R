@@ -73,7 +73,7 @@ local_periods <- function(env = parent.frame()) {
   local_mocked_bindings(
     fetch_detailled_period = function(api_token, workspace_id, since, until, user_agent) {
       asked <<- c(asked, paste(format(since), format(until)))
-      normalize_detailled_report(tibble::tibble(id = length(asked)))
+      normalize_detailled_report(dplyr::tibble(id = length(asked)))
     },
     .env = env
   )

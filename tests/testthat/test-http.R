@@ -166,14 +166,90 @@ test_that("a 200 announcing 0 remaining requests: the next one is not sent befor
 
 test_that("few remaining requests are spread until the reset (#68)", {
   local_fresh_state()
+  withr::local_options(togglr.min_interval = 0)
   waited <- c()
   srv <- serve(quota_ok(4, resets = 400), quota_ok(3, resets = 300))
   local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) waited <<- c(waited, s))
   toggl_GET("u", api_token = "t")
-  toggl_GET("u", api_token = "t")
+  expect_message(toggl_GET("u", api_token = "t", max_wait = 3600), "almost exhausted")
   expect_length(waited, 1)
   expect_gt(waited, 95)
   expect_lte(waited, 100)
+})
+
+# ---- revue PR #75 ------------------------------------------------------------------
+
+test_that("the spreading of the quota never waits more than max_wait, and says so (revue #75)", {
+  local_fresh_state()
+  withr::local_options(togglr.min_interval = 0)
+  waited <- c()
+  srv <- serve(quota_ok(2, resets = 3000), quota_ok(1, resets = 2900))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) waited <<- c(waited, s))
+  toggl_GET("u", api_token = "t")
+  expect_message(toggl_GET("u", api_token = "t", max_wait = 60), "waiting 60s")
+  expect_equal(waited, 60)
+})
+
+test_that("a token close to its quota does not slow down another token (revue #75)", {
+  local_fresh_state()
+  withr::local_options(togglr.min_interval = 0)
+  waited <- c()
+  srv <- serve(quota_ok(3, resets = 1800), quota_ok(200))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) waited <<- c(waited, s))
+  toggl_GET("u", api_token = "token_a")
+  toggl_GET("u", api_token = "token_b")
+  expect_length(waited, 0)
+})
+
+test_that("an exhausted workspace does not block /me nor another workspace (revue #75)", {
+  local_fresh_state()
+  srv <- serve(fake_response(402, headers = list(`x-toggl-quota-resets-in` = "1800")),
+               fake_response(200, list(ok = TRUE)), fake_response(200, list(ok = TRUE)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  ws1 <- "https://api.track.toggl.com/api/v9/workspaces/1/projects"
+  expect_error(toggl_GET(ws1, api_token = "t", max_tries = 1), "402")
+  expect_true(toggl_GET("https://api.track.toggl.com/api/v9/me", api_token = "t")$content$ok)
+  expect_true(toggl_GET("https://api.track.toggl.com/reports/api/v2/details?workspace_id=2",
+                        api_token = "t")$content$ok)
+  expect_error(toggl_GET("https://api.track.toggl.com/reports/api/v2/details?workspace_id=1&page=2",
+                         api_token = "t"), "no request sent")
+  expect_equal(srv$calls(), 3)
+})
+
+test_that("the quota scope comes from the url (revue #75)", {
+  expect_equal(toggl_quota_scope("https://api.track.toggl.com/api/v9/me"), "user")
+  expect_equal(toggl_quota_scope("https://api.track.toggl.com/api/v9/workspaces"), "user")
+  expect_equal(toggl_quota_scope("https://api.track.toggl.com/api/v9/workspaces/12/clients"), "ws12")
+  expect_equal(toggl_quota_scope("https://api.track.toggl.com/reports/api/v2/details?workspace_id=12&page=1"), "ws12")
+  expect_equal(toggl_quota_scope("https://api.track.toggl.com/api/v9/organizations/3/users"), "org3")
+})
+
+test_that("a processed POST is returned even if the quota cannot be recorded (revue #75)", {
+  local_fresh_state()
+  srv <- serve_write(quota_ok(3, body = list(id = 7L)))
+  local_mocked_bindings(POST = srv$send, toggl_sleep = function(s) NULL,
+                        toggl_note_quota = function(...) stop("could not lock the togglr state file"))
+  expect_warning(res <- toggl_request("POST", "u", api_token = "t", body = "{}"), "request succeeded")
+  expect_equal(res$content$id, 7L)
+})
+
+test_that("one lock pass per request, and a read does not rewrite the state file (revue #75)", {
+  local_fresh_state()
+  f <- withr::local_tempfile()
+  withr::local_options(togglr.state_file = f)
+  toggl_state_set("x", 1)
+  before <- file.info(f)$mtime
+  Sys.sleep(1.1)
+  expect_equal(toggl_state_get("x"), 1)
+  expect_equal(file.info(f)$mtime, before)
+
+  passes <- 0
+  real <- toggl_state_update
+  srv <- serve(fake_response(200, list(ok = TRUE)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL,
+                        toggl_state_update = function(f) { passes <<- passes + 1; real(f) })
+  toggl_GET("u", api_token = "t")
+  expect_equal(passes, 1)
 })
 
 test_that("plenty of remaining requests: no slowdown (#68)", {

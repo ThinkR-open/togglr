@@ -16,9 +16,7 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
                           workspace_id = get_workspace_id(api_token),
                           since = toggl_today() %m-% lubridate::years(1),
                           until = toggl_today()) {
-  period <- as_toggl_period(since, until)
-  since <- period$since
-  until <- period$until
+  read_toggl_period()
   url <-
     sprintf(
       "https://api.track.toggl.com/reports/api/v2/summary?workspace_id=%s&since=%s&until=%s&user_agent=%s",

@@ -26,9 +26,7 @@ get_summary_report <- function(api_token = get_toggl_api_token(),
                               ) {
   
   
-  period <- as_toggl_period(since, until)
-  since <- period$since
-  until <- period$until
+  read_toggl_period()
   url <- glue::glue("https://api.track.toggl.com/reports/api/v2/summary?workspace_id={workspace_id}&since={since}&until={until}&user_agent={utils::URLencode(user_agent, reserved = TRUE)}&grouping=users",
                     since=format(since, "%Y-%m-%d"),
                     until=format(until, "%Y-%m-%d")

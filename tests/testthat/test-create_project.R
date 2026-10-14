@@ -61,3 +61,28 @@ test_that("an existing project is not created again (#55)", {
   expect_equal(id, 12L)
   expect_equal(api$n(), 0)
 })
+
+test_that("a project with a client is created in a workspace without any client (revue #75)", {
+  local_fresh_state()
+  created <- character(0)
+  srv <- serve(fake_response(200, NULL))
+  local_mocked_bindings(
+    toggl_http_get = srv$get,
+    POST = function(url, ...) fake_response(200, list(id = 77L)),
+    get_project_id = function(...) NULL,
+    create_client = function(name, ...) { created <<- c(created, name); list(id = 8L) },
+    toggl_sleep = function(s) NULL
+  )
+  expect_equal(toggl_create_project("p", api_token = "t", workspace_id = 1,
+                                    client = "without client"), 77L)
+  expect_equal(created, "without client")
+})
+
+test_that("get_all_client_info keeps id and name for a workspace without client (revue #75)", {
+  local_fresh_state()
+  srv <- serve(fake_response(200, list()))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  out <- get_all_client_info(api_token = "t", workspace_id = 1)
+  expect_equal(nrow(out), 0)
+  expect_true(all(c("id", "name") %in% names(out)))
+})

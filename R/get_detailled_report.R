@@ -15,9 +15,7 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
                                        until = toggl_today(),
                                        page = 1,
                                        user_agent = toggl_user_agent()) {
-  period <- as_toggl_period(since, until)
-  since <- period$since
-  until <- period$until
+  # since / until : des Date deja validees par get_detailled_report()
   url <- glue("https://api.track.toggl.com/reports/api/v2/details?workspace_id={workspace_id}&since={since}&until={until}&user_agent={utils::URLencode(user_agent, reserved = TRUE)}&grouping=users&page={page}",
               since = format(since, "%Y-%m-%dT00:00:00"),
               until = format(until, "%Y-%m-%dT00:00:00")
@@ -43,16 +41,56 @@ get_detailled_report_paged <- function(api_token = get_toggl_api_token(),
 #' Each call reserves the next free slot under the state lock, then sleeps until
 #' it: with a shared state file (`togglr.state_file`), concurrent processes are
 #' spaced too.
+#'
+#' With an `api_token`, the same lock pass first checks what is known of the
+#' quota of the token in `scope`: an exhausted quota fails when its reset is
+#' beyond `max_wait`, otherwise it is waited for; a spread announced by
+#' [toggl_note_quota()] is waited for, at most `max_wait`. These waits only
+#' concern this token: the shared slot is reserved after them.
 #' @noRd
-toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1)) {
-  slot <- toggl_state_update(function(st) {
-    now <- Sys.time()
-    last <- st$last_report_call
-    slot <- if (is.null(last)) now else max(now, last + min_interval)
-    st$last_report_call <- slot
-    list(state = st, value = slot)
-  })
-  wait <- as.numeric(difftime(slot, Sys.time(), units = "secs"))
+toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
+                       api_token = NULL, scope = "user", max_wait = Inf) {
+  qkey <- if (!is.null(api_token)) toggl_quota_key(api_token, scope)
+  skey <- if (!is.null(api_token)) toggl_quota_key(api_token, scope, "spread_until")
+  done <- character(0)
+  repeat {
+    plan <- toggl_state_update(function(st) {
+      now <- Sys.time()
+      reset <- if (!is.null(qkey) && !"quota" %in% done) st[[qkey]]
+      if (!is.null(reset) && reset > now) {
+        wait <- ceiling(as.numeric(difftime(reset, now, units = "secs")))
+        return(list(state = st, value = list(hold = wait, why = "quota")))
+      }
+      spread <- if (!is.null(skey) && !"spread" %in% done) st[[skey]]
+      if (!is.null(spread) && spread > now) {
+        return(list(state = st, value = list(
+          hold = min(as.numeric(difftime(spread, now, units = "secs")), max_wait), why = "spread")))
+      }
+      # quota et etalement consommes par cet envoi
+      if (!is.null(qkey)) {
+        st[[qkey]] <- NULL
+        st[[skey]] <- NULL
+      }
+      last <- st$last_report_call
+      slot <- if (is.null(last)) now else max(now, last + min_interval)
+      st$last_report_call <- slot
+      list(state = st, value = list(slot = slot))
+    })
+    if (is.null(plan$hold)) break
+    if (plan$why == "quota") {
+      if (plan$hold > max_wait) {
+        stop("toggl hourly API quota exhausted, resets in ", plan$hold, "s (> max_wait = ",
+             max_wait, "s): no request sent, try again later.", call. = FALSE)
+      }
+      message("toggl hourly API quota exhausted, waiting ", plan$hold, "s for the reset")
+    } else {
+      message("toggl hourly API quota almost exhausted, spreading the requests: waiting ",
+              ceiling(plan$hold), "s")
+    }
+    toggl_sleep(plan$hold)
+    done <- c(done, plan$why)
+  }
+  wait <- as.numeric(difftime(plan$slot, Sys.time(), units = "secs"))
   if (wait > 0) toggl_sleep(wait)
 }
 
@@ -114,9 +152,7 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
     warning("`memoise_cache_dir` is deprecated, use `cache_dir`.", call. = FALSE)
     cache_dir <- memoise_cache_dir
   }
-  period <- as_toggl_period(since, until)
-  since <- period$since
-  until <- period$until
+  read_toggl_period()
   if (!is.null(max_page)) {
     warning("`max_page` is deprecated and ignored: the number of pages comes from ",
             "the total_count returned by the API.", call. = FALSE)
@@ -139,8 +175,9 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
 
   if (isTRUE(cache)) {
     cd <- cachem::cache_disk(dir = cache_dir)
-    key <- paste("detailled", workspace_id, format(since, "%Y%m%d"),
-                 format(until, "%Y%m%d"), sep = "_")
+    # par token : deux tokens d'un workspace ne voient pas forcement les memes entrees
+    key <- paste("detailled", toggl_token_hash(api_token), workspace_id,
+                 format(since, "%Y%m%d"), format(until, "%Y%m%d"), sep = "_")
     cached <- cd$get(key)
     if (!cachem::is.key_missing(cached)) {
       return(cached)
@@ -165,14 +202,19 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
 fetch_detailled_period <- function(api_token, workspace_id, since, until,
                                    user_agent,
                                    attempts = getOption("togglr.report_attempts", 3)) {
+  # un timer en cours fait grandir total_grand d'une page a l'autre si la
+  # periode contient aujourd'hui : tolerer cette hausse, pas plus
+  open <- until >= toggl_today()
   for (attempt in seq_len(attempts)) {
+    started <- Sys.time()
     first <- get_detailled_report_paged(api_token = api_token, workspace_id = workspace_id,
                                         since = since, until = until,
                                         user_agent = user_agent, page = 1)
     total <- attr(first, "total_count")
     # Signature de la periode, renvoyee avec chaque page : une suppression suivie
     # d'une insertion laisse total_count inchange mais modifie la somme des durees
-    signature <- list(total, attr(first, "total_grand"))
+    grand <- attr(first, "total_grand")
+    n_users <- max(1, length(unique(first$uid)))
     n_pages <- max(1, ceiling(total / attr(first, "per_page")))
 
     res <- list(first)
@@ -181,8 +223,10 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
       res[[page]] <- get_detailled_report_paged(api_token = api_token, workspace_id = workspace_id,
                                                 since = since, until = until,
                                                 user_agent = user_agent, page = page)
-      if (!identical(list(attr(res[[page]], "total_count"), attr(res[[page]], "total_grand")),
-                     signature)) {
+      elapsed_ms <- 1000 * as.numeric(difftime(Sys.time(), started, units = "secs"))
+      if (!identical(attr(res[[page]], "total_count"), total) ||
+          !same_total_grand(attr(res[[page]], "total_grand"), grand,
+                            growth_ms = if (open) (elapsed_ms + 1000) * n_users else 0)) {
         moved <- TRUE
         break
       }
@@ -208,6 +252,17 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
   stop("incomplete toggl detailled report for ", format(since), " -> ", format(until),
        ": ", nrow(out), " distinct entries fetched, ", total, " announced by the API.",
        call. = FALSE)
+}
+
+#' Has the total duration of the period stayed the same between two pages?
+#'
+#' `growth_ms` is the increase allowed for running timers (their duration
+#' grows with the clock); any decrease, or a larger increase, is an edit.
+#' @noRd
+same_total_grand <- function(now, before, growth_ms = 0) {
+  if (is.null(now) || is.null(before)) return(is.null(now) && is.null(before))
+  delta <- as.numeric(now) - as.numeric(before)
+  delta >= 0 && delta <= growth_ms
 }
 
 #' Column types of the detailled report

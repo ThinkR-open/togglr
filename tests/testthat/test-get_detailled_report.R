@@ -256,3 +256,48 @@ test_that("clean_cache() empties the reports cache; clean_memoise_cache() is dep
   old <- withr::local_tempdir()
   expect_warning(clean_memoise_cache(memoise_cache_dir = old), "deprecated.*clean_cache")
 })
+
+# ---- revue PR #75 ------------------------------------------------------------------
+
+test_that("the cache is kept per token (revue #75)", {
+  local_fresh_state()
+  dir <- withr::local_tempdir()
+  srv <- serve(fake_response(200, report_page(1:4, total = 4)),
+               fake_response(200, report_page(1:2, total = 2)))
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  admin <- suppressMessages(get_detailled_report(api_token = "admin", workspace_id = 1,
+                                                 since = as.Date("2026-09-01"), until = as.Date("2026-09-30"),
+                                                 cache = TRUE, cache_dir = dir))
+  member <- suppressMessages(get_detailled_report(api_token = "member", workspace_id = 1,
+                                                  since = as.Date("2026-09-01"), until = as.Date("2026-09-30"),
+                                                  cache = TRUE, cache_dir = dir))
+  expect_equal(srv$calls(), 2)
+  expect_equal(nrow(admin), 4)
+  expect_equal(nrow(member), 2)
+})
+
+test_that("a running timer growing total_grand between pages is not an edit (revue #75)", {
+  local_fresh_state()
+  local_mocked_bindings(toggl_today = function() as.Date("2026-10-14"))
+  srv <- serve(
+    fake_response(200, report_page(1:50, total = 60, total_grand = 216000000)),
+    fake_response(200, report_page(51:60, total = 60, total_grand = 216000400))
+  )
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_equal(nrow(suppressMessages(report())), 60)
+  expect_equal(srv$calls(), 2)
+})
+
+test_that("on a closed period, any change of total_grand is still an edit (revue #75)", {
+  local_fresh_state()
+  local_mocked_bindings(toggl_today = function() as.Date("2026-11-14"))
+  srv <- serve(
+    fake_response(200, report_page(1:50, total = 60, total_grand = 216000000)),
+    fake_response(200, report_page(51:60, total = 60, total_grand = 216000400)),
+    fake_response(200, report_page(1:50, total = 60, total_grand = 216000400)),
+    fake_response(200, report_page(51:60, total = 60, total_grand = 216000400))
+  )
+  local_mocked_bindings(toggl_http_get = srv$get, toggl_sleep = function(s) NULL)
+  expect_equal(nrow(suppressMessages(report())), 60)
+  expect_equal(srv$calls(), 4)
+})

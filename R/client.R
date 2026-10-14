@@ -40,8 +40,11 @@ toggl_request("POST", glue::glue("https://api.track.toggl.com/api/v9/workspaces/
 #' }
 #' @export
 get_all_client_info <- function(api_token=get_toggl_api_token(),workspace_id = get_workspace_id(api_token) ){
-  toggl_GET(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),
-            api_token = api_token)$content %>% bind_rows()
+  out <- toggl_GET(glue::glue("https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients"),
+                   api_token = api_token)$content %>% bind_rows()
+  # workspace sans client : l'API renvoie null ou [], garder les colonnes id et name
+  if (nrow(out) == 0) out <- dplyr::tibble(id = integer(0), name = character(0))
+  out
 }
 
 
