@@ -17,35 +17,25 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
                           since = toggl_today() %m-% lubridate::years(1),
                           until = toggl_today()) {
   read_toggl_period()
-  url <-
-    sprintf(
-      "https://api.track.toggl.com/reports/api/v2/summary?workspace_id=%s&since=%s&until=%s&user_agent=%s",
-      workspace_id,
-      format(since, "%Y-%m-%d"),
-      format(until, "%Y-%m-%d"),
-      utils::URLencode(toggl_user_agent(), reserved = TRUE)
-    )
-  wp <- toggl_GET(url, api_token = api_token)$content
-  
-  
-  # jsonlite:::simplify(wp$data, simplifyDataFrame = TRUE) -> out
-  simplify(wp$data, simplifyDataFrame = TRUE) -> out
-  
-  
-  synthese <-
-    data.frame(id = out$id, out$title, time = out$time) %>%
-    select(-any_of(c("color","hex_color")))
-  
-  tache <- out$items %>%
-    setNames(synthese$project) %>%
-    map( ~ {
-      .x$title <-  .x$title$time_entry
-      .x
-    })
-  
-  
-  res <- list(synthese = synthese,
-              tache = tache)
+  groups <- toggl_report_summary(workspace_id, api_token, since, until,
+                                 grouping = "projects", sub_grouping = "time_entries")
+  names_ <- toggl_report_names(api_token, workspace_id, users = FALSE)
+  ids <- vapply(groups, function(g) null_to_na(g$id, NA_integer_), integer(1))
+  pos <- match(ids, names_$projects$id)
+  synthese <- data.frame(
+    id = ids,
+    project = names_$projects$name[pos],
+    client = names_$clients$name[match(names_$projects$client_id[pos], names_$clients$id)],
+    time = vapply(groups, function(g) 1000 * sum(vapply(g$sub_groups, function(s) as.numeric(null_to_na(s$seconds, 0)), 0)), 0),
+    stringsAsFactors = FALSE
+  )
+  tache <- lapply(groups, function(g) {
+    it <- summary_items(g$sub_groups)
+    it$title <- it$title$time_entry
+    it
+  })
+  names(tache) <- synthese$project
+  res <- list(synthese = synthese, tache = tache)
   class(res) <- "toggl"
   res
 }

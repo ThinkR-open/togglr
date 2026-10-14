@@ -10,6 +10,12 @@
   This replaces the `total_grand` tolerance for running timers, which could
   hide a deletion followed by an insertion (#76, #77). New argument
   `user_ids`. `user_agent` is ignored.
+* `get_summary_report()`, `get_weekly_report()` and `get_dashboard()` read
+  Reports API v3 too, with the output of Reports v2. Reports v3 only returns
+  ids: the names of users, projects and clients come from the Track API v9.
+  The amounts of the summary items (`cur`, `sum`, `rate`) are no longer given
+  (NA). Entries without a visible project are grouped with an `NA` id and name
+  (Reports v2 called them "Private Project") (#76).
 
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the
