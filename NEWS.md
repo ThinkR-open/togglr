@@ -61,7 +61,7 @@
   1000 entries, so a full answer splits the period in two, recursively. A
   period starting more than 3 months ago (the limit of the API) fails before
   any request, pointing to `get_detailled_report(user_ids = )` (#13). Its
-  output gains a `client_name` column (#14).
+  output gains a `client_name` column, archived projects included (#14).
 * `get_workspace_id()` returns the default workspace of the account
   (`default_workspace_id` of `/me`), and the first workspace only when no
   default is set; it used to be always the first one. New `get_workspaces()`

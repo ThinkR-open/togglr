@@ -7,6 +7,8 @@
 #' @param user_agent ignored since the move to Reports v3 (the user agent is
 #'   sent in the header of every request)
 #'
+#' @details The rounding set in the Toggl profile is not applied
+#'   (`rounding = 0` in the request), as in Reports v2.
 #' @importFrom lubridate %m-%
 #' @return a tibble, one row per project: `pid`, `title` (`project`, `client`,
 #'   `color`, `hex_color`; Reports v3 gives no color index, `color` is always
@@ -43,7 +45,7 @@ get_weekly_report <- function(api_token = get_toggl_api_token(),
   title <- data.frame(
     project = names_$projects$name[pos],
     client = names_$clients$name[match(names_$projects$client_id[pos], names_$clients$id)],
-    color = rep("0", length(projects)),
+    color = rep("0", times = length(projects)),
     hex_color = names_$projects$color[pos],
     stringsAsFactors = FALSE
   )

@@ -1,7 +1,7 @@
 # ---- #76 : rapport detaille via Reports API v3 ----------------------------------------
 
-local_v3 <- function(pages, totals, env = parent.frame()) {
-  srv <- serve_v3(pages, totals)
+local_v3 <- function(pages, totals, server_dates = NULL, env = parent.frame()) {
+  srv <- serve_v3(pages, totals, server_dates = server_dates)
   local_mocked_bindings(POST = srv$send, toggl_sleep = function(s) NULL, .env = env)
   local_fresh_state(env)
   srv
@@ -118,6 +118,18 @@ test_that("an entry edited after the start of the read triggers a new read, even
   expect_setequal(out$id, c(1, 2, 4, 5))
   expect_equal(nrow(out), 4)
   expect_equal(srv$n_search(), 2)
+})
+
+test_that("the start of the read is the Date of the server, not the local clock (revue #85)", {
+  # horloge locale en retard de 90 s sur le serveur ; une entree modifiee 30 s avant
+  # l'appel (heure serveur) n'est pas un mouvement
+  local_mocked_bindings(toggl_now = function() as.POSIXct("2026-10-12 11:58:30", tz = "UTC"))
+  page <- structure(list(v3_row(5, at_tz = "2026-10-12T13:59:30+02:00")), more = FALSE)
+  srv <- local_v3(list(page), totals = 3600,
+                  server_dates = c("Mon, 12 Oct 2026 12:00:00 GMT", "Mon, 12 Oct 2026 12:00:03 GMT"))
+  out <- suppressMessages(report())
+  expect_equal(out$id, 5)
+  expect_equal(srv$n_search(), 1)
 })
 
 test_that("entries still edited during the last read raise an error (#77, revue #85)", {

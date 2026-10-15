@@ -11,6 +11,8 @@
 #' @param users the users of the workspace (a data frame with `id` and
 #'   `fullname`), to name the rows
 #'
+#' @details The rounding set in the Toggl profile is not applied
+#'   (`rounding = 0` in the request), as in Reports v2.
 #' @importFrom lubridate %m-%
 #' @return a tibble, one row per user: `id`, `user` (full name), `time` (ms) and `items` (a data frame of the user's time entries: `title`, `time` in ms, `local_start`; `cur`, `sum` and `rate` are `NA` since Reports v3)
 #' @export

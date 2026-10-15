@@ -174,7 +174,7 @@ toggl_quota_key <- function(api_token, scope = "user", what = "quota_until") {
 #' scope.
 #' @noRd
 toggl_quota_scope <- function(url) {
-  m <- regmatches(url, regexec("(workspaces?/|workspace_id=|organizations/)([0-9]+)", url))[[1]]
+  m <- regmatches(url, m = regexec("(workspaces?/|workspace_id=|organizations/)([0-9]+)", url))[[1]]
   if (!length(m)) {
     return("user")
   }

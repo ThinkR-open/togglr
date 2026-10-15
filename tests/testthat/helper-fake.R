@@ -91,14 +91,19 @@ v3_row <- function(id, seconds = 3600, user_id = 2L, project = "presta_x", clien
 # Faux Reports v3 : `pages` = liste de listes de lignes, servies dans l'ordre ;
 # `totals` = secondes renvoyees par les appels successifs a /totals (la derniere
 # valeur est repetee). Enregistre le corps de chaque requete.
-serve_v3 <- function(pages, totals) {
+serve_v3 <- function(pages, totals, server_dates = NULL) {
   bodies <- list(); n_search <- 0; n_totals <- 0
   send <- function(url, ..., body = NULL) {
     b <- if (is.null(body)) list() else jsonlite::fromJSON(body, simplifyVector = FALSE)
     bodies[[length(bodies) + 1]] <<- c(list(.url = url), b)
     if (grepl("/totals$", url)) {
       n_totals <<- n_totals + 1
-      return(fake_response(200, list(seconds = totals[min(n_totals, length(totals))], rates = list())))
+      headers <- list()
+      if (!is.null(server_dates)) {
+        headers <- list(date = server_dates[min(n_totals, length(server_dates))])
+      }
+      return(fake_response(200, list(seconds = totals[min(n_totals, length(totals))], rates = list()),
+                           headers = headers))
     }
     n_search <<- n_search + 1
     if (n_search > length(pages)) stop("unexpected extra call: ", url)

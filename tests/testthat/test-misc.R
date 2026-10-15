@@ -36,12 +36,14 @@ test_that("get_workspace_users returns one row per user of the workspace", {
 test_that("with togglr.state_file, real concurrent processes are spaced (#84)", {
   skip_on_cran()
   skip_if_not_installed("callr")
-  skip_if_not_installed("pkgload")
   state <- withr::local_tempfile()
   withr::defer(unlink(paste0(state, ".lock")))
   lib <- .libPaths()
   src <- normalizePath(testthat::test_path("..", ".."), mustWork = FALSE)
   from_sources <- length(list.files(file.path(src, "R"), pattern = "\\.R$")) > 0
+  if (from_sources) {
+    skip_if_not_installed("pkgload")
+  }
   worker <- function(state, lib, src, from_sources) {
     .libPaths(lib)
     if (from_sources) {
@@ -61,7 +63,9 @@ test_that("with togglr.state_file, real concurrent processes are spaced (#84)", 
   p <- lapply(1:2, function(i) {
     callr::r_bg(worker, args = args)
   })
-  for (x in p) x$wait(60000)
+  for (x in p) {
+    x$wait(60000)
+  }
   slots <- sort(unlist(lapply(p, function(x) x$get_result())))
   expect_length(slots, 6)
   expect_true(all(diff(slots) >= 1 - 1e-6)) # 6 creneaux d'1 s, jamais deux envois ensemble

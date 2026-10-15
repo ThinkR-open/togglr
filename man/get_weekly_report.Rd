@@ -34,3 +34,7 @@ and \code{details} (the same per user); 0 rows for a week without any entry
 \description{
 get weekly report
 }
+\details{
+The rounding set in the Toggl profile is not applied
+(\code{rounding = 0} in the request), as in Reports v2.
+}

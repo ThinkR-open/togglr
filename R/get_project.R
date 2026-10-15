@@ -102,7 +102,10 @@ get_all_projects <- function(api_token = get_toggl_api_token(),
                              active = NULL) {
   all_projects <- list()
   previous_ids <- NULL
-  filter_active <- if (is.null(active)) "" else paste0("&active=", active)
+  filter_active <- ""
+  if (!is.null(active)) {
+    filter_active <- paste0("&active=", active)
+  }
   for (nb_page in seq_len(max_pages)) {
     project_tbl_ <- toggl_GET(
       paste0("https://api.track.toggl.com/api/v9/workspaces/", workspace_id,

@@ -35,3 +35,7 @@ a tibble, one row per user: \code{id}, \code{user} (full name), \code{time} (ms)
 \description{
 by user then projet
 }
+\details{
+The rounding set in the Toggl profile is not applied
+(\code{rounding = 0} in the request), as in Reports v2.
+}

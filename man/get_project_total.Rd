@@ -29,3 +29,7 @@ the total time spent on the project, as text (e.g. "12:30:00"), the running entr
 \description{
 get project total time
 }
+\details{
+The rounding set in the Toggl profile is not applied
+(\code{rounding = 0} in the request), as in Reports v2.
+}

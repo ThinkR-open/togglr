@@ -70,6 +70,8 @@ n_to_tps <- function(n) {
 #' @param workspace_id the workspace id
 #' @param since a date
 #' @param until a date
+#' @details The rounding set in the Toggl profile is not applied
+#'   (`rounding = 0` in the request), as in Reports v2.
 #' @importFrom dplyr pull
 #'
 #' @return the total time spent on the project, as text (e.g. "12:30:00"), the running entry included

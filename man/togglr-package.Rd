@@ -29,7 +29,7 @@ private to the session.}
 requests than this (10), the next ones are spread until the reset of
 the quota.}
 \item{\code{togglr.page_size}}{number of entries per page of the detailled
-report (1000, the maximum of the API). With \code{togglr.max_pages}, it caps
+report (1000). With \code{togglr.max_pages}, it caps
 the entries read in one period: 100 000 by default.}
 \item{\code{togglr.report_attempts}}{number of reads of a period that keeps
 changing during its pagination (3), before an error.}
