@@ -38,7 +38,7 @@ sent per entry}
 }
 \value{
 the updated entry, as returned by the API, or a list of them when
-  several ids are given
+several ids are given
 }
 \description{
 update time entries

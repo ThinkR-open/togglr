@@ -10,8 +10,8 @@ get_workspaces(api_token = get_toggl_api_token())
 \item{api_token}{the toggl api token}
 }
 \value{
-a tibble with `id`, `name` and `default` (`TRUE` for the default
-  workspace of the account)
+a tibble with \code{id}, \code{name} and \code{default} (\code{TRUE} for the default
+workspace of the account)
 }
 \description{
 List the workspaces of the account

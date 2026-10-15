@@ -10,10 +10,10 @@ clean_cache(cache_dir = toggl_cache_dir())
 \item{cache_dir}{folder of the cache}
 }
 \value{
-invisibly, the result of [unlink()] (0 for success)
+invisibly, the result of \code{\link[=unlink]{unlink()}} (0 for success)
 }
 \description{
-Removes the periods stored by `get_detailled_report(cache = TRUE)`.
+Removes the periods stored by \code{get_detailled_report(cache = TRUE)}.
 }
 \examples{
 \dontrun{

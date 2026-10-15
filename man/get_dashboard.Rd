@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{get_dashboard}
 \alias{get_dashboard}
-\title{get all data from <https://toggl.com>}
+\title{get all data from \url{https://toggl.com}}
 \usage{
 get_dashboard(
   api_token = get_toggl_api_token(),
@@ -26,8 +26,8 @@ get_dashboard(
 default)}
 }
 \value{
-an object of class `toggl`: a list with `synthese` (one row per project: `id`, `project`, `client`, `time` in ms) and `tache` (per project, a data frame of its time entries: `title`, `time` in ms, `local_start`)
+an object of class \code{toggl}: a list with \code{synthese} (one row per project: \code{id}, \code{project}, \code{client}, \code{time} in ms) and \code{tache} (per project, a data frame of its time entries: \code{title}, \code{time} in ms, \code{local_start})
 }
 \description{
-get all data from <https://toggl.com>
+get all data from \url{https://toggl.com}
 }

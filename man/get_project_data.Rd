@@ -18,8 +18,8 @@ get_project_data(
 \item{workspace_id}{the workspace id}
 }
 \value{
-a list with the fields of the project (`id`, `name`, `client_id`,
-  `active`, `billable`, `color`...), as returned by the API v9
+a list with the fields of the project (\code{id}, \code{name}, \code{client_id},
+\code{active}, \code{billable}, \code{color}...), as returned by the API v9
 }
 \description{
 Data of one project

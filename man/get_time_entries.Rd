@@ -22,9 +22,9 @@ get_time_entries(
 \item{workspace_id}{the workspace id (to name the projects and clients)}
 }
 \value{
-a data.frame containing all time entries, with `project_name` and
-  `client_name`. The endpoint goes back at most 3 months: for an older
-  period, use [get_detailled_report()] with `user_ids`.
+a data.frame containing all time entries, with \code{project_name} and
+\code{client_name}. The endpoint goes back at most 3 months: for an older
+period, use \code{\link[=get_detailled_report]{get_detailled_report()}} with \code{user_ids}.
 }
 \description{
 Get all time entries between 2 dates

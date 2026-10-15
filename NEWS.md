@@ -5,8 +5,10 @@
 * Reports come from the Reports API v3 (#76): `get_summary_report()` items no
   longer give `cur`, `sum` and `rate` (`NA`); entries without a visible project
   are grouped under an `NA` id and name instead of "Private Project";
-  `get_detailled_report(user_agent = )` is ignored. The columns and types of
-  `get_detailled_report()` are unchanged.
+  the `user_agent` argument of the report functions is ignored. The columns
+  and types of `get_detailled_report()` are unchanged. The rounding set in the
+  Toggl profile is never applied (`rounding = 0` in every request), as in
+  Reports v2.
 * `get_workspace_id()` returns the default workspace of the account, no longer
   always the first one (#23).
 * `get_time_entries()` fails before any request for a period starting more
@@ -34,18 +36,27 @@
   in one or two requests. The period is checked against the total duration of
   `/search/time_entries/totals`, equal before and after the pagination and,
   up to the rounding of the API (1 s per entry), to the sum of the entries.
-  This replaces the `total_grand` tolerance for running timers, which could
-  hide a deletion followed by an insertion (#76, #77). New argument
-  `user_ids`. `user_agent` is ignored.
+  An entry received that was edited after the read started is a movement too:
+  the pages are numbered by row, so a deletion followed by an insertion of the
+  same duration shifts the rows without changing the totals. This replaces the
+  `total_grand` tolerance for running timers, which could hide such a movement
+  (#76, #77). One movement still escapes: an entry deleted and replaced by one
+  of exactly the same duration that is not in the pages received.
+  New argument `user_ids`. `user_agent` is ignored.
 * `get_summary_report()`, `get_weekly_report()` and `get_dashboard()` read
   Reports API v3 too, with the output of Reports v2. Reports v3 only returns
-  ids: the names of users, projects and clients come from the Track API v9.
+  ids: the names of users, projects and clients come from the Track API v9,
+  archived projects included. `get_weekly_report()` returns an empty tibble
+  for a week without any entry.
   The amounts of the summary items (`cur`, `sum`, `rate`) are no longer given
   (NA). Entries without a visible project are grouped with an `NA` id and name
   (Reports v2 called them "Private Project") (#76).
-* With a shared state file, an exhausted quota recorded by another process
-  while this one was waiting is no longer erased: it is waited for in turn, or
-  fails within `max_wait` (#78).
+* With a shared state file, an exhausted quota, or a spread of the requests,
+  recorded by another process while this one was waiting is no longer erased:
+  it is waited for in turn, or fails within `max_wait` (#78).
+* The requests of Reports v3 (`/reports/api/v3/workspace/<id>/`) count against
+  the quota of their workspace, like the requests of the API v9
+  (`/workspaces/<id>/`): an exhausted Reports quota no longer blocks `/me`.
 * `get_time_entries()` is never truncated: `/me/time_entries` returns at most
   1000 entries, so a full answer splits the period in two, recursively. A
   period starting more than 3 months ago (the limit of the API) fails before
@@ -158,10 +169,10 @@
 * `globalVariables()` no longer declares function names (`case_when`,
   `full_join`, `tribble`) nor unused names, which could hide a missing
   import (#70).
-* Every request sends the user agent `togglr/<version>` (header, and the
-  `user_agent` parameter of the reports API, now url-encoded); `get_dashboard()`
-  no longer sends a hardcoded `api_test`, and uses `any_of()` instead of the
-  superseded `one_of()`, which warned when the API returned no color (#71).
+* Every request sends the user agent `togglr/<version>` in its header;
+  `get_dashboard()` no longer sends a hardcoded `api_test` (#71). The
+  `user_agent` argument of the report functions is kept for compatibility and
+  ignored.
 * `get_workspace_id()` fails with its message when the account has no
   workspace, instead of "subscript out of bounds". New tests cover the edge
   cases of the pagination, of the quota and of the cache (#73).
@@ -192,7 +203,7 @@
   lost update, and the temporary file is removed (review of #75).
 * Network errors are no longer retried when the backoff exceeds `max_wait` (review of #75).
 
-# togglr 0.3.0
+# togglr 0.3.0 (GitHub only, never released on CRAN)
 
 * Every read of the API goes through `toggl_GET()`: HTTP errors are no longer
   turned into empty results. 429 and 5xx are retried, waiting what the API asks

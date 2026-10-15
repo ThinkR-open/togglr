@@ -15,7 +15,7 @@ get_workspace_users(
 \item{workspace_id}{the workspace id}
 }
 \value{
-a tibble, one row per user of the workspace (`id`, `fullname`, `email`...)
+a tibble, one row per user of the workspace (\code{id}, \code{fullname}, \code{email}...)
 }
 \description{
 Users of a workspace

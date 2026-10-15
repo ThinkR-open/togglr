@@ -7,7 +7,7 @@
 delete_toggl_api_token()
 }
 \value{
-invisibly, `NULL` or the error caught when there was no key
+invisibly, \code{NULL} or the error caught when there was no key
 }
 \description{
 delete the toggle api token

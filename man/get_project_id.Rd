@@ -27,7 +27,7 @@ get_project_id(
 \item{color}{id of the color selected for the project}
 }
 \value{
-the id of the project, or `NULL` when it does not exist (and is not created)
+the id of the project, or \code{NULL} when it does not exist (and is not created)
 }
 \description{
 retrieve project id

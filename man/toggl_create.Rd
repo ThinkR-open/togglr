@@ -33,7 +33,7 @@ toggl_create(
 \item{workspace_id}{workspace id}
 }
 \value{
-invisibly, the id of the created time entry (`NA`, with a warning, when the API accepted it but its answer could not be read)
+invisibly, the id of the created time entry (\code{NA}, with a warning, when the API accepted it but its answer could not be read)
 }
 \description{
 create a time entry

@@ -7,16 +7,16 @@
 simplify(x, ...)
 }
 \arguments{
-\item{x}{a list, as returned by `httr::content()`}
+\item{x}{a list, as returned by \code{httr::content()}}
 
-\item{...}{passed to `jsonlite::fromJSON()` (e.g. `simplifyDataFrame`)}
+\item{...}{passed to \code{jsonlite::fromJSON()} (e.g. \code{simplifyDataFrame})}
 }
 \value{
 the simplified object
 }
 \description{
-Same result as `jsonlite::fromJSON(simplifyVector = TRUE)` on a list already
-parsed with `simplifyVector = FALSE` (what `httr::content()` returns), using
+Same result as \code{jsonlite::fromJSON(simplifyVector = TRUE)} on a list already
+parsed with \code{simplifyVector = FALSE} (what \code{httr::content()} returns), using
 only the public API of jsonlite: the list is serialised back to JSON at full
 precision, then read with simplification.
 }

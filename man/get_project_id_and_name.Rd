@@ -15,7 +15,7 @@ get_project_id_and_name(
 \item{workspace_id}{workspace id}
 }
 \value{
-a tibble with `id`, `project_name` and `active`
+a tibble with \code{id}, \code{project_name} and \code{active}
 }
 \description{
 retrieve project id and name

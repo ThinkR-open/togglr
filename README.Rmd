@@ -33,7 +33,13 @@ Documentation site: https://thinkr-open.github.io/togglr/
 
 ## Installation
 
-togglr is installed from GitHub (the version on CRAN is outdated):
+From CRAN:
+
+```r
+install.packages("togglr")
+```
+
+The development version, from GitHub:
 
 ```{r}
 if (!requireNamespace("remotes")) install.packages("remotes")

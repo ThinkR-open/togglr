@@ -7,7 +7,7 @@
 open_toggl_website_profile()
 }
 \value{
-invisibly, the result of [utils::browseURL()]
+invisibly, the result of \code{\link[utils:browseURL]{utils::browseURL()}}
 }
 \description{
 open toggle.com website on profile page

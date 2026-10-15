@@ -23,12 +23,14 @@ get_summary_report(
 
 \item{until}{stop date}
 
-\item{user_agent}{user_agent}
+\item{user_agent}{ignored since the move to Reports v3 (the user agent is
+sent in the header of every request)}
 
-\item{users}{users}
+\item{users}{the users of the workspace (a data frame with \code{id} and
+\code{fullname}), to name the rows}
 }
 \value{
-a tibble, one row per user: `id`, `user` (full name), `time` (ms) and `items` (a data frame of the user's time entries: `title`, `time` in ms, `local_start`; `cur`, `sum` and `rate` are `NA` since Reports v3)
+a tibble, one row per user: \code{id}, \code{user} (full name), \code{time} (ms) and \code{items} (a data frame of the user's time entries: \code{title}, \code{time} in ms, \code{local_start}; \code{cur}, \code{sum} and \code{rate} are \code{NA} since Reports v3)
 }
 \description{
 by user then projet

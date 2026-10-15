@@ -2,18 +2,26 @@
 
 0 errors | 0 warnings | 0 notes
 
-* Checked locally with `--as-cran` on R 4.5.1 (Linux), and on GitHub Actions
-  (macOS, Windows, Ubuntu release / devel / oldrel-1).
-* Checked on win-builder (R release and R devel).
+* `R CMD check --as-cran` on R 4.5.1 (Ubuntu), with and without `NOT_CRAN`.
+* GitHub Actions, workflow R-CMD-check of r-lib/actions: macOS (release),
+  Windows (release), Ubuntu (release, devel, oldrel-1).
+* win-builder: R release and R devel (the results are pasted below when they
+  arrive).
 
 ## Tests
 
-* The tests never reach the network: every HTTP call is mocked
+* The tests never reach the network: every HTTP call is replaced by a double
   (`tests/testthat/setup-no_network.R`).
 
-## Breaking changes
+## Changes since the CRAN version
 
-* This is a major release. The breaking changes are listed in NEWS.md, under
+* CRAN has togglr 0.2.1 (2024). The 0.3.0 section of NEWS.md was a GitHub
+  release only; everything since 0.2.1 is new on CRAN with 1.0.0.
+* This is a major release. The breaking changes are listed in NEWS.md under
   "Breaking changes": Reports API v3 replaces Reports API v2, which Toggl has
   shut down; `create_client()` and `toggl_update_entries()` return the created
   or updated objects instead of httr responses; refused writes raise an error.
+
+## Reverse dependencies
+
+* None on CRAN.
