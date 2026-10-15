@@ -13,3 +13,4 @@ bidouille
 ^\.git$
 ^\.gitattributes$
 ^vignettes/togglr\.R$
+^cran-comments\.md$

@@ -1,4 +1,4 @@
-# togglr (development version, toward 1.0.0)
+# togglr 1.0.0
 
 ## Breaking changes
 
