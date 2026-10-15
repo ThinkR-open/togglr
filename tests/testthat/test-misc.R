@@ -38,6 +38,7 @@ test_that("with togglr.state_file, real concurrent processes are spaced (#84)", 
   skip_if_not_installed("callr")
   skip_if_not_installed("pkgload")
   state <- withr::local_tempfile()
+  withr::defer(unlink(paste0(state, ".lock")))
   lib <- .libPaths()
   src <- normalizePath(testthat::test_path("..", ".."), mustWork = FALSE)
   from_sources <- length(list.files(file.path(src, "R"), pattern = "\\.R$")) > 0
@@ -50,19 +51,18 @@ test_that("with togglr.state_file, real concurrent processes are spaced (#84)", 
     }
     pace <- get("toggl_pace", envir = asNamespace("togglr"))
     options(togglr.state_file = state)
-    t <- c()
+    slots <- c()
     for (i in 1:3) {
-      pace(min_interval = 1)
-      t <- c(t, as.numeric(Sys.time()))
+      slots <- c(slots, as.numeric(pace(min_interval = 1)))
     }
-    t
+    slots
   }
   args <- list(state = state, lib = lib, src = src, from_sources = from_sources)
   p <- lapply(1:2, function(i) {
     callr::r_bg(worker, args = args)
   })
   for (x in p) x$wait(60000)
-  times <- sort(unlist(lapply(p, function(x) x$get_result())))
-  expect_length(times, 6)
-  expect_true(all(diff(times) > 0.9)) # 6 creneaux d'1 s, jamais deux envois ensemble
+  slots <- sort(unlist(lapply(p, function(x) x$get_result())))
+  expect_length(slots, 6)
+  expect_true(all(diff(slots) >= 1 - 1e-6)) # 6 creneaux d'1 s, jamais deux envois ensemble
 })

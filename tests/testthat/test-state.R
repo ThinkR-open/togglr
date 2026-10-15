@@ -117,7 +117,9 @@ test_that("a state file that cannot be replaced is an error, and leaves no tempo
 
 test_that("a quota recorded by another process during the wait is waited for, not erased (#78)", {
   local_fresh_state()
-  withr::local_options(togglr.state_file = withr::local_tempfile())
+  state <- withr::local_tempfile()
+  withr::defer(unlink(paste0(state, ".lock")))
+  withr::local_options(togglr.state_file = state)
   key <- toggl_quota_key("t", "workspace")
   t1 <- Sys.time() + 100
   toggl_state_set(key, t1)
@@ -130,6 +132,27 @@ test_that("a quota recorded by another process during the wait is waited for, no
   toggl_pace(min_interval = 0, api_token = "t", scope = "workspace", max_wait = 1000)
   expect_length(waits, 2)
   expect_gt(waits[2], 250)
+})
+
+test_that("a spread recorded by another process during the wait is waited for, not erased (revue #85)", {
+  local_fresh_state()
+  state <- withr::local_tempfile()
+  withr::defer(unlink(paste0(state, ".lock")))
+  withr::local_options(togglr.state_file = state)
+  skey <- toggl_quota_key("t", "workspace", "spread_until")
+  t1 <- Sys.time() + 10
+  toggl_state_set(skey, t1)
+  waits <- c()
+  local_mocked_bindings(toggl_sleep = function(s) {
+    waits <<- c(waits, s)
+    if (length(waits) == 1) {
+      toggl_state_set(skey, t1 + 300)
+    }
+  })
+  toggl_pace(min_interval = 0, api_token = "t", scope = "workspace", max_wait = 1000)
+  expect_length(waits, 2)
+  expect_gt(waits[2], 250)
+  expect_null(toggl_state_get(skey)) # consomme par cet envoi, une fois attendu
 })
 
 test_that("the new quota is not waited for beyond max_wait (#78)", {

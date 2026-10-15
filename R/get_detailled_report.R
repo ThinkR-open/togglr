@@ -9,42 +9,59 @@
 #' With an `api_token`, the same lock pass first checks what is known of the
 #' quota of the token in `scope`: an exhausted quota fails when its reset is
 #' beyond `max_wait`, otherwise it is waited for; a spread announced by
-#' [toggl_note_quota()] is waited for, at most `max_wait`. These waits only
+#' `toggl_note_quota()` is waited for, at most `max_wait`. These waits only
 #' concern this token: the shared slot is reserved after them.
+#'
+#' Returns, invisibly, the reserved slot (a `POSIXct`).
 #' @noRd
 toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
                        api_token = NULL, scope = "user", max_wait = Inf) {
   qkey <- if (!is.null(api_token)) toggl_quota_key(api_token, scope)
   skey <- if (!is.null(api_token)) toggl_quota_key(api_token, scope, "spread_until")
-  done <- character(0)
-  waited_for <- NULL # le quota deja attendu : consomme, sauf s'il a change entre-temps
+  # le quota et l'etalement deja attendus : consommes, sauf s'ils ont change entre-temps
+  waited_for <- NULL
+  spread_waited <- NULL
   repeat {
     plan <- toggl_state_update(function(st) {
       now <- Sys.time()
       reset <- if (!is.null(qkey)) st[[qkey]]
-      if (!is.null(reset) && !is.null(waited_for) && identical(reset, waited_for)) reset <- NULL
+      if (!is.null(reset) && identical(reset, waited_for)) {
+        reset <- NULL
+      }
       if (!is.null(reset) && reset > now) {
         wait <- ceiling(as.numeric(difftime(reset, now, units = "secs")))
         return(list(state = st, value = list(hold = wait, why = "quota", reset = reset)))
       }
-      spread <- if (!is.null(skey) && !"spread" %in% done) st[[skey]]
+      spread <- if (!is.null(skey)) st[[skey]]
+      if (!is.null(spread) && identical(spread, spread_waited)) {
+        spread <- NULL
+      }
       if (!is.null(spread) && spread > now) {
         return(list(state = st, value = list(
-          hold = min(as.numeric(difftime(spread, now, units = "secs")), max_wait), why = "spread")))
+          hold = min(as.numeric(difftime(spread, now, units = "secs")), max_wait),
+          why = "spread", spread = spread)))
       }
-      # quota attendu (ou echu) et etalement consommes par cet envoi ; un quota
-      # pose par un autre processus pendant l'attente n'est jamais efface ici
+      # quota attendu (ou echu) et etalement attendu (ou echu) consommes par cet
+      # envoi ; une cle posee par un autre processus pendant l'attente n'est
+      # jamais effacee ici
       if (!is.null(qkey)) {
         current <- st[[qkey]]
-        if (is.null(current) || current <= now || identical(current, waited_for)) st[[qkey]] <- NULL
-        st[[skey]] <- NULL
+        if (is.null(current) || current <= now || identical(current, waited_for)) {
+          st[[qkey]] <- NULL
+        }
+        current <- st[[skey]]
+        if (is.null(current) || current <= now || identical(current, spread_waited)) {
+          st[[skey]] <- NULL
+        }
       }
       last <- st$last_report_call
       slot <- if (is.null(last)) now else max(now, last + min_interval)
       st$last_report_call <- slot
       list(state = st, value = list(slot = slot))
     })
-    if (is.null(plan$hold)) break
+    if (is.null(plan$hold)) {
+      break
+    }
     if (plan$why == "quota") {
       if (plan$hold > max_wait) {
         stop("toggl hourly API quota exhausted, resets in ", plan$hold, "s (> max_wait = ",
@@ -55,12 +72,15 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
     } else {
       message("toggl hourly API quota almost exhausted, spreading the requests: waiting ",
               ceiling(plan$hold), "s")
+      spread_waited <- plan$spread
     }
     toggl_sleep(plan$hold)
-    if (plan$why == "spread") done <- c(done, "spread")
   }
   wait <- as.numeric(difftime(plan$slot, Sys.time(), units = "secs"))
-  if (wait > 0) toggl_sleep(wait)
+  if (wait > 0) {
+    toggl_sleep(wait)
+  }
+  invisible(plan$slot)
 }
 
 
@@ -101,16 +121,20 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
 #'   the names of users, projects, clients and tags), with large pages
 #'   (`options(togglr.page_size)`, 1000 by default).
 #'   The period is checked against the total duration announced by the API
-#'   before and after the pagination; if entries were added, removed or
-#'   edited meanwhile, the period is fetched again, up to
-#'   `options(togglr.report_attempts)` reads in all (3 by default), then an
-#'   error is raised. A running entry is left out. An HTTP error (quota, server
+#'   before and after the pagination, and against the edit time of every entry
+#'   received; if entries were added, removed or edited meanwhile, the period
+#'   is fetched again, up to `options(togglr.report_attempts)` reads in all (3
+#'   by default), then an error is raised. One movement escapes these checks:
+#'   an entry deleted and another one of exactly the same duration created
+#'   during the read, when the new entry is not in the pages received. The
+#'   rounding set in the Toggl profile is not applied. A running entry is left out. An HTTP error (quota, server
 #'   error, authentication) raises an error too: the function never returns a
 #'   silently truncated period.
 #'
 #'   Periods longer than a year (365 days or more between `since` and
 #'   `until`, across a new year) are split by calendar year.
 #' @importFrom lubridate dmy days year %m-%
+#' @importFrom dplyr as_tibble bind_rows
 get_detailled_report <- function(api_token = get_toggl_api_token(),
                                  workspace_id = get_workspace_id(api_token),
                                  since = toggl_today() %m-% lubridate::years(1),
@@ -175,20 +199,26 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
 #' `/search/time_entries` is paginated with `X-Next-Row-Number` (sent back as
 #' `first_row_number`). The period is complete when the total duration announced by
 #' `/search/time_entries/totals` is the same before and after the pagination
-#' and equals the sum of the entries received. A running entry (no `stop`) is
-#' left out, as in Reports v2; its growth between the two totals is tolerated,
-#' and only its.
+#' and equals the sum of the entries received, and when no entry received was
+#' edited after the read started (the pages are numbered by row: an entry
+#' deleted and another one inserted during the pagination shift the rows, and
+#' equal durations leave the totals unchanged). An entry deleted and replaced
+#' by one of the same duration that is never received is not detected. A
+#' running entry (no `stop`) is left out, as in Reports v2; its growth between
+#' the two totals is tolerated, and only its.
 #' @noRd
-fetch_detailled_period <- function(api_token, workspace_id, since, until,
-                                   user_agent = NULL, user_ids = NULL,
+fetch_detailled_period <- function(api_token, workspace_id, since, until, user_ids = NULL,
                                    attempts = getOption("togglr.report_attempts", 3)) {
-  base <- list(start_date = format(since, "%Y-%m-%d"), end_date = format(until, "%Y-%m-%d"))
-  if (length(user_ids)) base$user_ids <- as.list(user_ids)
+  base <- list(start_date = format(since, "%Y-%m-%d"), end_date = format(until, "%Y-%m-%d"),
+               rounding = 0L)
+  if (length(user_ids)) {
+    base$user_ids <- as.list(user_ids)
+  }
   max_pages <- getOption("togglr.max_pages", 100)
 
   for (attempt in seq_len(attempts)) {
-    started <- Sys.time()
-    before <- toggl_report_totals(workspace_id, api_token, base)
+    started <- toggl_now()
+    before <- toggl_report_totals(workspace_id = workspace_id, api_token = api_token, base = base)
     rows <- list()
     cursor <- list()
     for (page in seq_len(max_pages + 1)) {
@@ -198,23 +228,28 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
       }
       body <- c(base, list(page_size = as.integer(getOption("togglr.page_size", 1000)),
                            enrich_response = TRUE), cursor)
-      resp <- toggl_report_post("/search/time_entries", workspace_id, api_token, body)
+      resp <- toggl_report_post("/search/time_entries", workspace_id = workspace_id,
+                                api_token = api_token, body = body)
       rows <- c(rows, resp$content)
       # page suivante par son numero de ligne : avec first_id / first_timestamp,
-      # l'API renvoie une page vide (constate le 14/10/2026) ; un mouvement pendant
-      # la pagination est detecte par les totaux
+      # l'API renvoie une page vide ; un mouvement pendant la pagination est
+      # detecte par les totaux et par les dates de modification
       next_row <- resp$headers[["x-next-row-number"]]
-      if (is.null(next_row) || !nzchar(next_row)) break
+      if (is.null(next_row) || !nzchar(next_row)) {
+        break
+      }
       cursor <- list(first_row_number = as.numeric(next_row))
     }
-    after <- toggl_report_totals(workspace_id, api_token, base)
+    after <- toggl_report_totals(workspace_id = workspace_id, api_token = api_token, base = base)
 
     entries <- v3_rows_to_entries(rows)
     running <- is.na(entries$end)
     out <- entries[!running, ]
     received <- sum(out$dur) / 1000
     running_s <- sum(entries$dur[running]) / 1000
-    elapsed <- as.numeric(difftime(Sys.time(), started, units = "secs"))
+    updated <- suppressWarnings(lubridate::ymd_hms(entries$updated, quiet = TRUE))
+    edited <- sum(!is.na(updated) & updated > started)
+    elapsed <- as.numeric(difftime(toggl_now(), started, units = "secs"))
     # un timer en cours grandit avec l'horloge : tolerer sa seule croissance
     growth <- if (any(running)) (elapsed + 1) * sum(running) else 0
     stable <- after >= before && after - before <= growth
@@ -226,13 +261,18 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until,
     # totaux avec ou sans le temps des entrees en cours : les deux sont acceptes
     complete <- abs(after - received - running_s) <= growth + rounding ||
       (any(running) && abs(after - received) <= growth + rounding)
-    if (stable && complete) {
+    if (stable && complete && edited == 0) {
       return(out)
     }
     if (attempt < attempts) {
       message("toggl entries changed while paginating ", format(since), " -> ",
               format(until), ", fetching the period again")
     }
+  }
+  if (edited > 0) {
+    stop("incomplete toggl detailled report for ", format(since), " -> ", format(until),
+         ": ", edited, " entries edited during the read, after ", attempts, " reads.",
+         call. = FALSE)
   }
   stop("incomplete toggl detailled report for ", format(since), " -> ", format(until),
        ": ", received, " s of entries fetched, ", after, " s announced by the API",
@@ -255,7 +295,8 @@ toggl_report_post <- function(path, workspace_id, api_token, body) {
 #' Total duration (seconds) of a period, from Reports v3
 #' @noRd
 toggl_report_totals <- function(workspace_id, api_token, base) {
-  res <- toggl_report_post("/search/time_entries/totals", workspace_id, api_token, base)$content
+  res <- toggl_report_post("/search/time_entries/totals", workspace_id = workspace_id,
+                           api_token = api_token, body = base)$content
   if (is.null(res$seconds)) {
     stop("unexpected answer from the toggl reports API: no total duration for ",
          base$start_date, " -> ", base$end_date, ".", call. = FALSE)
@@ -269,7 +310,12 @@ toggl_report_totals <- function(workspace_id, api_token, base) {
 #' updated version, in the original order otherwise.
 #' @noRd
 v3_rows_to_entries <- function(rows) {
-  null_na <- function(x, na = NA) if (is.null(x)) na else x
+  null_na <- function(x, na = NA) {
+    if (is.null(x)) {
+      return(na)
+    }
+    x
+  }
   entries <- lapply(rows, function(r) {
     lapply(r$time_entries, function(te) {
       list(id = te$id, pid = null_na(r$project_id), tid = null_na(r$task_id),
@@ -289,7 +335,9 @@ v3_rows_to_entries <- function(rows) {
     })
   })
   entries <- unlist(entries, recursive = FALSE)
-  if (!length(entries)) return(empty_detailled_report())
+  if (!length(entries)) {
+    return(empty_detailled_report())
+  }
   cols <- names(detailled_report_types())
   out <- lapply(cols, function(cn) {
     v <- lapply(entries, `[[`, cn)

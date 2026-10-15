@@ -42,6 +42,10 @@ test_that("the request asks the whole period, end included, enriched, with large
   expect_true(b$enrich_response)
   expect_equal(b$page_size, 1000L)
   expect_null(b$first_id)
+  expect_equal(b$rounding, 0)
+  totals <- Filter(function(x) grepl("/totals$", x$.url), srv$bodies())
+  expect_length(totals, 2)
+  expect_equal(totals[[1]]$rounding, 0)
 })
 
 test_that("togglr.page_size sets the page size (#76)", {
@@ -60,7 +64,7 @@ test_that("pages are followed with X-Next-Row-Number until there is no next page
   expect_length(s, 3)
   expect_equal(s[[2]]$first_row_number, 3)
   expect_equal(s[[3]]$first_row_number, 5)
-  # first_id / first_timestamp font renvoyer une page vide par l'API (constate le 14/10/2026)
+  # first_id / first_timestamp font renvoyer une page vide par l'API
   expect_null(s[[2]]$first_id)
   expect_null(s[[2]]$first_timestamp)
 })
@@ -94,6 +98,34 @@ test_that("a deletion + an insertion of close durations is detected by the total
                   totals = c(4 * 3600, 3 * 3600 + 3609, 3 * 3600 + 3609, 3 * 3600 + 3609))
   out <- suppressMessages(report())
   expect_setequal(out$id, c(1, 2, 4, 5))
+  expect_equal(nrow(out), 4)
+})
+
+test_that("an entry edited after the start of the read triggers a new read, even with equal totals (#77, revue #85)", {
+  # l'entree 3 (60 min) a ete supprimee et l'entree 5 (60 min aussi) creee entre le
+  # premier total et la page : les totaux ne bougent pas, mais `at` de 5 est posterieur
+  # au debut de la lecture. L'horloge avance de 5 min a chaque consultation.
+  t0 <- as.POSIXct("2026-10-12 12:00:00", tz = "UTC")
+  n <- 0
+  local_mocked_bindings(toggl_now = function() {
+    n <<- n + 1
+    t0 + 300 * (n - 1)
+  })
+  page <- structure(c(v3_page(c(1, 2, 4)), list(v3_row(5, at_tz = "2026-10-12T14:02:00+02:00"))),
+                    more = FALSE)
+  srv <- local_v3(list(page, page), totals = 4 * 3600)
+  out <- suppressMessages(report())
+  expect_setequal(out$id, c(1, 2, 4, 5))
+  expect_equal(nrow(out), 4)
+  expect_equal(srv$n_search(), 2)
+})
+
+test_that("entries still edited during the last read raise an error (#77, revue #85)", {
+  withr::local_options(togglr.report_attempts = 2)
+  local_mocked_bindings(toggl_now = function() as.POSIXct("2026-10-12 12:00:00", tz = "UTC"))
+  page <- structure(list(v3_row(5, at_tz = "2026-10-12T14:02:00+02:00")), more = FALSE)
+  local_v3(list(page, page), totals = 3600)
+  expect_error(suppressMessages(report()), "edited during the read")
 })
 
 test_that("a period still incomplete after the reads raises an error, never a truncation (#76)", {
