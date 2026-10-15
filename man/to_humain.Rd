@@ -9,6 +9,9 @@ to_humain(df)
 \arguments{
 \item{df}{a data.frame}
 }
+\value{
+the data frame, with \code{time} as a readable duration
+}
 \description{
 transforme time column into humain readable column
 }

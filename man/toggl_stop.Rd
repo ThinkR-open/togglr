@@ -17,12 +17,15 @@ toggl_stop(
 
 \item{workspace_id}{workspace id}
 }
+\value{
+invisibly, the stopped time entry, as returned by the API
+}
 \description{
 stop the active task
 }
 \examples{
 \dontrun{
-options(toggl_api_token = "XXXXXXXX")# set your api token here
+set_toggl_api_token() # once, stores your token in the keyring
 toggl_start()
 toggl_stop()
 }

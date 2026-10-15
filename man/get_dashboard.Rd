@@ -3,13 +3,14 @@
 \encoding{UTF-8}
 \name{get_dashboard}
 \alias{get_dashboard}
-\title{get all data from <https://toggl.com>}
+\title{get all data from \url{https://toggl.com}}
 \usage{
 get_dashboard(
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token),
   since = toggl_today() \%m-\% lubridate::years(1),
-  until = toggl_today()
+  until = toggl_today(),
+  user_ids = NULL
 )
 }
 \arguments{
@@ -20,7 +21,13 @@ get_dashboard(
 \item{since}{begin date}
 
 \item{until}{stop date}
+
+\item{user_ids}{optional, ids of the users whose time is counted (all by
+default)}
+}
+\value{
+an object of class \code{toggl}: a list with \code{synthese} (one row per project: \code{id}, \code{project}, \code{client}, \code{time} in ms) and \code{tache} (per project, a data frame of its time entries: \code{title}, \code{time} in ms, \code{local_start})
 }
 \description{
-get all data from <https://toggl.com>
+get all data from \url{https://toggl.com}
 }

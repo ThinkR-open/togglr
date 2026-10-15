@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_workspace_users.R
 \name{get_workspace_users}
 \alias{get_workspace_users}
-\title{Title}
+\title{Users of a workspace}
 \usage{
 get_workspace_users(
   api_token = get_toggl_api_token(),
@@ -14,6 +14,9 @@ get_workspace_users(
 
 \item{workspace_id}{the workspace id}
 }
+\value{
+a tibble, one row per user of the workspace (\code{id}, \code{fullname}, \code{email}...)
+}
 \description{
-Title
+Users of a workspace
 }

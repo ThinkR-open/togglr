@@ -3,49 +3,43 @@
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id
 #' @param since begin date
+#' @param user_ids optional, ids of the users whose time is counted (all by
+#'   default)
 #' @param until stop date
 #'
 #' @importFrom lubridate %m-%
+#' @return an object of class `toggl`: a list with `synthese` (one row per project: `id`, `project`, `client`, `time` in ms) and `tache` (per project, a data frame of its time entries: `title`, `time` in ms, `local_start`)
 #' @export
 #' @importFrom lubridate years
-#' @importFrom  dplyr select any_of
 #' @importFrom stats setNames
-#' @importFrom purrr map
 #' @encoding UTF-8
 get_dashboard <- function(api_token = get_toggl_api_token(),
                           workspace_id = get_workspace_id(api_token),
                           since = toggl_today() %m-% lubridate::years(1),
-                          until = toggl_today()) {
+                          until = toggl_today(),
+                          user_ids = NULL) {
   read_toggl_period()
-  url <-
-    sprintf(
-      "https://api.track.toggl.com/reports/api/v2/summary?workspace_id=%s&since=%s&until=%s&user_agent=%s",
-      workspace_id,
-      format(since, "%Y-%m-%d"),
-      format(until, "%Y-%m-%d"),
-      utils::URLencode(toggl_user_agent(), reserved = TRUE)
-    )
-  wp <- toggl_GET(url, api_token = api_token)$content
-  
-  
-  # jsonlite:::simplify(wp$data, simplifyDataFrame = TRUE) -> out
-  simplify(wp$data, simplifyDataFrame = TRUE) -> out
-  
-  
-  synthese <-
-    data.frame(id = out$id, out$title, time = out$time) %>%
-    select(-any_of(c("color","hex_color")))
-  
-  tache <- out$items %>%
-    setNames(synthese$project) %>%
-    map( ~ {
-      .x$title <-  .x$title$time_entry
-      .x
-    })
-  
-  
-  res <- list(synthese = synthese,
-              tache = tache)
+  groups <- toggl_report_summary(workspace_id = workspace_id, api_token = api_token,
+                                 since = since, until = until,
+                                 grouping = "projects", sub_grouping = "time_entries",
+                                 user_ids = user_ids)
+  names_ <- toggl_report_names(api_token = api_token, workspace_id = workspace_id, users = FALSE)
+  ids <- vapply(groups, function(g) null_to_na(g$id, NA_integer_), integer(1))
+  pos <- match(ids, names_$projects$id)
+  synthese <- data.frame(
+    id = ids,
+    project = names_$projects$name[pos],
+    client = names_$clients$name[match(names_$projects$client_id[pos], names_$clients$id)],
+    time = vapply(groups, function(g) 1000 * sum(vapply(g$sub_groups, function(s) as.numeric(null_to_na(s$seconds, 0)), 0)), 0),
+    stringsAsFactors = FALSE
+  )
+  tache <- lapply(groups, function(g) {
+    it <- summary_items(g$sub_groups)
+    it$title <- it$title$time_entry
+    it
+  })
+  names(tache) <- synthese$project
+  res <- list(synthese = synthese, tache = tache)
   class(res) <- "toggl"
   res
 }
@@ -76,8 +70,11 @@ n_to_tps <- function(n) {
 #' @param workspace_id the workspace id
 #' @param since a date
 #' @param until a date
+#' @details The rounding set in the Toggl profile is not applied
+#'   (`rounding = 0` in the request), as in Reports v2.
 #' @importFrom dplyr pull
 #'
+#' @return the total time spent on the project, as text (e.g. "12:30:00"), the running entry included
 #' @export
 #'
 get_project_total <- function(project_name = get_context_project(),
@@ -104,21 +101,25 @@ get_project_total <- function(project_name = get_context_project(),
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id
 #' @param since a date
+#' @param user_ids optional, only the projects these users worked on
 #' @param until a date
 #'
+#' @return a character vector of the project names
 #' @export
 #'
 
 get_all_project_names <- function(api_token = get_toggl_api_token(),
                                   workspace_id = get_workspace_id(api_token),
                                   since = toggl_today() %m-% lubridate::years(1),
-                                  until = toggl_today()) {
+                                  until = toggl_today(),
+                                  user_ids = NULL) {
   dash <-
     get_dashboard(
       api_token = api_token,
       workspace_id = workspace_id,
       since = since,
-      until = until
+      until = until,
+      user_ids = user_ids
     )
   
   dash$synthese$project
@@ -133,6 +134,7 @@ get_all_project_names <- function(api_token = get_toggl_api_token(),
 #' @param until a date
 #'
 
+#' @return a character vector of the client names, without duplicates
 #' @export
 #'
 get_all_client_names <- function(api_token = get_toggl_api_token(),
@@ -160,6 +162,7 @@ get_all_client_names <- function(api_token = get_toggl_api_token(),
 #' @param humain boolean humain readable time
 #'
 
+#' @return a data frame of the tasks of the project (`title`, `time`...), the running entry included
 #' @export
 #' @importFrom dplyr mutate case_when full_join tribble
 #' @importFrom lubridate years
@@ -236,6 +239,7 @@ get_current_project_task_detail <-
 #'
 #' @param df a data.frame
 #'
+#' @return the data frame, with `time` as a readable duration
 #' @export
 to_humain <- function(df){
   df %>% mutate(time = n_to_tps(time))

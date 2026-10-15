@@ -29,6 +29,9 @@ toggl_start(
 
 \item{workspace_id}{workspace id}
 }
+\value{
+invisibly, the id of the started time entry (\code{NA}, with a warning, when the API accepted it but its answer could not be read)
+}
 \description{
 start a task
 }

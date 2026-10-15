@@ -22,8 +22,19 @@ get_weekly_report(
 
 \item{until}{stop date}
 
-\item{user_agent}{user_agent}
+\item{user_agent}{ignored since the move to Reports v3 (the user agent is
+sent in the header of every request)}
+}
+\value{
+a tibble, one row per project: \code{pid}, \code{title} (\code{project}, \code{client},
+\code{color}, \code{hex_color}; Reports v3 gives no color index, \code{color} is always
+\code{"0"}), \code{totals} (8 values in ms: the 7 days, then the week; \code{NA} for 0)
+and \code{details} (the same per user); 0 rows for a week without any entry
 }
 \description{
 get weekly report
+}
+\details{
+The rounding set in the Toggl profile is not applied
+(\code{rounding = 0} in the request), as in Reports v2.
 }

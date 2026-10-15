@@ -11,8 +11,9 @@ fixtures <- list(
 )
 
 test_that("simplify() does not rely on an internal function of jsonlite (#69)", {
+  # (`:::` n'est pas teste : covr instrumente les fonctions avec covr:::count)
   used <- all.names(body(simplify))
-  expect_false(any(c("getFromNamespace", ":::") %in% used))
+  expect_false("getFromNamespace" %in% used)
 })
 
 test_that("simplify() gives the same result as jsonlite's simplification (#69)", {

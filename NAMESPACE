@@ -19,6 +19,7 @@ export(get_current_duration)
 export(get_current_project_task_detail)
 export(get_dashboard)
 export(get_detailled_report)
+export(get_project_data)
 export(get_project_id)
 export(get_project_id_and_name)
 export(get_project_total)
@@ -28,6 +29,7 @@ export(get_toggl_api_token)
 export(get_weekly_report)
 export(get_workspace_id)
 export(get_workspace_users)
+export(get_workspaces)
 export(notification)
 export(open_toggl_website_app)
 export(open_toggl_website_profile)
@@ -40,60 +42,76 @@ export(toggl_start)
 export(toggl_stop)
 export(toggl_update_entries)
 export(update_toggl_api_token)
-importFrom(assertthat,assert_that)
-importFrom(assertthat,is.string)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,any_of)
-importFrom(dplyr,arrange)
-importFrom(dplyr,as_tibble)
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,case_when)
-importFrom(dplyr,desc)
-importFrom(dplyr,everything)
-importFrom(dplyr,filter)
-importFrom(dplyr,full_join)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,one_of)
-importFrom(dplyr,pull)
-importFrom(dplyr,rename)
-importFrom(dplyr,select)
-importFrom(dplyr,slice)
-importFrom(dplyr,tribble)
+importFrom(assertthat,
+  assert_that,
+  is.string
+)
+importFrom(dplyr,
+  "%>%",
+  arrange,
+  as_tibble,
+  bind_rows,
+  case_when,
+  desc,
+  everything,
+  filter,
+  full_join,
+  left_join,
+  mutate,
+  pull,
+  rename,
+  select,
+  slice,
+  tribble
+)
 importFrom(glue,glue)
-importFrom(httr,DELETE)
-importFrom(httr,GET)
-importFrom(httr,PATCH)
-importFrom(httr,POST)
-importFrom(httr,PUT)
-importFrom(httr,authenticate)
-importFrom(httr,content)
-importFrom(httr,headers)
-importFrom(httr,http_status)
-importFrom(httr,status_code)
-importFrom(httr,timeout)
-importFrom(httr,user_agent)
-importFrom(jsonlite,fromJSON)
-importFrom(jsonlite,toJSON)
-importFrom(keyring,key_delete)
-importFrom(keyring,key_get)
-importFrom(keyring,key_set_with_value)
-importFrom(lubridate,"%m-%")
-importFrom(lubridate,days)
-importFrom(lubridate,dmy)
-importFrom(lubridate,now)
-importFrom(lubridate,with_tz)
-importFrom(lubridate,year)
-importFrom(lubridate,years)
-importFrom(lubridate,ymd_hms)
+importFrom(httr,
+  DELETE,
+  GET,
+  PATCH,
+  POST,
+  PUT,
+  authenticate,
+  content,
+  headers,
+  http_status,
+  status_code,
+  timeout,
+  user_agent
+)
+importFrom(jsonlite,
+  fromJSON,
+  toJSON
+)
+importFrom(keyring,
+  key_delete,
+  key_get,
+  key_set_with_value
+)
+importFrom(lubridate,
+  "%m-%",
+  days,
+  dmy,
+  now,
+  with_tz,
+  year,
+  years,
+  ymd_hms
+)
 importFrom(magrittr,"%>%")
 importFrom(parsedate,parse_iso_8601)
-importFrom(prettyunits,pretty_dt)
-importFrom(prettyunits,pretty_ms)
-importFrom(purrr,keep)
-importFrom(purrr,map)
-importFrom(purrr,map_df)
+importFrom(prettyunits,
+  pretty_dt,
+  pretty_ms
+)
+importFrom(purrr,
+  keep,
+  map,
+  map_df
+)
 importFrom(rstudioapi,getActiveProject)
 importFrom(stats,setNames)
-importFrom(utils,browseURL)
-importFrom(utils,packageDescription)
+importFrom(utils,
+  browseURL,
+  packageDescription
+)

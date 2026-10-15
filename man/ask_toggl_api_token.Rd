@@ -9,6 +9,9 @@ ask_toggl_api_token(msg = "toggl api token")
 \arguments{
 \item{msg}{the message}
 }
+\value{
+the token typed by the user, or \code{NULL} when nothing was typed
+}
 \description{
 ask for the toggle api token
 }

@@ -221,6 +221,8 @@ test_that("the quota scope comes from the url (revue #75)", {
   expect_equal(toggl_quota_scope("https://api.track.toggl.com/api/v9/workspaces"), "user")
   expect_equal(toggl_quota_scope("https://api.track.toggl.com/api/v9/workspaces/12/clients"), "ws12")
   expect_equal(toggl_quota_scope("https://api.track.toggl.com/reports/api/v2/details?workspace_id=12&page=1"), "ws12")
+  expect_equal(toggl_quota_scope("https://api.track.toggl.com/reports/api/v3/workspace/12/search/time_entries"), "ws12")
+  expect_equal(toggl_quota_scope("https://api.track.toggl.com/reports/api/v3/workspace/12/search/time_entries/totals"), "ws12")
   expect_equal(toggl_quota_scope("https://api.track.toggl.com/api/v9/organizations/3/users"), "org3")
 })
 

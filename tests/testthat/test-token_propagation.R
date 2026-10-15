@@ -4,6 +4,7 @@
 fake_api <- function() {
   log <- data.frame(url = character(0), token = character(0))
   answer <- function(url) {
+    if (grepl("/me$", url)) return(list(id = 1L, default_workspace_id = 111L))
     if (grepl("/workspaces$", url)) return(list(list(id = 111L)))
     if (grepl("/projects", url)) return(list(list(id = 1L, name = "p1", active = TRUE, client_id = 5L)))
     if (grepl("/clients", url)) return(list(list(id = 5L, name = "acme")))
@@ -35,6 +36,7 @@ local_fake_api <- function(env = parent.frame()) {
   local_mocked_bindings(
     toggl_http_get = api$get, POST = api$write, PUT = api$write, PATCH = api$write,
     toggl_sleep = function(s) NULL, notification = function(...) NULL,
+    toggl_today = function() as.Date("2026-10-15"),
     get_toggl_api_token = function(...) stop("the keyring was used although api_token was given"),
     .env = env
   )
@@ -46,7 +48,7 @@ expect_only_token <- function(api, token = "tok", workspace_lookup = FALSE) {
   log <- api$log()
   expect_gt(nrow(log), 0)
   expect_true(all(log$token == token), label = paste(unique(log$token), collapse = ","))
-  if (!workspace_lookup) expect_false(any(grepl("/workspaces$", log$url)), label = "useless /workspaces call")
+  if (!workspace_lookup) expect_false(any(grepl("/workspaces$|/me$", log$url)), label = "useless workspace lookup")
   expect_false(any(grepl("/workspaces/111/", log$url)), label = "default workspace used instead of the given one")
 }
 

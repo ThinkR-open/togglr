@@ -6,6 +6,9 @@
 \usage{
 update_toggl_api_token()
 }
+\value{
+invisibly, the new token, or \code{NULL} when the input was cancelled (the stored token is then kept)
+}
 \description{
 update the toggle api token
 }

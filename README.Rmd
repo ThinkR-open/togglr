@@ -13,106 +13,94 @@ knitr::opts_chunk$set(
   eval = FALSE
 )
 ```
-  <!-- badges: start -->
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/togglr)](https://cran.r-project.org/package=togglr)
-[![](http://cranlogs.r-pkg.org/badges/togglr)](https://cran.r-project.org/package=togglr)
-  [![R-CMD-check](https://github.com/ThinkR-open/togglr/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/togglr/actions)
-  <!-- badges: end -->
- 
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/ThinkR-open/togglr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ThinkR-open/togglr/actions/workflows/R-CMD-check.yaml)
+[![test-coverage](https://github.com/ThinkR-open/togglr/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/ThinkR-open/togglr/actions/workflows/test-coverage.yaml)
+<!-- badges: end -->
+
 # togglr
 
-An R and Rstudio wrapper for toggl Api.
-<https://www.toggl.com/>
+An R client for the [Toggl Track](https://toggl.com/) API: start and stop
+timers from R or RStudio, read and write time entries, projects and clients,
+and download reports.
+
+Reads never return silently truncated or empty results: HTTP errors are
+raised, the hourly quota and rate limits of the API are respected, and
+paginated reports are checked for completeness.
 
 Documentation site: https://thinkr-open.github.io/togglr/
 
-## Installation of `togglr`
+## Installation
 
+From CRAN:
 
-### From CRAN
-
-```{r}
+```r
 install.packages("togglr")
 ```
 
+The development version, from GitHub:
 
-### From Github
-```R
-if (!requireNamespace("remotes")){install.packages("remotes")}
+```{r}
+if (!requireNamespace("remotes")) install.packages("remotes")
 remotes::install_github("ThinkR-open/togglr")
 ```
 
+## Set your Toggl API token
 
-
-## Set toggl Api token
-
-Go on toogl.com website : `https://track.toggl.com/profile`
+Your token is at the bottom of your Toggl profile page:
 
 ```{r}
 togglr::open_toggl_website_profile()
 ```
 
-then select and copy your token api at the bottom of the page.
+Store it once in your keyring:
 
 ```{r}
 library(togglr)
 set_toggl_api_token("your_token_api")
 ```
-You just need to do this once.
 
+Every function also accepts an `api_token` argument, and a `workspace_id`
+(the default workspace of your account otherwise, see `get_workspaces()`).
 
-## Start the tracking system
-
-Without any parameters it will create a new project using your Rstudio project name. 
-
-```{r}
-toggl_start()
-```
-
-By default the client name is "without client" you can choose (and eventualy create a client) by using :
+## Track your time
 
 ```{r}
-toggl_start(client = "my client")
-```
-
-But you can also choose the task and the project
-
-```{r}
-toggl_start(client = "my client",
-            description = "what I'm doing",
-            project_name = "my project")
-```
-
-
-## Stop the tracking system
-
-```{r}
+toggl_start()   # a new entry, in a project named after your RStudio project
+toggl_start(client = "my client", description = "what I'm doing",
+            project_name = "my project", tags = c("dev", "R"))
 toggl_stop()
+
+get_current_duration()             # the running entry
+get_current_project_task_detail()  # the tasks of the current project
 ```
 
+RStudio addins 'start toggl' and 'stop toggl' are provided: bind them to
+keyboard shortcuts.
 
-## Get total time passed on the current project
+## Reports
+
+Reports come from the Toggl Reports API v3.
 
 ```{r}
-get_current_duration()# the current track
-get_current_project_task_detail()# (including the current track)
+# every time entry of a period, one row per entry
+get_detailled_report(since = "2026-01-01", until = "2026-03-31")
+# only some users
+get_detailled_report(since = "2026-01-01", until = "2026-03-31", user_ids = 123456)
 
+get_summary_report(since = "2026-09-01", until = "2026-09-30")  # per user
+get_weekly_report(since = "2026-09-07", until = "2026-09-13")   # per project and day
+get_dashboard(since = "2026-09-01", until = "2026-09-30")       # per project
 ```
 
-## Get all your dashboard
+`get_time_entries()` reads your own entries of the last 3 months (a limit of
+the API); for older periods, use `get_detailled_report(user_ids = )`.
 
-```{r}
-get_dashboard()
-```
+## Long extractions, several processes
 
-
-## Use Rstudio Addins
-
-This package comes with 2 Rstudio addins 'start toggl' and 'stop toggl', feel free to use keybindings for convenience.
-
-
-## Some other uselfull functions are in this package
-
-```{r}
-ls(package:togglr)
-```
+A few options, documented in `?togglr`, tune the requests: for example
+`options(togglr.min_interval = 16)` spreads a long extraction to spare the
+hourly quota of the API, and `options(togglr.state_file = "...")` shares the
+pacing and the known quota between R processes (callr, future, targets
+workers).

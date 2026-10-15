@@ -6,6 +6,9 @@
 \usage{
 get_context()
 }
+\value{
+a text describing the RStudio project, or "I'm using R" outside a project
+}
 \description{
 retrieve Rstudio projet if possible
 }

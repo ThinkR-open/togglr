@@ -6,6 +6,9 @@
 \usage{
 get_context_project()
 }
+\value{
+the name of the RStudio project, or "sans projet" outside a project
+}
 \description{
 retrieve Rstudio projet if possible
 }

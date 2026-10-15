@@ -22,7 +22,7 @@ toggl_create_project(
 \item{workspace_id}{workspace_id}
 
 \item{client}{client name: an existing client is reused, an unknown one is
-created; `NULL` or `""` for no client}
+created; \code{NULL} or \code{""} for no client}
 
 \item{private}{whether project is accessible for only project users or for all workspace users (boolean, default false)}
 

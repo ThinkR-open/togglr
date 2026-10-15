@@ -19,11 +19,15 @@ knitr::opts_chunk$set(
 
 ## Installation of `togglr`
 
-
-### From Github
+### From CRAN
 ```R
-if (!requireNamespace("devtools")){install.packages("devtools")}
-devtools::install_github("ThinkR-open/togglr")
+install.packages("togglr")
+```
+
+### Development version, from GitHub
+```R
+if (!requireNamespace("remotes")) install.packages("remotes")
+remotes::install_github("ThinkR-open/togglr")
 ```
 
 
@@ -79,7 +83,7 @@ toggl_stop()
 
 ```{r, eval = FALSE}
 get_current_duration()# the current track
-get_project_task_detail()# all the project (including the current track)
+get_current_project_task_detail() # the tasks of the current project (running entry included)
 
 ```
 

@@ -9,6 +9,9 @@ get_toggl_api_token(ask = TRUE)
 \arguments{
 \item{ask}{booleen do we have to ask if missing}
 }
+\value{
+the token (a character string), or \code{NULL} when there is none and \code{ask = FALSE}
+}
 \description{
 return the toggle api token
 }

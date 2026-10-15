@@ -1,5 +1,93 @@
-# togglr (development version, toward 1.0.0)
+# togglr 1.0.0
 
+## Breaking changes
+
+* Reports come from the Reports API v3 (#76): `get_summary_report()` items no
+  longer give `cur`, `sum` and `rate` (`NA`); entries without a visible project
+  are grouped under an `NA` id and name instead of "Private Project";
+  the `user_agent` argument of the report functions is ignored. The columns
+  and types of `get_detailled_report()` are unchanged. The rounding set in the
+  Toggl profile is never applied (`rounding = 0` in every request), as in
+  Reports v2.
+* `get_workspace_id()` returns the default workspace of the account, no longer
+  always the first one (#23).
+* `get_time_entries()` fails before any request for a period starting more
+  than 3 months ago (the API refused it anyway) (#13).
+* `create_client()` returns the created client (a list), no longer the httr
+  response (#54); `toggl_update_entries()` sends one PUT per entry and returns
+  the updated entry, or a list of them (#56).
+* A write refused by the API raises an error (#54); `toggl_start()` and
+  `toggl_create()` return `NA`, with a warning, when the API accepted the
+  entry but its answer could not be read.
+* `get_toggl_api_token()` fails, outside an interactive session, instead of
+  prompting, and never deletes the stored key (#51).
+* `set_toggl_api_token()` returns the token invisibly (#84).
+* `simplify()` is rewritten on the public API of jsonlite (#69).
+* `get_detailled_report()`: `cache = FALSE` by default, `max_page` and
+  `memoise_cache_dir` deprecated (#60, #67); a 7th positional argument now
+  goes to `cache`.
+
+## Other changes
+
+* `get_detailled_report()` reads Reports API v3 (`/search/time_entries`,
+  enriched with the names of users, projects, clients and tags) instead of
+  Reports v2, with the same columns and types. Pages of 1000 entries
+  (`options(togglr.page_size)`) instead of 50: a month of a team of 20 is read
+  in one or two requests. The period is checked against the total duration of
+  `/search/time_entries/totals`, equal before and after the pagination and,
+  up to the rounding of the API (1 s per entry), to the sum of the entries.
+  New argument `user_ids`; `user_agent` is ignored (#76).
+* The completeness checks of `get_detailled_report()` also treat as a movement
+  any entry received that was edited after the read started: the pages are
+  numbered by row, so a deletion followed by an insertion of the same duration
+  shifts the rows without changing the totals. This replaces the `total_grand`
+  tolerance for running timers, which could hide such a movement (#77). A
+  running timer may only grow by the time between the two totals, measured by
+  the clock of the server from its own start, not by the time spent waiting
+  before the first total. One movement still escapes: an entry deleted and
+  replaced by one of exactly the same duration that is not in the pages
+  received.
+* `get_summary_report()`, `get_weekly_report()` and `get_dashboard()` read
+  Reports API v3 too, with the output of Reports v2. Reports v3 only returns
+  ids: the names of users, projects and clients come from the Track API v9,
+  archived projects included. `get_weekly_report()` returns an empty tibble
+  for a week without any entry. An unreadable answer to a report request is an
+  error, never an empty report.
+  The amounts of the summary items (`cur`, `sum`, `rate`) are no longer given
+  (NA). Entries without a visible project are grouped with an `NA` id and name
+  (Reports v2 called them "Private Project") (#76).
+* With a shared state file, an exhausted quota, or a spread of the requests,
+  recorded by another process while this one was waiting is no longer erased:
+  it is waited for in turn, or fails within `max_wait` (#78).
+* The requests of Reports v3 (`/reports/api/v3/workspace/<id>/`) count against
+  the quota of their workspace, like the requests of the API v9
+  (`/workspaces/<id>/`): an exhausted Reports quota no longer blocks `/me`.
+* `get_time_entries()` is never truncated: `/me/time_entries` returns at most
+  1000 entries, so a full answer splits the period in two, recursively. A
+  period starting more than 3 months ago (the limit of the API) fails before
+  any request, pointing to `get_detailled_report(user_ids = )` (#13). Its
+  output gains a `client_name` column; `project_name` and `client_name` cover
+  the archived projects too (#14). `get_project_id_and_name()` gains `active`
+  (`NULL`, `"false"` or `"both"`) and returns 0 rows, not an error, for a
+  workspace without any matching project. `since` and `until` may be text
+  dates again.
+* `get_workspace_id()` returns the default workspace of the account
+  (`default_workspace_id` of `/me`), and the first workspace only when no
+  default is set; it used to be always the first one. New `get_workspaces()`
+  lists every workspace, the default one flagged (#23).
+* `get_dashboard()` and `get_all_project_names()` gain `user_ids`, to keep the
+  projects some team members worked on (#12).
+* New `get_project_data()`: the data of one project from its id (#28).
+* `toggl_start(tags = )` sends its tags, now covered by a test (#16).
+* `set_toggl_api_token()` returns the token invisibly (it was printed when
+  called at top level, e.g. in a script whose output is logged), and checks
+  the new token before deleting the stored one. `update_toggl_api_token()`
+  asks first: a cancelled input keeps the stored token (#84).
+* Tests: coverage from 85 % to 93 %, a real multi-process test of
+  `togglr.state_file`, no test depending on covr's instrumentation; new
+  workflow measuring the coverage (#84, #32, #33).
+* DESCRIPTION declares `R (>= 4.1.0)` and the minimal versions of its
+  dependencies; the obsolete `inst/dependencies.R` is no longer shipped (#83).
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the
   `Authorization` header (#50).
@@ -9,10 +97,6 @@
 * `get_detailled_report()` returns fixed column types (e.g. `task` is always
   text, `tid` integer), whatever the content of the page: periods over a year
   with an empty year no longer fail to combine (#46).
-* `get_detailled_report()` also compares the total duration (`total_grand`)
-  returned with each page: a deletion followed by an insertion during the
-  pagination, which leaves `total_count` unchanged, now triggers a new fetch
-  instead of returning a stale entry and missing another (#47).
 * New option `togglr.state_file`: the pacing of the reports calls and the
   knowledge of an exhausted quota are stored in that file, under a lock, and
   shared by every R process using it (callr / future / targets workers, cron
@@ -66,14 +150,11 @@
   deprecated and ignored (#60).
 * The reports functions (`get_detailled_report()`, `get_summary_report()`,
   `get_weekly_report()`, `get_dashboard()`) accept `since` / `until` as a
-  `Date`, a date-time (its day in its own time zone) or a text "AAAA-MM-JJ",
+  `Date`, a date-time (its day in its own time zone) or a text "YYYY-MM-DD",
   and fail with a clear message, before any request, on anything else or on
   `since` after `until` (#61).
 * Default periods ("one year ago") are computed with `%m-%`: they were `NA`
   on February 29th (#62).
-* `get_detailled_report_paged()` has the same default period as
-  `get_detailled_report()` (the last year, until today): it was three years,
-  beyond the one year limit of the reports API v2, until tomorrow (#63).
 * `options(togglr.min_interval)` (1 s by default) now spaces every request,
   reads and writes, retries included, not only the pages of the detailled
   report (#64).
@@ -96,44 +177,41 @@
 * `globalVariables()` no longer declares function names (`case_when`,
   `full_join`, `tribble`) nor unused names, which could hide a missing
   import (#70).
-* Every request sends the user agent `togglr/<version>` (header, and the
-  `user_agent` parameter of the reports API, now url-encoded); `get_dashboard()`
-  no longer sends a hardcoded `api_test`, and uses `any_of()` instead of the
-  superseded `one_of()`, which warned when the API returned no color (#71).
+* Every request sends the user agent `togglr/<version>` in its header;
+  `get_dashboard()` no longer sends a hardcoded `api_test` (#71). The
+  `user_agent` argument of the report functions is kept for compatibility and
+  ignored.
 * `get_workspace_id()` fails with its message when the account has no
   workspace, instead of "subscript out of bounds". New tests cover the edge
   cases of the pagination, of the quota and of the cache (#73).
 * Package metadata and documentation: new title and description, no more
   `LazyData` without data, targeted imports only (no more whole `dplyr`,
   `httr`, `keyring`, `assertthat`, `getPass`), `get_detailled_report()` has
-  its own help page, the vignette installs from GitHub and no longer runs
-  `install.packages()` during `R CMD check`. `R CMD check` is clean: 0 error,
+  its own help page, the vignette no longer runs `install.packages()` during
+  `R CMD check`. `R CMD check` is clean: 0 error,
   0 warning, 0 note (#74).
-* Fixes from the review of #75:
-  - `toggl_create_project()` (and so `toggl_start()` on a new project) works
-    again in a workspace without any client: `get_all_client_info()` returns
-    the `id` and `name` columns, even with no rows.
-  - The reports cache is kept per token (as a hash): a period fetched with one
-    token is no longer returned to another token of the same workspace.
-  - The spreading of the last requests of the quota waits at most `max_wait`,
-    with a message, and only slows down the token that is short of quota.
-  - The quota is remembered per token and per scope (the workspace or
-    organization of the url, or the user for `/me` and `/workspaces`): an
-    exhausted workspace no longer blocks `/me` or another workspace.
-  - A request processed by the API is returned even if its quota cannot be
-    recorded in the state file (warning): a time entry is no longer reported
-    as not started, then created twice.
-  - One pass on the state file per request instead of three, and a read no
-    longer rewrites it.
-  - In a period that includes today, the growth of `total_grand` caused by a
-    running timer between two pages is no longer taken for an edit.
-  - A time entry accepted by the API but whose answer cannot be read is
-    reported as started (with a warning, id `NA`), not as `NOT STARTED`.
-  - A state file that cannot be replaced is an error instead of a silently
-    lost update, and the temporary file is removed.
-  - Network errors are no longer retried when the backoff exceeds `max_wait`.
+* `toggl_create_project()` (and so `toggl_start()` on a new project) works
+  again in a workspace without any client: `get_all_client_info()` returns
+  the `id` and `name` columns, even with no rows (review of #75).
+* The reports cache is kept per token (as a hash): a period fetched with one
+  token is no longer returned to another token of the same workspace (review of #75).
+* The spreading of the last requests of the quota waits at most `max_wait`,
+  with a message, and only slows down the token that is short of quota (review of #75).
+* The quota is remembered per token and per scope (the workspace or
+  organization of the url, or the user for `/me` and `/workspaces`): an
+  exhausted workspace no longer blocks `/me` or another workspace (review of #75).
+* A request processed by the API is returned even if its quota cannot be
+  recorded in the state file (warning): a time entry is no longer reported
+  as not started, then created twice (review of #75).
+* One pass on the state file per request instead of three, and a read no
+  longer rewrites it (review of #75).
+* A time entry accepted by the API but whose answer cannot be read is
+  reported as started (with a warning, id `NA`), not as `NOT STARTED` (review of #75).
+* A state file that cannot be replaced is an error instead of a silently
+  lost update, and the temporary file is removed (review of #75).
+* Network errors are no longer retried when the backoff exceeds `max_wait` (review of #75).
 
-# togglr 0.3.0
+# togglr 0.3.0 (GitHub only, never released on CRAN)
 
 * Every read of the API goes through `toggl_GET()`: HTTP errors are no longer
   turned into empty results. 429 and 5xx are retried, waiting what the API asks

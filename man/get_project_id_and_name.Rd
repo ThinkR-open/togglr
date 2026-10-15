@@ -6,13 +6,21 @@
 \usage{
 get_project_id_and_name(
   api_token = get_toggl_api_token(),
-  workspace_id = get_workspace_id(api_token)
+  workspace_id = get_workspace_id(api_token),
+  active = NULL
 )
 }
 \arguments{
 \item{api_token}{the toggl api token}
 
 \item{workspace_id}{workspace id}
+
+\item{active}{\code{NULL} for the active projects only (the default of the API),
+\code{"false"} for the archived ones, \code{"both"} for all}
+}
+\value{
+a tibble with \code{id}, \code{project_name} and \code{active}; 0 rows when the
+workspace has no such project
 }
 \description{
 retrieve project id and name

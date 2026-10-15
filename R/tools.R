@@ -4,6 +4,7 @@
 #' @importFrom magrittr %>% 
 #' @importFrom  keyring key_set_with_value
 #' @importFrom keyring key_get key_set_with_value key_delete
+#' @return the token (a character string), or `NULL` when there is none and `ask = FALSE`
 #' @export
 get_toggl_api_token <- function(ask=TRUE){
   # never delete the stored key here: a locked keyring (cron) also makes
@@ -32,33 +33,39 @@ is_interactive <- function() interactive()
 #' @param token toggl api token
 #' @importFrom magrittr %>% 
 #' @importFrom assertthat assert_that is.string
+#' @return invisibly, the token stored (or `NULL` when nothing was typed)
 #' @export
 set_toggl_api_token <- function(token){
-
-  
   if ( missing(token) ){
-    token <- ask_toggl_api_token() 
+    token <- ask_toggl_api_token()
   }
   if (is.null(token)){return(invisible(NULL))}
-  
+  # valider avant d'effacer : un token invalide ne doit pas faire perdre l'ancien
+  assert_that(is.string(token))
   delete_toggl_api_token()
-  assert_that(is.character(token))
-    token %>% key_set_with_value(service = "toggl_api_token",password = .)
-  
-  token
+  key_set_with_value(service = "toggl_api_token", password = token)
+  # invisible : affiche, le token finirait dans la console ou les logs
+  invisible(token)
 }
 
 #' update_toggl_api_token
 #' @description  update the toggle api token
 #' @importFrom magrittr %>% 
+#' @return invisibly, the new token, or `NULL` when the input was cancelled (the stored token is then kept)
 #' @export
 update_toggl_api_token <- function(){
-  delete_toggl_api_token()
-    ask_toggl_api_token() %>% key_set_with_value(service = "toggl_api_token",password = .)
+  # demander d'abord : une saisie annulee garde le token actuel
+  token <- ask_toggl_api_token()
+  if (is.null(token)) {
+    message("no token entered: the stored toggl api token is kept")
+    return(invisible(NULL))
+  }
+  set_toggl_api_token(token)
 }
 
 #' @title delete_toggl_api_token
 #' @description  delete the toggle api token
+#' @return invisibly, `NULL` or the error caught when there was no key
 #' @export
 delete_toggl_api_token <- function(){
   try(key_delete("toggl_api_token"),silent=TRUE)
@@ -68,6 +75,7 @@ delete_toggl_api_token <- function(){
 #' ask_toggl_api_token
 #' @param msg the message
 #' @description  ask for the toggle api token
+#' @return the token typed by the user, or `NULL` when nothing was typed
 #' @export
 ask_toggl_api_token <- function (msg="toggl api token") 
 {
@@ -89,6 +97,7 @@ ask_toggl_api_token <- function (msg="toggl api token")
 #' @return time in iso 8601
 #'
 #' @param time a POSIXt
+#' @noRd
 correct_date <- function(time){
   if (! is.null(time)) {
     tm <- strftime(time, "%Y-%m-%dT%H:%M:%S")
@@ -106,7 +115,7 @@ correct_date <- function(time){
 }
 
 #' Read a date argument: a `Date`, a date-time (taken as its day in its own time
-#' zone) or a text "AAAA-MM-JJ"; anything else fails with a clear message
+#' zone) or a text "YYYY-MM-DD"; anything else fails with a clear message
 #' @noRd
 as_toggl_date <- function(x, arg = deparse(substitute(x))) {
   out <- if (inherits(x, "Date")) {
@@ -119,7 +128,7 @@ as_toggl_date <- function(x, arg = deparse(substitute(x))) {
     as.Date(NA)
   }
   if (length(out) != 1 || is.na(out)) {
-    stop("`", arg, "` must be a Date, a date-time or a text \"AAAA-MM-JJ\", not ",
+    stop("`", arg, "` must be a Date, a date-time or a text \"YYYY-MM-DD\", not ",
          paste(format(x), collapse = ", "), ".", call. = FALSE)
   }
   out
@@ -137,7 +146,7 @@ as_toggl_period <- function(since, until) {
 }
 
 #' Check the period of the calling function and replace its `since` and
-#' `until` by the `Date`s read by [as_toggl_period()]
+#' `until` by the `Date`s read by `as_toggl_period()`
 #' @noRd
 read_toggl_period <- function(env = parent.frame()) {
   period <- as_toggl_period(env$since, env$until)
@@ -148,7 +157,14 @@ read_toggl_period <- function(env = parent.frame()) {
 
 # wrapper, so that tests can choose the day
 #' @noRd
-toggl_today <- function() Sys.Date()
+toggl_today <- function() {
+  Sys.Date()
+}
+
+#' @noRd
+toggl_now <- function() {
+  Sys.time()
+}
 
 #' User agent of the requests: "togglr/<version>"
 #' @noRd

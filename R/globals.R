@@ -5,9 +5,8 @@ globalVariables(
     "name",
     "project",
     "time",
-    "client_id",
+    "client_id", "client_name",
     "id","start","duration","pretty_duration",'project_name','description','pid','wid',
-    # get_summary_report
-    "total_currencies", "title", "id", "fullname", "time", "items"
+    "title", "id", "fullname", "time"
   ))
 )

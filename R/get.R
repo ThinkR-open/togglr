@@ -1,6 +1,7 @@
 #' @title get_context
 #' @description  retrieve Rstudio projet if possible
 #' @importFrom rstudioapi getActiveProject
+#' @return a text describing the RStudio project, or "I'm using R" outside a project
 #' @export
 get_context <- function(){
   projet <- NULL
@@ -18,6 +19,7 @@ get_context <- function(){
 #' @description  retrieve current projet id
 #' @param api_token the toggl api token
 #' @importFrom httr GET authenticate content
+#' @return a list describing the running time entry (`id`, `description`, `start`, `project_id`...), or `NULL` when nothing is running
 #' @export
 get_current <- function(api_token=get_toggl_api_token()){
   if (is.null(api_token)){
@@ -36,6 +38,7 @@ get_current <- function(api_token=get_toggl_api_token()){
 #' @title get_context_projet
 #' @description  retrieve Rstudio projet if possible
 #' @importFrom rstudioapi getActiveProject
+#' @return the name of the RStudio project, or "sans projet" outside a project
 #' @export
 get_context_project <- function(){
   projet <- NULL

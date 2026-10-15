@@ -41,3 +41,15 @@ test_that("the result does not depend on the time zone of the session (#52)", {
                        toggl_start("x", start = instants$ete_paris, api_token = "t", workspace_id = 1))
   expect_equal(sent(), attendu[1])
 })
+
+# ---- #16 : tags de toggl_start() -----------------------------------------------------------
+
+test_that("toggl_start sends its tags (#16)", {
+  tags <- NULL
+  local_mocked_bindings(
+    POST = function(url, ..., body) { tags <<- jsonlite::fromJSON(body)$tags; fake_response(200, list(id = 1L)) },
+    get_project_id = function(...) 1L, notification = function(...) NULL, toggl_sleep = function(s) NULL)
+  local_fresh_state()
+  toggl_start("x", tags = c("dev", "R"), api_token = "t", workspace_id = 1)
+  expect_equal(tags, c("dev", "R"))
+})

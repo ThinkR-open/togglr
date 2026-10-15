@@ -13,7 +13,7 @@
 #'   without contacting the API. A 402 without quota headers (a feature of a
 #'   paid plan) stops at once.
 #' * a few requests left in the scope are spread until the reset, each wait
-#'   capped at `max_wait` (see [toggl_note_quota()]).
+#'   capped at `max_wait` (see `toggl_note_quota()`).
 #' * 429 means the rate limit (about 1 request per second) is exceeded: the call
 #'   backs off (`retry-after`, or 60 s, 120 s...) within `max_wait`.
 #' * 5xx and network errors (timeout, DNS, connection reset) are retried with a
@@ -40,13 +40,16 @@ toggl_GET <- function(url,
 
 #' Perform a write request (POST, PUT, PATCH, DELETE) on the Toggl API
 #'
-#' Same policy as [toggl_GET()] (quota, 429, errors raised with the message of
+#' Same policy as `toggl_GET()` (quota, 429, errors raised with the message of
 #' the API), with one difference: a POST is not idempotent, so it is never
 #' retried after a 5xx or a network error, as it may have been processed. A 429
 #' is always retried: the request was refused, not processed.
 #'
 #' @param verb "POST", "PUT", "PATCH" or "DELETE"
 #' @param body request body (a JSON string)
+#' @param idempotent `TRUE` for a request that can safely be sent twice (PUT,
+#'   PATCH, DELETE, and the read-only searches of the reports API): it is then
+#'   retried after a 5xx or a network error
 #' @inheritParams toggl_GET
 #' @return a list with `content` (parsed body, `NULL` for an empty answer) and
 #'   `headers`
@@ -55,15 +58,16 @@ toggl_request <- function(verb, url,
                           api_token = get_toggl_api_token(),
                           body = NULL,
                           max_tries = 5,
-                          max_wait = getOption("togglr.max_wait", 60)) {
+                          max_wait = getOption("togglr.max_wait", 60),
+                          idempotent = verb != "POST") {
   verb <- match.arg(verb, c("POST", "PUT", "PATCH", "DELETE"))
   toggl_call(verb, url, api_token = api_token, body = body,
-             max_tries = max_tries, max_wait = max_wait)
+             max_tries = max_tries, max_wait = max_wait, idempotent = idempotent)
 }
 
 #' @noRd
-toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait) {
-  idempotent <- verb != "POST"
+toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait,
+                       idempotent = verb != "POST") {
   scope <- toggl_quota_scope(url)
   for (try in seq_len(max_tries)) {
     # quota connu, etalement et espacement : chaque envoi, relances comprises,
@@ -106,8 +110,13 @@ toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait) {
         warning("togglr could not record the quota of the API (", conditionMessage(e),
                 "); the request succeeded.", call. = FALSE)
       })
+      # une lecture (GET, ou POST idempotent des rapports) illisible est une
+      # erreur ; une ecriture illisible a ete traitee, l'erreur ferait croire
+      # a un echec et un POST relance creerait un doublon
       body <- if (status == 204 || !length(resp$content)) NULL else tryCatch(content(resp), error = function(e) {
-        if (verb == "GET") stop(e)
+        if (verb == "GET" || idempotent) {
+          stop(e)
+        }
         warning("toggl API answer to ", verb, " ", sub("\\?.*$", "", url), " could not be read (",
                 conditionMessage(e), "); the request succeeded.", call. = FALSE)
         NULL
@@ -165,11 +174,15 @@ toggl_quota_key <- function(api_token, scope = "user", what = "quota_until") {
 #' Toggl counts the hourly quota per organization, and per user for the
 #' endpoints outside any organization (`/me`, `/workspaces`). The organization
 #' of a workspace is not known from the url, so the workspace stands for it: an
-#' exhausted workspace does not block the other ones, nor `/me`.
+#' exhausted workspace does not block the other ones, nor `/me`. The API v9
+#' says `workspaces/<id>`, Reports v3 says `workspace/<id>`: both are the same
+#' scope.
 #' @noRd
 toggl_quota_scope <- function(url) {
-  m <- regmatches(url, regexec("(workspaces/|workspace_id=|organizations/)([0-9]+)", url))[[1]]
-  if (!length(m)) return("user")
+  m <- regmatches(url, m = regexec("(workspaces?/|workspace_id=|organizations/)([0-9]+)", url))[[1]]
+  if (!length(m)) {
+    return("user")
+  }
   paste0(if (m[2] == "organizations/") "org" else "ws", m[3])
 }
 
@@ -225,7 +238,7 @@ toggl_error_message <- function(resp, url) {
 #' left means no request before the reset (instead of a wasted 402); a few
 #' requests left (fewer than `options(togglr.quota_spread)`, 10 by default) are
 #' spread evenly until the reset: the next request of the token in this scope
-#' waits `reset / remaining` seconds, at most `max_wait` (see [toggl_pace()]).
+#' waits `reset / remaining` seconds, at most `max_wait` (see `toggl_pace()`).
 #' Other tokens and scopes are not slowed down.
 #' @noRd
 toggl_note_quota <- function(resp, api_token, scope = "user") {

@@ -8,7 +8,8 @@ get_all_project_names(
   api_token = get_toggl_api_token(),
   workspace_id = get_workspace_id(api_token),
   since = toggl_today() \%m-\% lubridate::years(1),
-  until = toggl_today()
+  until = toggl_today(),
+  user_ids = NULL
 )
 }
 \arguments{
@@ -19,6 +20,11 @@ get_all_project_names(
 \item{since}{a date}
 
 \item{until}{a date}
+
+\item{user_ids}{optional, only the projects these users worked on}
+}
+\value{
+a character vector of the project names
 }
 \description{
 Get all project's names
