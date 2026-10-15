@@ -5,8 +5,8 @@
 * `R CMD check --as-cran` on R 4.5.1 (Ubuntu), with and without `NOT_CRAN`.
 * GitHub Actions, workflow R-CMD-check of r-lib/actions: macOS (release),
   Windows (release), Ubuntu (release, devel, oldrel-1).
-* win-builder: R release and R devel (the results are pasted below when they
-  arrive).
+* win-builder, 2026-10-15: Status OK on R 4.6.1 (2026-06-24 ucrt) and on
+  R Under development (unstable) (2026-10-14 r90673 ucrt), without any NOTE.
 
 ## Tests
 
