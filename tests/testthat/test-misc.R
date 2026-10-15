@@ -40,16 +40,27 @@ test_that("with togglr.state_file, real concurrent processes are spaced (#84)", 
   state <- withr::local_tempfile()
   lib <- .libPaths()
   src <- normalizePath(testthat::test_path("..", ".."), mustWork = FALSE)
-  skip_if_not(dir.exists(file.path(src, "R")), "package sources not available")
-  worker <- function(state, lib, src) {
+  from_sources <- length(list.files(file.path(src, "R"), pattern = "\\.R$")) > 0
+  worker <- function(state, lib, src, from_sources) {
     .libPaths(lib)
-    pkgload::load_all(src, quiet = TRUE, export_all = TRUE)
+    if (from_sources) {
+      pkgload::load_all(src, quiet = TRUE)
+    } else {
+      loadNamespace("togglr", lib.loc = lib)
+    }
+    pace <- get("toggl_pace", envir = asNamespace("togglr"))
     options(togglr.state_file = state)
     t <- c()
-    for (i in 1:3) { toggl_pace(min_interval = 1); t <- c(t, as.numeric(Sys.time())) }
+    for (i in 1:3) {
+      pace(min_interval = 1)
+      t <- c(t, as.numeric(Sys.time()))
+    }
     t
   }
-  p <- lapply(1:2, function(i) callr::r_bg(worker, args = list(state, lib, src)))
+  args <- list(state = state, lib = lib, src = src, from_sources = from_sources)
+  p <- lapply(1:2, function(i) {
+    callr::r_bg(worker, args = args)
+  })
   for (x in p) x$wait(60000)
   times <- sort(unlist(lapply(p, function(x) x$get_result())))
   expect_length(times, 6)
