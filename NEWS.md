@@ -36,16 +36,17 @@
   in one or two requests. The period is checked against the total duration of
   `/search/time_entries/totals`, equal before and after the pagination and,
   up to the rounding of the API (1 s per entry), to the sum of the entries.
-  An entry received that was edited after the read started is a movement too:
-  the pages are numbered by row, so a deletion followed by an insertion of the
-  same duration shifts the rows without changing the totals. This replaces the
-  `total_grand` tolerance for running timers, which could hide such a movement
-  (#76, #77). A running timer may only grow by the time between the two
-  totals, measured by the clock of the server from its own start, not by the
-  time spent waiting before the first total. One movement still escapes: an
-  entry deleted and replaced by one of exactly the same duration that is not in
-  the pages received.
-  New argument `user_ids`. `user_agent` is ignored.
+  New argument `user_ids`; `user_agent` is ignored (#76).
+* The completeness checks of `get_detailled_report()` also treat as a movement
+  any entry received that was edited after the read started: the pages are
+  numbered by row, so a deletion followed by an insertion of the same duration
+  shifts the rows without changing the totals. This replaces the `total_grand`
+  tolerance for running timers, which could hide such a movement (#77). A
+  running timer may only grow by the time between the two totals, measured by
+  the clock of the server from its own start, not by the time spent waiting
+  before the first total. One movement still escapes: an entry deleted and
+  replaced by one of exactly the same duration that is not in the pages
+  received.
 * `get_summary_report()`, `get_weekly_report()` and `get_dashboard()` read
   Reports API v3 too, with the output of Reports v2. Reports v3 only returns
   ids: the names of users, projects and clients come from the Track API v9,
@@ -82,12 +83,11 @@
   called at top level, e.g. in a script whose output is logged), and checks
   the new token before deleting the stored one. `update_toggl_api_token()`
   asks first: a cancelled input keeps the stored token (#84).
-* Tests: coverage from 85 % to 91 %, a real multi-process test of
+* Tests: coverage from 85 % to 93 %, a real multi-process test of
   `togglr.state_file`, no test depending on covr's instrumentation; new
   workflow measuring the coverage (#84, #32, #33).
 * DESCRIPTION declares `R (>= 4.1.0)` and the minimal versions of its
   dependencies; the obsolete `inst/dependencies.R` is no longer shipped (#83).
-
 * The API token is no longer printed: `create_client()` and
   `toggl_create_project()` used `httr::verbose()`, which shows the
   `Authorization` header (#50).
@@ -150,7 +150,7 @@
   deprecated and ignored (#60).
 * The reports functions (`get_detailled_report()`, `get_summary_report()`,
   `get_weekly_report()`, `get_dashboard()`) accept `since` / `until` as a
-  `Date`, a date-time (its day in its own time zone) or a text "AAAA-MM-JJ",
+  `Date`, a date-time (its day in its own time zone) or a text "YYYY-MM-DD",
   and fail with a clear message, before any request, on anything else or on
   `since` after `until` (#61).
 * Default periods ("one year ago") are computed with `%m-%`: they were `NA`
@@ -187,8 +187,8 @@
 * Package metadata and documentation: new title and description, no more
   `LazyData` without data, targeted imports only (no more whole `dplyr`,
   `httr`, `keyring`, `assertthat`, `getPass`), `get_detailled_report()` has
-  its own help page, the vignette installs from GitHub and no longer runs
-  `install.packages()` during `R CMD check`. `R CMD check` is clean: 0 error,
+  its own help page, the vignette no longer runs `install.packages()` during
+  `R CMD check`. `R CMD check` is clean: 0 error,
   0 warning, 0 note (#74).
 * `toggl_create_project()` (and so `toggl_start()` on a new project) works
   again in a workspace without any client: `get_all_client_info()` returns

@@ -100,7 +100,7 @@ toggl_pace <- function(min_interval = getOption("togglr.min_interval", 1),
 #' @param api_token the toggl api token
 #' @param workspace_id the workspace id
 #' @param since begin date (included): a `Date`, a date-time or a text
-#'   "AAAA-MM-JJ"; one year ago by default
+#'   "YYYY-MM-DD"; one year ago by default
 #' @param until end date (included), same formats; today by default
 #' @param user_agent ignored since the move to Reports v3 (the user agent is
 #'   sent in the header of every request)

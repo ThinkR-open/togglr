@@ -115,7 +115,7 @@ correct_date <- function(time){
 }
 
 #' Read a date argument: a `Date`, a date-time (taken as its day in its own time
-#' zone) or a text "AAAA-MM-JJ"; anything else fails with a clear message
+#' zone) or a text "YYYY-MM-DD"; anything else fails with a clear message
 #' @noRd
 as_toggl_date <- function(x, arg = deparse(substitute(x))) {
   out <- if (inherits(x, "Date")) {
@@ -128,7 +128,7 @@ as_toggl_date <- function(x, arg = deparse(substitute(x))) {
     as.Date(NA)
   }
   if (length(out) != 1 || is.na(out)) {
-    stop("`", arg, "` must be a Date, a date-time or a text \"AAAA-MM-JJ\", not ",
+    stop("`", arg, "` must be a Date, a date-time or a text \"YYYY-MM-DD\", not ",
          paste(format(x), collapse = ", "), ".", call. = FALSE)
   }
   out

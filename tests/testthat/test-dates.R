@@ -22,7 +22,7 @@ report_functions <- list(
   dashboard = function(...) get_dashboard(api_token = "t", workspace_id = 1, ...)
 )
 
-test_that("dates given as text AAAA-MM-JJ are accepted by every report (#61)", {
+test_that("dates given as text YYYY-MM-DD are accepted by every report (#61)", {
   for (f in report_functions) {
     urls <- capture_url()
     expect_error(f(since = "2026-10-01", until = "2026-10-31"), "captured")

@@ -23,7 +23,7 @@ get_detailled_report(
 \item{workspace_id}{the workspace id}
 
 \item{since}{begin date (included): a \code{Date}, a date-time or a text
-"AAAA-MM-JJ"; one year ago by default}
+"YYYY-MM-DD"; one year ago by default}
 
 \item{until}{end date (included), same formats; today by default}
 

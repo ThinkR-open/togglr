@@ -19,8 +19,12 @@ knitr::opts_chunk$set(
 
 ## Installation of `togglr`
 
+### From CRAN
+```R
+install.packages("togglr")
+```
 
-### From Github
+### Development version, from GitHub
 ```R
 if (!requireNamespace("remotes")) install.packages("remotes")
 remotes::install_github("ThinkR-open/togglr")
