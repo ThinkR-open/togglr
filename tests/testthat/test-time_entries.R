@@ -8,6 +8,7 @@ local_entries_api <- function(entries, env = parent.frame()) {
     get_all_projects = function(...) data.frame(id = 1L, client_id = NA_integer_),
     get_all_client_info = function(...) data.frame(id = integer(0), name = character(0)),
     toggl_sleep = function(s) NULL,
+    toggl_today = function() as.Date("2026-10-15"),
     .env = env
   )
   local_fresh_state(env)
@@ -43,6 +44,39 @@ test_that("entries with several tags give a list column, one element per entry (
   expect_equal(unlist(tags_by_id[["1"]]), c("a", "b"))
   expect_length(unlist(tags_by_id[["2"]]), 0)
   expect_equal(unlist(tags_by_id[["3"]]), "c")
+})
+
+test_that("since and until may be text dates, as before the 3 months guard (revue Copilot #85)", {
+  urls <- local_entries_api(list(entry(1L)))
+  out <- get_time_entries(api_token = "t", workspace_id = 9, since = "2026-10-13", until = "2026-10-14")
+  expect_equal(nrow(out), 1)
+  expect_match(urls(), "start_date=2026-10-1[23]T[0-9:]+Z")
+})
+
+test_that("get_time_entries names the archived projects too, and survives a workspace without active project (revue Copilot #85)", {
+  urls <- c()
+  local_fresh_state()
+  local_mocked_bindings(
+    toggl_http_get = function(url, api_token) {
+      urls <<- c(urls, url)
+      fake_response(200, list(entry(1L)))
+    },
+    get_all_projects = function(api_token, workspace_id, max_pages = 100, active = NULL) {
+      if (identical(active, "both")) {
+        return(data.frame(id = c(1L, 2L), name = c("old", "p1"), client_id = c(5L, NA),
+                          active = c(FALSE, TRUE)))
+      }
+      data.frame()
+    },
+    get_all_client_info = function(...) data.frame(id = 5L, name = "acme"),
+    toggl_sleep = function(s) NULL,
+    toggl_today = function() as.Date("2026-10-15")
+  )
+  out <- get_time_entries(api_token = "t", workspace_id = 9,
+                          since = as.POSIXct("2026-10-13", tz = "UTC"),
+                          until = as.POSIXct("2026-10-15", tz = "UTC"))
+  expect_equal(out$project_name, "old")
+  expect_equal(out$client_name, "acme")
 })
 
 # ---- #13 : jamais de troncature a 1000 entrees ; limite de 3 mois de l'API v9 ----------

@@ -27,7 +27,7 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
                              workspace_id = get_workspace_id(api_token)) {
   # l'API v9 refuse un debut a plus de 3 mois : le dire avant toute requete
   limit <- toggl_today() %m-% lubridate::period(3, "months")
-  if (as.Date(format(since, "%Y-%m-%d")) < limit) {
+  if (bound_date(since) < limit) {
     stop("get_time_entries() reads /me/time_entries, which does not go back more than 3 months ",
          "(not before ", format(limit), "). For an older period, use ",
          "get_detailled_report(user_ids = <your user id>), which has no such limit.", call. = FALSE)
@@ -45,8 +45,9 @@ get_time_entries <- function(api_token = get_toggl_api_token(),
   # extract list of tags
   tags <- map(res, ~ .x$tags)
 
-  woot <- get_project_id_and_name(api_token = api_token, workspace_id = workspace_id) %>% 
-    mutate(id=as.character(id))
+  woot <- get_project_id_and_name(api_token = api_token, workspace_id = workspace_id,
+                                  active = "both") %>%
+    mutate(id = as.character(id))
   
 res %>% map(unlist) %>%  map(~ {
   avirer <- which(grepl(names(.x), pattern = "tag"))
@@ -118,6 +119,19 @@ me_time_entries <- function(api_token, since, until, cap = 1000) {
            me_time_entries(api_token = api_token, since = middle, until = until, cap = cap))
   ids <- vapply(out, function(e) as.numeric(e$id), 0)
   out[!duplicated(ids)]
+}
+
+#' Calendar date of a `since` / `until` bound: a `Date`, a date-time or a text
+#' read as `as.POSIXct()` reads it (like the request url)
+#' @noRd
+bound_date <- function(x) {
+  if (inherits(x, "Date")) {
+    return(x)
+  }
+  if (is.character(x)) {
+    x <- as.POSIXct(x)
+  }
+  as.Date(format(x, "%Y-%m-%d"))
 }
 
 #' Client name of each project of a workspace

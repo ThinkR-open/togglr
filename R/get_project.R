@@ -68,24 +68,27 @@ get_project_id <- function(project_name = get_context_project(),
 #'
 #' @param api_token the toggl api token
 #' @param workspace_id workspace id
+#' @param active `NULL` for the active projects only (the default of the API),
+#'   `"false"` for the archived ones, `"both"` for all
 #'
 #' @importFrom httr GET authenticate content
 #' @importFrom dplyr bind_rows filter rename select
-#' @return a tibble with `id`, `project_name` and `active`
+#' @return a tibble with `id`, `project_name` and `active`; 0 rows when the
+#'   workspace has no such project
 #' @export
-get_project_id_and_name <- function(
-                           api_token = get_toggl_api_token(),
-                           workspace_id = get_workspace_id(api_token)
-                          ) {
+get_project_id_and_name <- function(api_token = get_toggl_api_token(),
+                                    workspace_id = get_workspace_id(api_token),
+                                    active = NULL) {
   if (is.null(api_token)) {
     stop("you have to set your api token using set_toggl_api_token('XXXXXXXX')")
-    
   }
-  
-  # active: possible values true/false/both. By default true. If false, only archived projects are returned.
-  
-get_all_projects(api_token = api_token, workspace_id = workspace_id) %>% 
-    select(id,name,'active') %>% 
+  projects <- get_all_projects(api_token = api_token, workspace_id = workspace_id,
+                               active = active)
+  if (!"id" %in% names(projects)) {
+    return(dplyr::tibble(id = integer(0), project_name = character(0), active = logical(0)))
+  }
+  projects %>%
+    select(id, name, "active") %>%
     rename(project_name = name)
 
 }

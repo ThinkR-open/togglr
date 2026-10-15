@@ -156,11 +156,32 @@ test_that("an entry seen twice keeps its most recently updated version (#76)", {
 })
 
 test_that("a running entry is left out, and its growth does not count as an edit (#76)", {
-  running <- v3_row(9, seconds = 600, stop = NULL)
+  # timer demarre a 08:00Z ; totaux a 08:10:00Z (600 s) et 08:10:01Z (601 s)
+  running <- v3_row(9, seconds = 600, stop = NULL, start = "2026-10-12T10:00:00+02:00",
+                    at_tz = "2026-10-12T10:00:00+02:00")
   page <- structure(c(v3_page(1:2), list(running)), more = FALSE)
-  srv <- local_v3(list(page), totals = c(2 * 3600 + 600, 2 * 3600 + 601))
+  srv <- local_v3(list(page), totals = c(2 * 3600 + 600, 2 * 3600 + 601),
+                  server_dates = c("Mon, 12 Oct 2026 08:10:00 GMT", "Mon, 12 Oct 2026 08:10:01 GMT"))
   out <- suppressMessages(report())
   expect_equal(out$id, 1:2)
+})
+
+test_that("the growth of a running timer is measured between the two totals, by the server clock (revue Copilot #85)", {
+  # 2 entrees de 3600 s recues ; une entree de 3600 s supprimee et une de 3609 s inseree
+  # jamais recue ; timer en cours demarre a 11:49:44Z ; totaux a 12:00:00Z (7800) et
+  # 12:00:32Z (7841 = 7200 + 3609 - 3600 + 648 - 616) ; l'horloge locale a attendu 16 s
+  # avant le premier total puis 32 s : la croissance admise ne doit pas inclure l'attente
+  n <- 0
+  local_mocked_bindings(toggl_now = function() {
+    n <<- n + 1
+    as.POSIXct("2026-10-12 12:00:00", tz = "UTC") + 48 * (n - 1)
+  })
+  running <- v3_row(9, seconds = 616, stop = NULL, start = "2026-10-12T13:49:44+02:00",
+                    at_tz = "2026-10-12T13:49:44+02:00")
+  page <- structure(c(v3_page(1:2), list(running)), more = FALSE)
+  local_v3(list(page, page, page), totals = rep(c(7800, 7841), 3),
+           server_dates = rep(c("Mon, 12 Oct 2026 12:00:00 GMT", "Mon, 12 Oct 2026 12:00:32 GMT"), 3))
+  expect_error(suppressMessages(report()), "incomplete toggl detailled report")
 })
 
 test_that("without a running entry, any change of the totals is an edit (#76)", {

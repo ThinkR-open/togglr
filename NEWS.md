@@ -40,14 +40,18 @@
   the pages are numbered by row, so a deletion followed by an insertion of the
   same duration shifts the rows without changing the totals. This replaces the
   `total_grand` tolerance for running timers, which could hide such a movement
-  (#76, #77). One movement still escapes: an entry deleted and replaced by one
-  of exactly the same duration that is not in the pages received.
+  (#76, #77). A running timer may only grow by the time between the two
+  totals, measured by the clock of the server from its own start, not by the
+  time spent waiting before the first total. One movement still escapes: an
+  entry deleted and replaced by one of exactly the same duration that is not in
+  the pages received.
   New argument `user_ids`. `user_agent` is ignored.
 * `get_summary_report()`, `get_weekly_report()` and `get_dashboard()` read
   Reports API v3 too, with the output of Reports v2. Reports v3 only returns
   ids: the names of users, projects and clients come from the Track API v9,
   archived projects included. `get_weekly_report()` returns an empty tibble
-  for a week without any entry.
+  for a week without any entry. An unreadable answer to a report request is an
+  error, never an empty report.
   The amounts of the summary items (`cur`, `sum`, `rate`) are no longer given
   (NA). Entries without a visible project are grouped with an `NA` id and name
   (Reports v2 called them "Private Project") (#76).
@@ -61,7 +65,11 @@
   1000 entries, so a full answer splits the period in two, recursively. A
   period starting more than 3 months ago (the limit of the API) fails before
   any request, pointing to `get_detailled_report(user_ids = )` (#13). Its
-  output gains a `client_name` column, archived projects included (#14).
+  output gains a `client_name` column; `project_name` and `client_name` cover
+  the archived projects too (#14). `get_project_id_and_name()` gains `active`
+  (`NULL`, `"false"` or `"both"`) and returns 0 rows, not an error, for a
+  workspace without any matching project. `since` and `until` may be text
+  dates again.
 * `get_workspace_id()` returns the default workspace of the account
   (`default_workspace_id` of `/me`), and the first workspace only when no
   default is set; it used to be always the first one. New `get_workspaces()`

@@ -110,8 +110,13 @@ toggl_call <- function(verb, url, api_token, body = NULL, max_tries, max_wait,
         warning("togglr could not record the quota of the API (", conditionMessage(e),
                 "); the request succeeded.", call. = FALSE)
       })
+      # une lecture (GET, ou POST idempotent des rapports) illisible est une
+      # erreur ; une ecriture illisible a ete traitee, l'erreur ferait croire
+      # a un echec et un POST relance creerait un doublon
       body <- if (status == 204 || !length(resp$content)) NULL else tryCatch(content(resp), error = function(e) {
-        if (verb == "GET") stop(e)
+        if (verb == "GET" || idempotent) {
+          stop(e)
+        }
         warning("toggl API answer to ", verb, " ", sub("\\?.*$", "", url), " could not be read (",
                 conditionMessage(e), "); the request succeeded.", call. = FALSE)
         NULL

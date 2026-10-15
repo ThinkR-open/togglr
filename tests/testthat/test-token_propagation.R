@@ -36,6 +36,7 @@ local_fake_api <- function(env = parent.frame()) {
   local_mocked_bindings(
     toggl_http_get = api$get, POST = api$write, PUT = api$write, PATCH = api$write,
     toggl_sleep = function(s) NULL, notification = function(...) NULL,
+    toggl_today = function() as.Date("2026-10-15"),
     get_toggl_api_token = function(...) stop("the keyring was used although api_token was given"),
     .env = env
   )

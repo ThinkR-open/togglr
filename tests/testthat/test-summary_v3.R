@@ -119,6 +119,20 @@ test_that("summary and weekly requests disable the rounding of the account (revu
   }
 })
 
+test_that("an unreadable answer of a report is an error, never an empty report (revue Copilot #85)", {
+  local_names()
+  local_fresh_state()
+  html <- fake_response(200, list())
+  html$content <- charToRaw("<html>502 Bad Gateway</html>")
+  local_mocked_bindings(POST = function(url, ...) html, toggl_sleep = function(s) NULL)
+  expect_error(get_weekly_report(api_token = "t", workspace_id = 1, since = "2026-09-07", until = "2026-09-13"),
+               "lexical error|invalid")
+  expect_error(get_summary_report(api_token = "t", workspace_id = 1, since = "2026-09-07", until = "2026-09-13"),
+               "lexical error|invalid")
+  expect_error(get_dashboard(api_token = "t", workspace_id = 1, since = "2026-09-07", until = "2026-09-13"),
+               "lexical error|invalid")
+})
+
 test_that("the names of the reports include the archived projects (revue #85)", {
   local_fresh_state()
   urls <- c()

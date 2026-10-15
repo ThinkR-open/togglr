@@ -208,7 +208,10 @@ get_detailled_report <- function(api_token = get_toggl_api_token(),
 #' `/search/time_entries/totals` is the same before and after the pagination
 #' and equals the sum of the entries received, and when no entry received was
 #' edited after the read started, by the clock of the server (the `Date`
-#' header of the first totals; the local clock may drift). The pages are
+#' headers of the two totals; the local clock may drift). A running entry
+#' grows between the two totals: its duration at each total is deduced from
+#' its start, so the growth admitted is its own, not the time spent waiting
+#' before the first total. The pages are
 #' numbered by row: an entry
 #' deleted and another one inserted during the pagination shift the rows, and
 #' equal durations leave the totals unchanged. An entry deleted and replaced
@@ -226,12 +229,8 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until, user_i
   max_pages <- getOption("togglr.max_pages", 100)
 
   for (attempt in seq_len(attempts)) {
-    started <- toggl_now()
     before <- toggl_report_totals(workspace_id = workspace_id, api_token = api_token, base = base)
-    server_started <- attr(before, "server_time")
-    if (is.null(server_started)) {
-      server_started <- started
-    }
+    t1 <- report_time(before)
     rows <- list()
     cursor <- list()
     for (page in seq_len(max_pages + 1)) {
@@ -254,27 +253,34 @@ fetch_detailled_period <- function(api_token, workspace_id, since, until, user_i
       cursor <- list(first_row_number = as.numeric(next_row))
     }
     after <- toggl_report_totals(workspace_id = workspace_id, api_token = api_token, base = base)
+    t2 <- report_time(after)
 
     entries <- v3_rows_to_entries(rows)
     running <- is.na(entries$end)
     out <- entries[!running, ]
     received <- sum(out$dur) / 1000
-    running_s <- sum(entries$dur[running]) / 1000
     # `at` est a la seconde : une modification dans la seconde du depart compte
     updated <- suppressWarnings(lubridate::ymd_hms(entries$updated, quiet = TRUE))
-    edited <- sum(!is.na(updated) & updated >= trunc(server_started, units = "secs"))
-    elapsed <- as.numeric(difftime(time1 = toggl_now(), time2 = started, units = "secs"))
-    # un timer en cours grandit avec l'horloge : tolerer sa seule croissance
-    growth <- if (any(running)) (elapsed + 1) * sum(running) else 0
-    stable <- after >= before && after - before <= growth
+    edited <- sum(!is.na(updated) & updated >= trunc(t1, units = "secs"))
+    # un timer en cours grandit avec l'horloge du serveur : sa duree au second
+    # total se deduit de son debut ; sans debut lisible, de sa duree a la lecture
+    # plus le temps ecoule entre les deux totaux
+    span <- max(0, as.numeric(difftime(time1 = t2, time2 = t1, units = "secs")))
+    starts <- suppressWarnings(lubridate::ymd_hms(entries$start[running], quiet = TRUE))
+    running_t2 <- as.numeric(difftime(time1 = t2, time2 = starts, units = "secs"))
+    unreadable <- is.na(running_t2) | running_t2 < 0
+    running_t2[unreadable] <- entries$dur[running][unreadable] / 1000 + span
     # les totaux arrondissent la somme exacte (ms), la recherche arrondit chaque
-    # entree : jusqu'a 1 s d'ecart par entree recue (une entree ou une page
-    # manquante pese bien plus) ; un mouvement pendant la lecture est detecte par
-    # l'egalite stricte des totaux avant / apres
-    rounding <- nrow(entries)
+    # entree : jusqu'a 1 s d'ecart par entree recue, 2 s par timer en cours (son
+    # debut et le total sont arrondis separement) ; une entree ou une page
+    # manquante pese bien plus
+    n_running <- sum(running)
+    rounding <- nrow(out) + 2 * n_running
+    # entre les deux totaux, seuls les timers en cours ont le droit de grandir
+    stable <- abs(after - before - span * n_running) <= 2 * n_running
     # totaux avec ou sans le temps des entrees en cours : les deux sont acceptes
-    complete <- abs(after - received - running_s) <= growth + rounding ||
-      (any(running) && abs(after - received) <= growth + rounding)
+    complete <- abs(after - received - sum(running_t2)) <= rounding ||
+      (n_running > 0 && abs(after - received) <= rounding)
     if (stable && complete && edited == 0) {
       return(out)
     }
@@ -305,6 +311,17 @@ toggl_reports_v3_url <- function(workspace_id, path) {
 toggl_report_post <- function(path, workspace_id, api_token, body) {
   toggl_request("POST", toggl_reports_v3_url(workspace_id, path), api_token = api_token,
                 body = toJSON(body, auto_unbox = TRUE, digits = NA), idempotent = TRUE)
+}
+
+#' Time of the server when a total was measured (attribute `server_time`), or
+#' the local clock when the header was not given
+#' @noRd
+report_time <- function(total) {
+  server_time <- attr(total, "server_time")
+  if (is.null(server_time)) {
+    return(toggl_now())
+  }
+  server_time
 }
 
 #' Total duration (seconds) of a period, from Reports v3, with the time of the
