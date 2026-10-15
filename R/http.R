@@ -13,7 +13,7 @@
 #'   without contacting the API. A 402 without quota headers (a feature of a
 #'   paid plan) stops at once.
 #' * a few requests left in the scope are spread until the reset, each wait
-#'   capped at `max_wait` (see [toggl_note_quota()]).
+#'   capped at `max_wait` (see `toggl_note_quota()`).
 #' * 429 means the rate limit (about 1 request per second) is exceeded: the call
 #'   backs off (`retry-after`, or 60 s, 120 s...) within `max_wait`.
 #' * 5xx and network errors (timeout, DNS, connection reset) are retried with a
@@ -40,7 +40,7 @@ toggl_GET <- function(url,
 
 #' Perform a write request (POST, PUT, PATCH, DELETE) on the Toggl API
 #'
-#' Same policy as [toggl_GET()] (quota, 429, errors raised with the message of
+#' Same policy as `toggl_GET()` (quota, 429, errors raised with the message of
 #' the API), with one difference: a POST is not idempotent, so it is never
 #' retried after a 5xx or a network error, as it may have been processed. A 429
 #' is always retried: the request was refused, not processed.
@@ -169,11 +169,15 @@ toggl_quota_key <- function(api_token, scope = "user", what = "quota_until") {
 #' Toggl counts the hourly quota per organization, and per user for the
 #' endpoints outside any organization (`/me`, `/workspaces`). The organization
 #' of a workspace is not known from the url, so the workspace stands for it: an
-#' exhausted workspace does not block the other ones, nor `/me`.
+#' exhausted workspace does not block the other ones, nor `/me`. The API v9
+#' says `workspaces/<id>`, Reports v3 says `workspace/<id>`: both are the same
+#' scope.
 #' @noRd
 toggl_quota_scope <- function(url) {
-  m <- regmatches(url, regexec("(workspaces/|workspace_id=|organizations/)([0-9]+)", url))[[1]]
-  if (!length(m)) return("user")
+  m <- regmatches(url, regexec("(workspaces?/|workspace_id=|organizations/)([0-9]+)", url))[[1]]
+  if (!length(m)) {
+    return("user")
+  }
   paste0(if (m[2] == "organizations/") "org" else "ws", m[3])
 }
 
@@ -229,7 +233,7 @@ toggl_error_message <- function(resp, url) {
 #' left means no request before the reset (instead of a wasted 402); a few
 #' requests left (fewer than `options(togglr.quota_spread)`, 10 by default) are
 #' spread evenly until the reset: the next request of the token in this scope
-#' waits `reset / remaining` seconds, at most `max_wait` (see [toggl_pace()]).
+#' waits `reset / remaining` seconds, at most `max_wait` (see `toggl_pace()`).
 #' Other tokens and scopes are not slowed down.
 #' @noRd
 toggl_note_quota <- function(resp, api_token, scope = "user") {
