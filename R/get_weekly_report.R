@@ -4,16 +4,17 @@
 #' @param workspace_id the workspace id
 #' @param since begin date
 #' @param until stop date
-#' @param user_agent user_agent
+#' @param user_agent ignored since the move to Reports v3 (the user agent is
+#'   sent in the header of every request)
 #'
 #' @importFrom lubridate %m-%
-#' @return a tibble, one row per project: `pid`, `title` (`project`, `client`, `color`, `hex_color`), `totals` (8 values in ms: the 7 days, then the week; `NA` for 0) and `details` (the same per user)
+#' @return a tibble, one row per project: `pid`, `title` (`project`, `client`,
+#'   `color`, `hex_color`; Reports v3 gives no color index, `color` is always
+#'   `"0"`), `totals` (8 values in ms: the 7 days, then the week; `NA` for 0)
+#'   and `details` (the same per user); 0 rows for a week without any entry
 #' @export
 #' @importFrom lubridate years
-#' @importFrom dplyr bind_rows mutate
 #' @importFrom stats setNames
-#' @importFrom purrr map
-#' @importFrom glue glue
 #' @encoding UTF-8
 get_weekly_report <- function(api_token = get_toggl_api_token(),
                               workspace_id = get_workspace_id(api_token),
@@ -21,22 +22,28 @@ get_weekly_report <- function(api_token = get_toggl_api_token(),
                               until = toggl_today(),
                               user_agent = toggl_user_agent()) {
   read_toggl_period()
-  rows <- toggl_report_post("/weekly/time_entries", workspace_id, api_token,
-                            list(start_date = format(since, "%Y-%m-%d"),
-                                 end_date = format(until, "%Y-%m-%d")))$content
-  names_ <- toggl_report_names(api_token, workspace_id)
+  rows <- toggl_report_post("/weekly/time_entries", workspace_id = workspace_id,
+                            api_token = api_token,
+                            body = list(start_date = format(since, "%Y-%m-%d"),
+                                        end_date = format(until, "%Y-%m-%d"),
+                                        rounding = 0L))$content
+  names_ <- toggl_report_names(api_token = api_token, workspace_id = workspace_id)
   row_pid <- vapply(rows, function(r) null_to_na(r$project_id, NA_integer_), integer(1))
   row_uid <- vapply(rows, function(r) null_to_na(r$user_id, NA_integer_), integer(1))
   sec <- lapply(rows, function(r) vapply(r$seconds, function(x) as.numeric(null_to_na(x, 0)), 0))
   # (noms row_* : dplyr::tibble() verrait sinon ses propres colonnes pid / uid)
   # totaux en ms par jour puis total ; NA pour 0, comme Reports v2
-  week_ms <- function(s) { v <- c(s, sum(s)) * 1000; v[v == 0] <- NA; v }
+  week_ms <- function(s) {
+    v <- c(s, sum(s)) * 1000
+    v[v == 0] <- NA
+    v
+  }
   projects <- unique(row_pid)
   pos <- match(projects, names_$projects$id)
   title <- data.frame(
     project = names_$projects$name[pos],
     client = names_$clients$name[match(names_$projects$client_id[pos], names_$clients$id)],
-    color = "0",
+    color = rep("0", length(projects)),
     hex_color = names_$projects$color[pos],
     stringsAsFactors = FALSE
   )

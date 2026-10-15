@@ -91,15 +91,22 @@ get_all_projects(api_token = api_token, workspace_id = workspace_id) %>%
 }
 
 
+#' Every project of a workspace
+#'
+#' `active`: `NULL` (the default of the API: active projects only), `"false"`
+#' (archived projects only) or `"both"`.
+#' @noRd
 get_all_projects <- function(api_token = get_toggl_api_token(),
                              workspace_id = get_workspace_id(api_token),
-                             max_pages = getOption("togglr.max_pages", 100)) {
+                             max_pages = getOption("togglr.max_pages", 100),
+                             active = NULL) {
   all_projects <- list()
   previous_ids <- NULL
+  filter_active <- if (is.null(active)) "" else paste0("&active=", active)
   for (nb_page in seq_len(max_pages)) {
     project_tbl_ <- toggl_GET(
       paste0("https://api.track.toggl.com/api/v9/workspaces/", workspace_id,
-             "/projects?page=", nb_page, "&per_page=200"),
+             "/projects?page=", nb_page, "&per_page=200", filter_active),
       api_token = api_token
     )$content %>% bind_rows()
 

@@ -9,6 +9,7 @@
 #'   `client_name`. The endpoint goes back at most 3 months: for an older
 #'   period, use [get_detailled_report()] with `user_ids`.
 #' @export
+#' @importFrom purrr map
 #' @importFrom lubridate years %m-%
 #' @importFrom dplyr select mutate case_when slice everything left_join arrange desc bind_rows %>% 
 #' @importFrom stats setNames
@@ -105,13 +106,16 @@ me_time_entries <- function(api_token, since, until, cap = 1000) {
   # RFC 3339 en UTC (`Z`) : un `+01:00` non encode serait lu comme une espace
   url <- glue::glue("https://api.track.toggl.com/api/v9/me/time_entries?start_date={format_toggl_utc(since)}&end_date={format_toggl_utc(until)}")
   res <- toggl_GET(url, api_token = api_token)$content
-  if (length(res) < cap) return(res)
+  if (length(res) < cap) {
+    return(res)
+  }
   middle <- as.POSIXct(since) + as.numeric(difftime(as.POSIXct(until), as.POSIXct(since), units = "secs")) / 2
   if (as.numeric(difftime(as.POSIXct(until), as.POSIXct(since), units = "secs")) < 2) {
     stop("more than ", cap, " toggl time entries in one second: cannot split further.", call. = FALSE)
   }
   message("toggl /me/time_entries returned ", cap, " entries (its maximum): splitting the period")
-  out <- c(me_time_entries(api_token, since, middle, cap), me_time_entries(api_token, middle, until, cap))
+  out <- c(me_time_entries(api_token = api_token, since = since, until = middle, cap = cap),
+           me_time_entries(api_token = api_token, since = middle, until = until, cap = cap))
   ids <- vapply(out, function(e) as.numeric(e$id), 0)
   out[!duplicated(ids)]
 }
@@ -119,10 +123,15 @@ me_time_entries <- function(api_token, since, until, cap = 1000) {
 #' Client name of each project of a workspace
 #' @noRd
 client_names <- function(api_token, workspace_id) {
-  p <- as.data.frame(get_all_projects(api_token = api_token, workspace_id = workspace_id))
-  if (!"client_id" %in% names(p)) p$client_id <- rep(NA_integer_, nrow(p))
+  p <- as.data.frame(get_all_projects(api_token = api_token, workspace_id = workspace_id,
+                                      active = "both"))
+  if (!"client_id" %in% names(p)) {
+    p$client_id <- rep(NA_integer_, nrow(p))
+  }
   cl <- as.data.frame(get_all_client_info(api_token = api_token, workspace_id = workspace_id))
-  if (!all(c("id", "name") %in% names(cl))) cl <- data.frame(id = integer(0), name = character(0))
+  if (!all(c("id", "name") %in% names(cl))) {
+    cl <- data.frame(id = integer(0), name = character(0))
+  }
   out <- data.frame(project_id = as.character(p$id),
                     client_name = cl$name[match(p$client_id, cl$id)],
                     stringsAsFactors = FALSE)

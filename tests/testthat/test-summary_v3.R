@@ -94,6 +94,46 @@ test_that("get_weekly_report: one row per project, daily totals and per user det
   expect_equal(w$details[[1]]$totals[[2]], c(NA, 600000, NA, NA, NA, NA, NA, 600000))
 })
 
+test_that("get_weekly_report: a week without any entry gives an empty tibble (revue #85)", {
+  local_names()
+  local_reports(list(`/weekly/time_entries` = list()))
+  w <- get_weekly_report(api_token = "t", workspace_id = 1, since = "2026-09-07", until = "2026-09-13")
+  expect_named(w, c("pid", "title", "totals", "details"))
+  expect_equal(nrow(w), 0)
+  expect_named(w$title, c("project", "client", "color", "hex_color"))
+})
+
+test_that("summary and weekly requests disable the rounding of the account (revue #85)", {
+  local_names()
+  seen <- local_reports(list(
+    `/weekly/time_entries` = list(),
+    `/summary/time_entries` = list(groups = list())
+  ))
+  get_weekly_report(api_token = "t", workspace_id = 1, since = "2026-09-07", until = "2026-09-13")
+  get_summary_report(api_token = "t", workspace_id = 1, since = "2026-09-07", until = "2026-09-13")
+  get_dashboard(api_token = "t", workspace_id = 1, since = "2026-09-07", until = "2026-09-13")
+  bodies <- lapply(seen(), `[[`, "body")
+  expect_length(bodies, 3)
+  for (b in bodies) {
+    expect_equal(b$rounding, 0)
+  }
+})
+
+test_that("the names of the reports include the archived projects (revue #85)", {
+  local_fresh_state()
+  urls <- c()
+  local_mocked_bindings(toggl_http_get = function(url, api_token) {
+    urls <<- c(urls, url)
+    fake_response(200, list())
+  }, toggl_sleep = function(s) NULL)
+  n <- toggl_report_names(api_token = "t", workspace_id = 9, users = FALSE)
+  expect_match(urls, "/workspaces/9/projects\\?page=1&per_page=200&active=both", all = FALSE)
+  expect_equal(nrow(n$projects), 0)
+  urls <- c()
+  client_names(api_token = "t", workspace_id = 9)
+  expect_match(urls, "/workspaces/9/projects\\?page=1&per_page=200&active=both", all = FALSE)
+})
+
 # ---- #12 : filtre par membre de l'equipe ---------------------------------------------------
 
 test_that("get_all_project_names and get_dashboard can be limited to some users (#12)", {

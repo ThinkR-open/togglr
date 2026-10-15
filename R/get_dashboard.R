@@ -11,9 +11,7 @@
 #' @return an object of class `toggl`: a list with `synthese` (one row per project: `id`, `project`, `client`, `time` in ms) and `tache` (per project, a data frame of its time entries: `title`, `time` in ms, `local_start`)
 #' @export
 #' @importFrom lubridate years
-#' @importFrom  dplyr select any_of
 #' @importFrom stats setNames
-#' @importFrom purrr map
 #' @encoding UTF-8
 get_dashboard <- function(api_token = get_toggl_api_token(),
                           workspace_id = get_workspace_id(api_token),
@@ -21,10 +19,11 @@ get_dashboard <- function(api_token = get_toggl_api_token(),
                           until = toggl_today(),
                           user_ids = NULL) {
   read_toggl_period()
-  groups <- toggl_report_summary(workspace_id, api_token, since, until,
+  groups <- toggl_report_summary(workspace_id = workspace_id, api_token = api_token,
+                                 since = since, until = until,
                                  grouping = "projects", sub_grouping = "time_entries",
                                  user_ids = user_ids)
-  names_ <- toggl_report_names(api_token, workspace_id, users = FALSE)
+  names_ <- toggl_report_names(api_token = api_token, workspace_id = workspace_id, users = FALSE)
   ids <- vapply(groups, function(g) null_to_na(g$id, NA_integer_), integer(1))
   pos <- match(ids, names_$projects$id)
   synthese <- data.frame(

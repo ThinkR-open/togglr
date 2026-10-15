@@ -6,17 +6,17 @@
 #' @param workspace_id the workspace id
 #' @param since begin date
 #' @param until stop date
-#' @param user_agent user_agent
-#' @param users users
+#' @param user_agent ignored since the move to Reports v3 (the user agent is
+#'   sent in the header of every request)
+#' @param users the users of the workspace (a data frame with `id` and
+#'   `fullname`), to name the rows
 #'
 #' @importFrom lubridate %m-%
 #' @return a tibble, one row per user: `id`, `user` (full name), `time` (ms) and `items` (a data frame of the user's time entries: `title`, `time` in ms, `local_start`; `cur`, `sum` and `rate` are `NA` since Reports v3)
 #' @export
 #' @importFrom glue glue
 #' @importFrom lubridate years
-#' @importFrom  dplyr select one_of as_tibble
 #' @importFrom stats setNames
-#' @importFrom purrr map
 #' @encoding UTF-8
 get_summary_report <- function(api_token = get_toggl_api_token(),
                               workspace_id = get_workspace_id(api_token),
@@ -25,7 +25,8 @@ get_summary_report <- function(api_token = get_toggl_api_token(),
                               user_agent = toggl_user_agent(),
                               users = get_workspace_users(api_token = api_token, workspace_id = workspace_id)) {
   read_toggl_period()
-  groups <- toggl_report_summary(workspace_id, api_token, since, until,
+  groups <- toggl_report_summary(workspace_id = workspace_id, api_token = api_token,
+                                 since = since, until = until,
                                  grouping = "users", sub_grouping = "time_entries")
   ids <- vapply(groups, function(g) null_to_na(g$id, NA_integer_), integer(1))
   dplyr::tibble(
